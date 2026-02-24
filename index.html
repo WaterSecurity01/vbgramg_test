@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VBGRAMG – Test Pages</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #333;
+    }
+    h1 { color: #2c5f8a; }
+    .flow-steps {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+    .step-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      width: 200px;
+      text-align: center;
+      text-decoration: none;
+      color: #333;
+      transition: box-shadow 0.2s;
+    }
+    .step-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .step-card .number {
+      font-size: 2em;
+      font-weight: bold;
+      color: #2c5f8a;
+    }
+  </style>
+</head>
+<body>
+  <h1>VBGRAMG Test Pages</h1>
+  <p>Welcome to the VBGRAMG test flow. Use the pages below to walk through each step of the flow.</p>
+
+  <div class="flow-steps">
+    <a class="step-card" href="page1.html">
+      <div class="number">1</div>
+      <div>Input</div>
+    </a>
+    <a class="step-card" href="page2.html">
+      <div class="number">2</div>
+      <div>Processing</div>
+    </a>
+    <a class="step-card" href="page3.html">
+      <div class="number">3</div>
+      <div>Results</div>
+    </a>
+  </div>
+</body>
+</html>

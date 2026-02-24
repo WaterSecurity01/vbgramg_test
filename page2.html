@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VBGRAMG – Step 2: Processing</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #333;
+    }
+    h1 { color: #2c5f8a; }
+    .breadcrumb { margin-bottom: 24px; font-size: 0.9em; color: #666; }
+    .breadcrumb a { color: #2c5f8a; text-decoration: none; }
+    .options { margin-top: 16px; }
+    .option-row { margin: 12px 0; display: flex; align-items: center; gap: 10px; }
+    select, input[type="number"] {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+    .nav {
+      margin-top: 32px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .btn {
+      padding: 10px 24px;
+      background: #2c5f8a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 1em;
+    }
+    .btn:hover { background: #1e4266; }
+    .btn.secondary { background: #666; }
+    .btn.secondary:hover { background: #444; }
+  </style>
+</head>
+<body>
+  <div class="breadcrumb"><a href="index.html">Home</a> &rsaquo; <a href="page1.html">Step 1</a> &rsaquo; Step 2: Processing</div>
+  <h1>Step 2 – Processing</h1>
+  <p>Configure processing options for the VBGRAMG flow.</p>
+
+  <form action="page3.html" method="get">
+    <div class="options">
+      <div class="option-row">
+        <label for="mode">Processing Mode</label>
+        <select id="mode" name="mode">
+          <option value="standard">Standard</option>
+          <option value="fast">Fast</option>
+          <option value="thorough">Thorough</option>
+        </select>
+      </div>
+
+      <div class="option-row">
+        <label for="iterations">Iterations</label>
+        <input type="number" id="iterations" name="iterations" value="3" min="1" max="100" />
+      </div>
+
+      <div class="option-row">
+        <label>
+          <input type="checkbox" name="validate" value="1" checked />
+          Validate output
+        </label>
+      </div>
+
+      <div class="option-row">
+        <label>
+          <input type="checkbox" name="verbose" value="1" />
+          Verbose logging
+        </label>
+      </div>
+    </div>
+
+    <div class="nav">
+      <a class="btn secondary" href="page1.html">Back</a>
+      <button type="submit" class="btn">Next &rarr;</button>
+    </div>
+  </form>
+</body>
+</html>
