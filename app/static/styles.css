@@ -1,0 +1,51 @@
+/* NAVBAR */
+.navbar {
+    background-color: #f8f9fa;
+    padding: 20px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-container {
+    display: flex;
+    justify-content: space-between;
+    width: 600px;
+    position: relative;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.progress-container::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #444;
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+.step {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #444;
+    color: #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    z-index: 1;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.step.active {
+    background: #0091ff;
+    color: #fefdfd;
+}
+
+a {
+    text-decoration: none;
+}

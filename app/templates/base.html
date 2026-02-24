@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+    <title>VB GRAM G - {% block title %}{% endblock %}</title>
+</head>
+<body>
+    <!-- add a beautiful navbar here. write the relevant css within style tags and comment it as 'NAVBAR'. 
+     The navbar will mainly show a four step progress bar 
+     linked to 'step_1.html', 'step_2.html','step_3.html','step_4.html' that will show the 
+     progress based on the steps completed. You may create the relevant html pages under the 'templates' folder  -->
+    <style>
+        
+    </style>
+
+    <nav class="navbar">
+        <div class="progress-container">
+            {% for step in range(1, 5) %}
+                <a href="{{url_for('routes.step_' + step|string)}}" class="step {% if current_step >= step %}active{% endif %}">{{step}}</a>
+            {% endfor %}
+        </div>
+    </nav>
+    {% block content %}{% endblock %}
+</body>
+</html>
