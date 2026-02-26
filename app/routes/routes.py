@@ -17,7 +17,7 @@ def step_2():
 
 @blp.route('/step-3')
 def step_3():
-    return render_template('step_3.html', current_step=3)
+    return render_template('step_3.html', current_step=3, schemes=[], aap_items=[], stats={})
 
 @blp.route('/step-4')
 def step_4():
