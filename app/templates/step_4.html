@@ -1,5 +1,785 @@
 {% extends 'base.html' %}
-{% block title %} Home {% endblock %}
+{% block title %} Step 4 {% endblock %}
 {% block content %}
-Step 4
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<style>
+    :root {
+        --step4-nav-height: 0px;
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .step4-page {
+        width: 100vw;
+        height: calc(100vh - var(--step4-nav-height));
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        flex: 0 0 auto;
+        display: flex;
+        align-items: stretch;
+    }
+
+    .step4-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.1fr;
+        gap: 0;
+        align-items: stretch;
+        width: 100%;
+        height: 100%;
+    }
+
+    .panel {
+        background: #ffffff;
+        border: 1px solid #d4dce8;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        box-sizing: border-box;
+        min-height: 0;
+    }
+
+    .panel h2 {
+        margin: 0 0 8px;
+        color: #132238;
+        font-size: 1.25rem;
+    }
+
+    .panel p {
+        margin: 0 0 16px;
+        color: #4e5e74;
+        font-size: 0.95rem;
+        line-height: 1.45;
+    }
+
+    .map-wrap {
+        background: linear-gradient(135deg, #e8f4ff 0%, #f3f8ff 100%);
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 8px;
+        min-height: 0;
+        flex: 1;
+    }
+
+    .india-map {
+        width: 100%;
+        height: 100%;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #b8cbdf;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border-radius: 10px;
+        table-layout: fixed;
+    }
+
+    .data-table thead th {
+        text-align: left;
+        background: #1d4f91;
+        color: #fff;
+        font-size: 0.9rem;
+        letter-spacing: 0.03em;
+        padding: 12px 10px;
+    }
+
+    .data-table tbody td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #e6edf6;
+        color: #23344d;
+        font-size: 0.92rem;
+    }
+
+    .data-table tbody tr:nth-child(even) {
+        background: #f7faff;
+    }
+
+    .data-table tbody tr:hover {
+        background: #e9f3ff;
+        cursor: pointer;
+    }
+
+    .data-table tbody tr.active-row {
+        background: #d9ebff;
+    }
+
+    .table-wrap {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        border: 1px solid #d7e3f1;
+        border-radius: 10px;
+    }
+
+    .domain-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 12px;
+    }
+
+    .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 999px;
+        background: #eff4fb;
+        color: #243650;
+        font-size: 0.78rem;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: background 0.18s, border-color 0.18s, opacity 0.18s, transform 0.12s, box-shadow 0.18s;
+        user-select: none;
+    }
+
+    .legend-item:hover {
+        filter: brightness(0.93);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+    }
+
+    .legend-item.is-active {
+        border-color: currentColor;
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.13);
+        font-weight: 600;
+    }
+
+    .legend-item.is-dimmed {
+        opacity: 0.35;
+    }
+
+    .legend-dot {
+        font-size: 0.9rem;
+        line-height: 1;
+    }
+
+    .legend-domain-1 {
+        color: #1f77b4;
+    }
+
+    .legend-domain-2 {
+        color: #2ca02c;
+    }
+
+    .legend-domain-3 {
+        color: #ff7f0e;
+    }
+
+    .legend-domain-4 {
+        color: #d62728;
+    }
+
+    .map-marker-pin {
+        font-size: 24px;
+        line-height: 1;
+        transform: translate(-1px, -8px);
+        text-shadow: 0 1px 0 #ffffff, 0 0 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .map-marker-domain-1 {
+        color: #1f77b4;
+    }
+
+    .map-marker-domain-2 {
+        color: #2ca02c;
+    }
+
+    .map-marker-domain-3 {
+        color: #ff7f0e;
+    }
+
+    .map-marker-domain-4 {
+        color: #d62728;
+    }
+
+    .map-marker-pin.is-focused {
+        font-size: 30px;
+        text-shadow: 0 1px 0 #ffffff, 0 0 6px rgba(0, 0, 0, 0.55);
+    }
+
+    .map-status {
+        margin: 0 0 10px;
+        font-size: 0.85rem;
+        color: #37506f;
+    }
+
+    @media (max-width: 900px) {
+        .step4-grid {
+            grid-template-columns: 1fr;
+            height: auto;
+        }
+
+        .map-wrap {
+            min-height: 300px;
+            flex: initial;
+        }
+
+        .step4-page {
+            height: auto;
+        }
+
+        .panel {
+            height: auto;
+        }
+    }
+</style>
+
+<section class="step4-page">
+    <div class="step4-grid">
+        <article class="panel">
+            <h2>India Overview Map</h2>
+            <p id="map-status" class="map-status">Loading KML layer...</p>
+            <div class="map-wrap">
+                <div id="india-map" class="india-map" aria-label="Interactive map of India"></div>
+            </div>
+        </article>
+
+        <article class="panel">
+            <h2>State Data Table</h2>
+            <div id="domain-legend" class="domain-legend"></div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>S.No.</th>
+                            <th>Domain Name</th>
+                            <th>Group Name</th>
+                            <th>Work Name</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="works-table-body"></tbody>
+                </table>
+            </div>
+        </article>
+    </div>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
+<script>
+    function syncStep4LayoutToNavbar() {
+        const navbar = document.querySelector(".navbar");
+        const navHeight = navbar ? navbar.offsetHeight : 0;
+        document.documentElement.style.setProperty("--step4-nav-height", navHeight + "px");
+    }
+
+    syncStep4LayoutToNavbar();
+    window.addEventListener("resize", syncStep4LayoutToNavbar);
+
+    const MAX_ROWS = 278;
+    const CSV_URL = "{{ url_for('static', filename='VBGRAMG_Final_Classified_278_Works.csv') }}";
+    const KML_URL = "{{ url_for('static', filename='HR Village.kml') }}";
+    const INDIA_GEOJSON_URL = "https://raw.githubusercontent.com/johan/world.geo.json/master/countries/IND.geo.json";
+    const mapStatusEl = document.getElementById("map-status");
+    const tableBody = document.getElementById("works-table-body");
+    const domainLegend = document.getElementById("domain-legend");
+
+    const domainColorClass = {
+        "Domain I": "map-marker-domain-1",
+        "Domain II": "map-marker-domain-2",
+        "Domain III": "map-marker-domain-3",
+        "Domain IV": "map-marker-domain-4"
+    };
+    const domainColorHex = {
+        "Domain I": "#1f77b4",
+        "Domain II": "#2ca02c",
+        "Domain III": "#ff7f0e",
+        "Domain IV": "#d62728"
+    };
+    const domainLabelMap = new Map([
+        ["Domain I", "Water Harvesting"],
+        ["Domain II", "Rural Amenities"],
+        ["Domain III", "Livelihood Assets"],
+        ["Domain IV", "Climate Resilience"]
+    ]);
+
+    const indiaBounds = L.latLngBounds(
+        L.latLng(6.0, 68.0),
+        L.latLng(37.5, 97.5)
+    );
+
+    const map = L.map("india-map", {
+        zoomControl: true,
+        minZoom: 4,
+        maxZoom: 19,
+        maxBounds: indiaBounds.pad(0.2),
+        maxBoundsViscosity: 1.0
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+        maxZoom: 19
+    }).addTo(map);
+
+    map.fitBounds(indiaBounds);
+    const kmlLayerGroup = L.featureGroup().addTo(map);
+    const markerLayerGroup = L.featureGroup().addTo(map);
+    const rowMarkerMap = new Map();
+    const rowDataMap = new Map();
+    let pointPool = [];
+    let kmlBounds = null;
+    let indiaBoundaryPolygons = [];
+    let indiaBoundaryLoaded = false;
+    let focusedRowIndex = null;
+
+    function parseCsvLine(line) {
+        const fields = [];
+        let current = "";
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === "\"") {
+                if (inQuotes && line[i + 1] === "\"") {
+                    current += "\"";
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (ch === "," && !inQuotes) {
+                fields.push(current.trim());
+                current = "";
+            } else {
+                current += ch;
+            }
+        }
+        fields.push(current.trim());
+        return fields;
+    }
+
+    function parseCsv(text) {
+        const lines = text.split(/\r?\n/).filter(Boolean);
+        if (lines.length < 2) {
+            return [];
+        }
+        const headers = parseCsvLine(lines[0]);
+        return lines.slice(1).map((line) => {
+            const values = parseCsvLine(line);
+            const obj = {};
+            headers.forEach((header, idx) => {
+                obj[header] = values[idx] || "";
+            });
+            return obj;
+        });
+    }
+
+    function getDomainBucket(domainText) {
+        if (domainText.includes("Domain IV")) return "Domain IV";
+        if (domainText.includes("Domain III")) return "Domain III";
+        if (domainText.includes("Domain II")) return "Domain II";
+        if (domainText.includes("Domain I")) return "Domain I";
+        return "Domain I";
+    }
+
+    function getDomainDisplayName(domainText) {
+        const fromParen = domainText.match(/\(([^)]+)\)/);
+        if (fromParen && fromParen[1]) {
+            return fromParen[1].trim();
+        }
+        return getDomainBucket(domainText);
+    }
+
+    function getMarkerIcon(domainBucket, focused = false) {
+        const cssClass = domainColorClass[domainBucket] || "map-marker-domain-1";
+        const colorHex = domainColorHex[domainBucket] || "#1f77b4";
+        return L.divIcon({
+            html: `<i class="fa-solid fa-location-dot map-marker-pin ${cssClass} ${focused ? "is-focused" : ""}" style="color:${colorHex};"></i>`,
+            className: "",
+            iconSize: focused ? [30, 30] : [24, 24],
+            iconAnchor: focused ? [15, 30] : [12, 24],
+            popupAnchor: [0, -24]
+        });
+    }
+
+    let activeDomainFilter = null;
+
+    function applyDomainFilter(bucket) {
+        // Toggle: clicking active filter resets it
+        activeDomainFilter = (activeDomainFilter === bucket) ? null : bucket;
+
+        // Update legend pill styles
+        domainLegend.querySelectorAll(".legend-item").forEach((item) => {
+            const itemBucket = item.dataset.bucket;
+            if (activeDomainFilter === null) {
+                item.classList.remove("is-active", "is-dimmed");
+            } else if (itemBucket === activeDomainFilter) {
+                item.classList.add("is-active");
+                item.classList.remove("is-dimmed");
+            } else {
+                item.classList.remove("is-active");
+                item.classList.add("is-dimmed");
+            }
+        });
+
+        // Filter table rows
+        tableBody.querySelectorAll("tr").forEach((rowEl) => {
+            const idx = Number(rowEl.dataset.rowIndex);
+            const row = rowDataMap.get(idx);
+            if (!row) return;
+            const rowBucket = getDomainBucket(row["Thematic Domain"] || "");
+            const show = activeDomainFilter === null || rowBucket === activeDomainFilter;
+            rowEl.style.display = show ? "" : "none";
+        });
+
+        // Filter map markers
+        rowMarkerMap.forEach((marker, idx) => {
+            const row = rowDataMap.get(idx);
+            if (!row) return;
+            const rowBucket = getDomainBucket(row["Thematic Domain"] || "");
+            const show = activeDomainFilter === null || rowBucket === activeDomainFilter;
+            if (show) {
+                if (!markerLayerGroup.hasLayer(marker)) {
+                    markerLayerGroup.addLayer(marker);
+                }
+            } else {
+                if (markerLayerGroup.hasLayer(marker)) {
+                    markerLayerGroup.removeLayer(marker);
+                }
+            }
+        });
+
+        // Update status text
+        const visibleCount = activeDomainFilter
+            ? [...rowDataMap.values()].filter(r => getDomainBucket(r["Thematic Domain"] || "") === activeDomainFilter).length
+            : rowDataMap.size;
+        const filterLabel = activeDomainFilter ? ` — filtered to ${domainLabelMap.get(activeDomainFilter) || activeDomainFilter}` : "";
+        mapStatusEl.textContent = `Haryana KML loaded. Showing ${visibleCount} of ${rowDataMap.size} works${filterLabel}. Click a row to focus.`;
+    }
+
+    function renderLegend() {
+        const buckets = ["Domain I", "Domain II", "Domain III", "Domain IV"];
+        domainLegend.innerHTML = "";
+        buckets.forEach((bucket) => {
+            const label = domainLabelMap.get(bucket) || bucket;
+            const cssClass = domainColorClass[bucket];
+            const item = document.createElement("span");
+            item.className = "legend-item";
+            item.dataset.bucket = bucket;
+            item.title = `Click to filter by ${label}`;
+            item.innerHTML = `<i class="fa-solid fa-location-dot legend-dot ${cssClass}"></i>${label}`;
+            item.addEventListener("click", () => applyDomainFilter(bucket));
+            domainLegend.appendChild(item);
+        });
+    }
+
+    function buildTable(rows) {
+        tableBody.innerHTML = "";
+        rows.forEach((row, idx) => {
+            const domainBucket = getDomainBucket(row["Thematic Domain"] || "");
+            const domainName = getDomainDisplayName(row["Thematic Domain"] || "");
+            const tr = document.createElement("tr");
+            tr.dataset.rowIndex = String(idx);
+            tr.innerHTML = `
+                <td>${row["S.No."] || idx + 1}</td>
+                <td>${domainName}</td>
+                <td>${row["Group Name"] || "-"}</td>
+                <td>${row["Work Name"] || "-"}</td>
+                <td>${row["Classification"] || "-"}</td>
+            `;
+            domainLabelMap.set(domainBucket, domainName);
+            rowDataMap.set(idx, row);
+            tableBody.appendChild(tr);
+        });
+        renderLegend();
+    }
+
+    function highlightRow(index) {
+        tableBody.querySelectorAll("tr").forEach((rowEl) => {
+            rowEl.classList.toggle("active-row", rowEl.dataset.rowIndex === String(index));
+        });
+    }
+
+    function setFocusedMarker(rowIndex) {
+        if (focusedRowIndex !== null && rowMarkerMap.has(focusedRowIndex)) {
+            const oldMarker = rowMarkerMap.get(focusedRowIndex);
+            const oldRow = rowDataMap.get(focusedRowIndex);
+            oldMarker.setIcon(getMarkerIcon(getDomainBucket(oldRow["Thematic Domain"] || ""), false));
+        }
+        focusedRowIndex = rowIndex;
+        if (rowMarkerMap.has(rowIndex)) {
+            const marker = rowMarkerMap.get(rowIndex);
+            const row = rowDataMap.get(rowIndex);
+            marker.setIcon(getMarkerIcon(getDomainBucket(row["Thematic Domain"] || ""), true));
+        }
+    }
+
+    function focusRowOnMap(rowIndex) {
+        const row = rowDataMap.get(rowIndex);
+        const marker = rowMarkerMap.get(rowIndex);
+        if (!row || !marker) {
+            return;
+        }
+        highlightRow(rowIndex);
+        setFocusedMarker(rowIndex);
+        map.flyTo(marker.getLatLng(), 16, { duration: 0.45 });
+        marker.openPopup();
+    }
+
+    function bindTableClicks(rows) {
+        tableBody.addEventListener("click", (event) => {
+            const rowEl = event.target.closest("tr");
+            if (!rowEl) {
+                return;
+            }
+            const rowIndex = Number(rowEl.dataset.rowIndex);
+            focusRowOnMap(rowIndex);
+        });
+    }
+
+    function layerToCenterPoint(layer) {
+        if (typeof layer.getLatLng === "function") {
+            const latlng = layer.getLatLng();
+            if (latlng && Number.isFinite(latlng.lat) && Number.isFinite(latlng.lng)) {
+                return [latlng.lat, latlng.lng];
+            }
+        }
+        if (typeof layer.getBounds === "function") {
+            const bounds = layer.getBounds();
+            if (bounds && bounds.isValid()) {
+                const c = bounds.getCenter();
+                return [c.lat, c.lng];
+            }
+        }
+        return null;
+    }
+
+    function collectCenterPoints(group) {
+        const points = [];
+        group.eachLayer((layer) => {
+            if (typeof layer.eachLayer === "function") {
+                points.push(...collectCenterPoints(layer));
+                return;
+            }
+            const p = layerToCenterPoint(layer);
+            if (p) {
+                points.push(p);
+            }
+        });
+        return points;
+    }
+
+    function loadKmlLayer() {
+        return new Promise((resolve, reject) => {
+            const kml = omnivore.kml(KML_URL, null, L.geoJson(null, {
+                style: {
+                    color: "#315a88",
+                    weight: 1.2,
+                    opacity: 0.8,
+                    fillOpacity: 0.04
+                },
+                pointToLayer: function (_feature, latlng) {
+                    return L.circleMarker(latlng, {
+                        radius: 0,
+                        opacity: 0,
+                        fillOpacity: 0
+                    });
+                }
+            }));
+
+            kml.on("ready", () => {
+                kmlLayerGroup.addLayer(kml);
+                const bounds = kmlLayerGroup.getBounds();
+                if (bounds.isValid()) {
+                    kmlBounds = bounds;
+                    map.fitBounds(bounds.pad(0.04));
+                }
+                pointPool = collectCenterPoints(kml);
+                mapStatusEl.textContent = `Haryana KML loaded. Showing all ${MAX_ROWS} works. Click a row to focus.`;
+                resolve();
+            });
+
+            kml.on("error", (err) => {
+                reject(new Error(err && err.error ? err.error.message : "Failed to parse KML."));
+            });
+        });
+    }
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function randomPointInBounds(bounds) {
+        const south = bounds.getSouth();
+        const north = bounds.getNorth();
+        const west = bounds.getWest();
+        const east = bounds.getEast();
+        const lat = south + Math.random() * (north - south);
+        const lng = west + Math.random() * (east - west);
+        return [lat, lng];
+    }
+
+    function pointInRing(point, ring) {
+        const x = point[1];
+        const y = point[0];
+        let inside = false;
+
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+            const xi = ring[i][1];
+            const yi = ring[i][0];
+            const xj = ring[j][1];
+            const yj = ring[j][0];
+            const intersects = ((yi > y) !== (yj > y))
+                && (x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1e-12) + xi);
+            if (intersects) {
+                inside = !inside;
+            }
+        }
+        return inside;
+    }
+
+    function pointInPolygon(point, polygonRings) {
+        if (!polygonRings.length || !pointInRing(point, polygonRings[0])) {
+            return false;
+        }
+        for (let i = 1; i < polygonRings.length; i++) {
+            if (pointInRing(point, polygonRings[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function isPointInsideIndia(point) {
+        if (!indiaBoundaryLoaded || !indiaBoundaryPolygons.length) {
+            return indiaBounds.contains(L.latLng(point[0], point[1]));
+        }
+        return indiaBoundaryPolygons.some((polygonRings) => pointInPolygon(point, polygonRings));
+    }
+
+    function buildIndiaBoundaryPolygons(geoJson) {
+        const polygons = [];
+        const features = geoJson.type === "FeatureCollection" ? geoJson.features : [geoJson];
+
+        features.forEach((feature) => {
+            const geom = feature && feature.geometry ? feature.geometry : feature;
+            if (!geom || !geom.coordinates) {
+                return;
+            }
+            if (geom.type === "Polygon") {
+                polygons.push(geom.coordinates.map((ring) => ring.map(([lng, lat]) => [lat, lng])));
+            } else if (geom.type === "MultiPolygon") {
+                geom.coordinates.forEach((poly) => {
+                    polygons.push(poly.map((ring) => ring.map(([lng, lat]) => [lat, lng])));
+                });
+            }
+        });
+
+        return polygons;
+    }
+
+    async function loadIndiaBoundary() {
+        try {
+            const response = await fetch(INDIA_GEOJSON_URL);
+            if (!response.ok) {
+                throw new Error(`India boundary fetch failed: ${response.status}`);
+            }
+            const geoJson = await response.json();
+            indiaBoundaryPolygons = buildIndiaBoundaryPolygons(geoJson);
+            indiaBoundaryLoaded = indiaBoundaryPolygons.length > 0;
+        } catch (_err) {
+            indiaBoundaryPolygons = [];
+            indiaBoundaryLoaded = false;
+        }
+    }
+
+    function getRandomIndiaPoint() {
+        for (let i = 0; i < 250; i++) {
+            const p = randomPointInBounds(indiaBounds);
+            if (isPointInsideIndia(p)) {
+                return p;
+            }
+        }
+        return [22.9734, 78.6569];
+    }
+
+    function buildMarkerPointPool(totalRows) {
+        const pointsInIndia = pointPool.filter((p) => isPointInsideIndia(p));
+        const usablePool = shuffleArray(pointsInIndia).slice(0, totalRows);
+        if (usablePool.length >= totalRows) {
+            return usablePool;
+        }
+
+        const filled = [...usablePool];
+        while (filled.length < totalRows) {
+            filled.push(getRandomIndiaPoint());
+        }
+        return filled;
+    }
+
+    function plotAllRows(rows) {
+        const markerPoints = buildMarkerPointPool(rows.length);
+        rows.forEach((row, idx) => {
+            const domainBucket = getDomainBucket(row["Thematic Domain"] || "");
+            const domainName = getDomainDisplayName(row["Thematic Domain"] || "");
+            const latlng = markerPoints[idx];
+
+            const marker = L.marker(latlng, {
+                icon: getMarkerIcon(domainBucket, false)
+            }).addTo(markerLayerGroup);
+
+            marker.bindPopup(
+                `<b>${row["Work Name"] || "Work"}</b><br>` +
+                `${domainName}<br>` +
+                `S.No.: ${row["S.No."] || idx + 1}`
+            );
+
+            marker.on("click", () => focusRowOnMap(idx));
+            rowMarkerMap.set(idx, marker);
+        });
+    }
+
+    async function loadCsvRows() {
+        const response = await fetch(CSV_URL);
+        if (!response.ok) {
+            throw new Error(`CSV fetch failed: ${response.status}`);
+        }
+        const csvText = await response.text();
+        return parseCsv(csvText).slice(0, MAX_ROWS);
+    }
+
+    async function initStep4Data() {
+        try {
+            const rows = await loadCsvRows();
+            await Promise.all([loadKmlLayer(), loadIndiaBoundary()]);
+            buildTable(rows);
+            plotAllRows(rows);
+            bindTableClicks(rows);
+            const markerBounds = markerLayerGroup.getBounds();
+            if (markerBounds.isValid()) {
+                map.fitBounds(markerBounds.pad(0.12));
+            }
+        } catch (error) {
+            mapStatusEl.textContent = "Unable to load CSV/KML data.";
+            tableBody.innerHTML = `<tr><td colspan="5">Failed to load data: ${error.message}</td></tr>`;
+        }
+    }
+
+    initStep4Data();
+
+</script>
 {% endblock %}
