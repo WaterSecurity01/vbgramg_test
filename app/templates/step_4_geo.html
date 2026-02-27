@@ -1,0 +1,1200 @@
+{% extends 'base.html' %}
+{% block title %}Works Explorer – GeoServer Map{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+    :root {
+        --nav-height: 0px;
+        --d1-color: #0369a1;
+        --d1-bg: #e0f2fe;
+        --d1-badge: #bae6fd;
+        --d2-color: #15803d;
+        --d2-bg: #dcfce7;
+        --d2-badge: #bbf7d0;
+        --d3-color: #b45309;
+        --d3-bg: #fef3c7;
+        --d3-badge: #fde68a;
+        --d4-color: #b91c1c;
+        --d4-bg: #fee2e2;
+        --d4-badge: #fecaca;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: #f8fafc;
+    }
+
+    .layout-container {
+        display: flex;
+        flex-direction: row;
+        height: calc(100vh - var(--nav-height));
+    }
+
+    /* LEFT SECTION: MAP & LEGEND */
+    .left-section {
+        position: relative;
+        flex: 6;
+        height: 100%;
+        border-right: 2px solid #e2e8f0;
+        background: #e2e8f0;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .legend-overlay {
+        position: absolute;
+        top: 140px;
+        left: 20px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        padding: 12px 16px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .legend-panel {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border: 1px solid #e2e8f0;
+        margin-top: 8px;
+    }
+
+    .legend-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+
+    .legend-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        flex-grow: 1;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #334155;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .legend-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .legend-item.is-dimmed {
+        opacity: 0.4;
+        background: #f1f5f9;
+        border-color: transparent;
+    }
+
+    .legend-item.is-active {
+        border-color: var(--item-color);
+        background: var(--item-bg);
+    }
+
+    .legend-item.is-active .li-text {
+        color: var(--item-color);
+    }
+
+    .li-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--item-color);
+        flex-shrink: 0;
+    }
+
+    .map-status-pill {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #475569;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        pointer-events: none;
+    }
+
+    .reset-btn {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        z-index: 1000;
+        background: white;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #0f172a;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .reset-btn:hover {
+        background: #f8fafc;
+    }
+
+    .reset-btn.visible {
+        display: flex;
+    }
+
+    /* RIGHT SECTION: DATA TABLE */
+    .right-section {
+        flex: 4;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+    }
+
+    .table-toolbar {
+        padding: 16px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: #f8fafc;
+    }
+
+    .tb-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .tb-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 0.95rem;
+    }
+
+    .tb-title i {
+        color: #64748b;
+    }
+
+    .tb-search {
+        position: relative;
+        width: 100%;
+    }
+
+    .tb-search i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.85rem;
+    }
+
+    .tb-search input {
+        width: 100%;
+        padding: 8px 12px 8px 36px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        outline: none;
+        transition: all 0.2s;
+        box-sizing: border-box;
+    }
+
+    .tb-search input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px #eff6ff;
+    }
+
+    .tb-count {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+        background: #e2e8f0;
+        padding: 4px 10px;
+        border-radius: 999px;
+    }
+
+    .table-container {
+        flex: 1;
+        overflow: auto;
+        position: relative;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: left;
+    }
+
+    th {
+        position: sticky;
+        top: 0;
+        background: #f8fafc;
+        padding: 12px 16px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e2e8f0;
+        z-index: 10;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 14px 16px;
+        font-size: 0.85rem;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    tr {
+        transition: background 0.15s;
+    }
+
+    tr:hover {
+        background: #f8fafc;
+    }
+
+    tr.focused {
+        background: #eff6ff;
+    }
+
+    tr.focused td {
+        border-bottom-color: #bfdbfe;
+    }
+
+    .work-name-cell {
+        font-weight: 600;
+        color: #0f172a;
+        max-width: 250px;
+        line-height: 1.4;
+    }
+
+    .work-group {
+        display: block;
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 500;
+        margin-top: 4px;
+    }
+
+    .domain-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--badge-color);
+        background: var(--badge-bg);
+        border: 1px solid var(--badge-border);
+        white-space: nowrap;
+    }
+
+    .db-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--badge-color);
+    }
+
+    .class-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .class-new {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .class-repair {
+        background: #ffedd5;
+        color: #c2410c;
+    }
+
+    /* LEAFLET POPUP OVERRIDES */
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .leaflet-popup-content {
+        margin: 0;
+        min-width: 240px;
+    }
+
+    .leaflet-popup-tip {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .popup-header {
+        padding: 12px 16px;
+        /* Border and radius handled inline based on domain colors */
+    }
+
+    .popup-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #0f172a;
+        margin: 0 0 4px;
+        font-family: 'Inter', sans-serif;
+        line-height: 1.3;
+    }
+
+    .popup-subtitle {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    @media (max-width: 1024px) {
+        .layout-container {
+            flex-direction: column;
+        }
+
+        .left-section {
+            flex: none;
+            height: 50vh;
+            border-right: none;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .right-section {
+            flex: none;
+            height: 50vh;
+        }
+
+        .legend-overlay {
+            top: auto;
+            bottom: 60px;
+        }
+    }
+
+    /* --- LOADER STYLES --- */
+    #map-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999;
+        background: rgba(15, 23, 42, 0.4);
+        /* dark transparent */
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        color: white;
+        transition: opacity 0.3s ease;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    #map-loader.is-active {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .loader-spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    .loader-text {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        letter-spacing: 0.05em;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<!-- FULL SCREEN LOADER -->
+<div id="map-loader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text" id="loader-msg">Loading Map Data...</div>
+</div>
+
+<div class="layout-container">
+    <!-- LEFT: MAP -->
+    <div class="left-section">
+        <div id="map"></div>
+        <div class="map-status-pill" id="map-status">Initializing Web Feature Service...</div>
+        <button class="reset-btn" id="reset-map-btn" onclick="resetToIndia()"><i class="fa-solid fa-arrow-left"></i>
+            Back to India</button>
+    </div>
+
+    <!-- RIGHT: TABLE -->
+    <div class="right-section">
+        <div class="table-toolbar">
+            <div class="tb-header-row">
+                <div class="tb-title"><i class="fa-solid fa-table-list"></i> Works Catalogue</div>
+                <div class="tb-count" id="table-count">0 works</div>
+            </div>
+
+            <!-- Moved Legend Panel -->
+            <div class="legend-panel">
+                <span class="legend-label">Filter by Domain</span>
+                <div class="legend-items" id="domain-legend">
+                    <!-- Rendered via JS -->
+                </div>
+            </div>
+
+            <div class="tb-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="table-search" placeholder="Search works or groups..." autocomplete="off">
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="works-table">
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Thematic Domain</th>
+                        <th>Group Name</th>
+                        <th>Work Name</th>
+                        <th>Classification</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Rows via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="/static/leaflet.js"></script>
+<script src='/static/omnivore.js'></script>
+<script>
+    function syncNavHeight() {
+        const nav = document.querySelector('.navbar');
+        if (nav) {
+            document.documentElement.style.setProperty('--nav-height', nav.offsetHeight + 'px');
+        }
+    }
+    syncNavHeight();
+    window.addEventListener('resize', syncNavHeight);
+
+    // Data Sources
+    const CSV_URL = "{{ url_for('static', filename='VBGRAMG_Final_Classified_93_Works.csv') }}";
+    const STATES_GEOJSON = "{{ url_for('static', filename='states.geojson') }}";
+    const HR_VILLAGES_GEOJSON = "{{ url_for('static', filename='hr_villages.geojson') }}";
+
+    // Config
+    const TOTAL_CSV_ROWS = 278;
+    const MARKERS_INDIA = 100;
+    const MARKERS_HARYANA = 20;
+
+    // State globals
+    let map, stateLayer, villageLayer;
+    let markerGroup; // Will be initialized later with L.layerGroup().addTo(map);
+    let allCsvRows = [];
+    let rowMarkerMap = new Map(); // maps row index (in csv) to Leaflet marker
+    let activeDomainFilter = null;
+    let activeStateFilter = null;
+    let searchTerm = '';
+    let currentState = 'INDIA'; // 'INDIA' or 'HARYANA'
+
+    const DOMAIN_COLORS = {
+        'Domain I': { name: 'Water Harvesting', c: '#0ea5e9', bg: '#e0f2fe', bd: '#bae6fd' },     // Blue
+        'Domain II': { name: 'Rural Amenities', c: '#10b981', bg: '#d1fae5', bd: '#a7f3d0' },    // Green
+        'Domain III': { name: 'Livelihood Assets', c: '#f59e0b', bg: '#fef3c7', bd: '#fde68a' }, // Orange/Yellow
+        'Domain IV': { name: 'Climate Resilience', c: '#ef4444', bg: '#fee2e2', bd: '#fecaca' }  // Red
+    };
+
+    function getDomainBucket(domainText) {
+        if (!domainText) return 'Domain I';
+        if (domainText.includes("Domain IV")) return "Domain IV";
+        if (domainText.includes("Domain III")) return "Domain III";
+        if (domainText.includes("Domain II")) return "Domain II";
+        return "Domain I";
+    }
+
+    // Basic CSV Parser
+    function parseCSV(text) {
+        const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+        if (lines.length < 2) return [];
+
+        // Parse headers handling quotes
+        const headers = [];
+        let curHeader = '', inQuotes = false;
+        for (let i = 0; i < lines[0].length; i++) {
+            let char = lines[0][i];
+            if (char === '"' && (i === 0 || lines[0][i - 1] !== '\\')) inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) { headers.push(curHeader.trim()); curHeader = ''; }
+            else curHeader += char;
+        }
+        headers.push(curHeader.trim());
+
+        return lines.slice(1).map(line => {
+            const obj = {};
+            let curVal = '', inQuotes = false, fieldIdx = 0;
+            for (let i = 0; i < line.length; i++) {
+                let char = line[i];
+                if (char === '"' && (i === 0 || line[i - 1] !== '\\')) inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) {
+                    if (headers[fieldIdx]) obj[headers[fieldIdx]] = curVal.trim().replace(/^"|"$/g, '');
+                    curVal = ''; fieldIdx++;
+                }
+                else curVal += char;
+            }
+            if (headers[fieldIdx]) obj[headers[fieldIdx]] = curVal.trim().replace(/^"|"$/g, '');
+            return obj;
+        });
+    }
+
+    /* --- GEOMETRY HELPERS FOR RANDOM POINT GENERATION --- */
+    // Extracts rings from GeoJSON (Multi)Polygon
+    function extractRings(geometry) {
+        let rings = [];
+        if (geometry.type === 'Polygon') {
+            rings.push(geometry.coordinates);
+        } else if (geometry.type === 'MultiPolygon') {
+            geometry.coordinates.forEach(poly => rings.push(poly));
+        }
+        return rings;
+    }
+
+    // Ray-casting algorithm
+    function pointInRing(pt, ring) {
+        let isInside = false;
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+            let xi = ring[i][0], yi = ring[i][1];
+            let xj = ring[j][0], yj = ring[j][1];
+            let intersect = ((yi > pt[1]) !== (yj > pt[1])) && (pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi);
+            if (intersect) isInside = !isInside;
+        }
+        return isInside;
+    }
+
+    function pointInPolygonCoords(pt, rings) {
+        // pt is [lng, lat]
+        // First ring is exterior, rest are holes
+        if (!rings || rings.length === 0 || !pointInRing(pt, rings[0])) return false;
+        for (let i = 1; i < rings.length; i++) {
+            if (pointInRing(pt, rings[i])) return false;
+        }
+        return true;
+    }
+
+    function pointInLayer(ptLngLat, geoJsonFeatures) {
+        for (let f of geoJsonFeatures) {
+            const ringsList = extractRings(f.geometry);
+            for (let rings of ringsList) {
+                if (pointInPolygonCoords(ptLngLat, rings)) return true;
+            }
+        }
+        return false;
+    }
+
+    // Generate N random points within GeoJSON features
+    function generateRandomPointsInLayer(n, layer, bounds) {
+        const pts = [];
+        const features = layer.toGeoJSON().features;
+        let attempts = 0;
+        const maxAttempts = n * 100;
+
+        while (pts.length < n && attempts < maxAttempts) {
+            attempts++;
+            const lat = bounds.getSouth() + Math.random() * (bounds.getNorth() - bounds.getSouth());
+            const lng = bounds.getWest() + Math.random() * (bounds.getEast() - bounds.getWest());
+
+            if (pointInLayer([lng, lat], features)) {
+                pts.push([lat, lng]);
+            }
+        }
+        return pts;
+    }
+
+    /* --- DATA SAMPLING & MARKER GENERATION --- */
+    // Process all 278 rows and assign them to states strictly.
+    function assignMarkersToStates(stateGeoJsonLayer) {
+        document.getElementById('map-status').textContent = `Calculating geometric distribution for all ${allCsvRows.length} works...`;
+
+        // Clear existing map
+        markerGroup.clearLayers();
+        rowMarkerMap.clear();
+
+        const features = stateGeoJsonLayer.toGeoJSON().features;
+        const bounds = stateGeoJsonLayer.getBounds();
+
+        let processedCount = 0;
+
+        // Process in chunks so we don't block the UI thread completely
+        setTimeout(function processChunk() {
+            const chunkEnd = Math.min(processedCount + 50, allCsvRows.length);
+            for (let i = processedCount; i < chunkEnd; i++) {
+                const row = allCsvRows[i];
+                const bucket = getDomainBucket(row['Thematic Domain']);
+
+                // Find a random point inside *any* state feature
+                let pt = null;
+                let attempts = 0;
+                let foundFeature = null;
+
+                while (!pt && attempts < 200) {
+                    attempts++;
+                    const lat = bounds.getSouth() + Math.random() * (bounds.getNorth() - bounds.getSouth());
+                    const lng = bounds.getWest() + Math.random() * (bounds.getEast() - bounds.getWest());
+
+                    // Check which feature it fell into
+                    for (let f of features) {
+                        const ringsList = extractRings(f.geometry);
+                        let inside = false;
+                        for (let rings of ringsList) {
+                            if (pointInPolygonCoords([lng, lat], rings)) {
+                                inside = true;
+                                break;
+                            }
+                        }
+                        if (inside) {
+                            pt = [lat, lng];
+                            foundFeature = f;
+                            break;
+                        }
+                    }
+                }
+
+                if (pt && foundFeature) {
+                    // Assign the state boundary name permanently to the memory model
+                    row['_state'] = foundFeature.properties.State_Name || foundFeature.properties.LGD_ST_Nam || 'Unknown State';
+
+                    const marker = L.marker(pt, { icon: createMarkerIcon(bucket, false) });
+                    const isNew = (row['Classification'] || '').toLowerCase() === 'new';
+                    const clsBadge = `<span class="class-badge ${isNew ? 'class-new' : 'class-repair'}">${row['Classification'] || '—'}</span>`;
+
+                    const popupHtml = `
+                    <div class="popup-header" style="background: ${DOMAIN_COLORS[bucket].bg}; border: 1px solid ${DOMAIN_COLORS[bucket].bd}; border-radius: 8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                        <h3 class="popup-title">${row['Work Name'] || 'Unnamed Work'}</h3>
+                        ${clsBadge}
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            <p class="popup-subtitle" style="margin:0; font-weight:700;">${DOMAIN_COLORS[bucket].name}</p>
+                            <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${row['Group Name'] || '—'}</p>
+                        </div>
+                    </div>
+                    `;
+
+                    marker.bindPopup(popupHtml);
+                    marker.on('click', () => flyToRow(i));
+
+                    markerGroup.addLayer(marker);
+                    rowMarkerMap.set(i, marker);
+                } else {
+                    row['_state'] = 'Offline Buffer'; // Fallback if PIP fails wildly
+                }
+            }
+
+            processedCount = chunkEnd;
+            if (processedCount < allCsvRows.length) {
+                document.getElementById('map-status').textContent = `Calculating geometric distribution... (${processedCount}/${allCsvRows.length})`;
+                setTimeout(processChunk, 10);
+            } else {
+                document.getElementById('map-status').textContent = `Plotted 278 works strictly mapped to states.`;
+                renderTable();
+                applyFilters();
+                hideLoader();
+            }
+        }, 10);
+    }
+
+    // Generate N randomized, unanchored subset markers specifically for the Haryana drilldown
+    // respecting overall domain ratio
+    function generateRatioBoundedMarkers(targetCount, geoJsonLayer) {
+        markerGroup.clearLayers();
+        rowMarkerMap.clear();
+
+        document.getElementById('map-status').textContent = `Spawning ${targetCount} randomized markers inside Haryana...`;
+
+        // 1. Calculate ratio in full CSV
+        const domainCounts = { 'Domain I': 0, 'Domain II': 0, 'Domain III': 0, 'Domain IV': 0 };
+        allCsvRows.forEach(r => domainCounts[getDomainBucket(r['Thematic Domain'])]++);
+
+        // 2. Budget target count per domain
+        const targets = {};
+        let allocated = 0;
+        ['Domain I', 'Domain II', 'Domain III', 'Domain IV'].forEach(d => {
+            let count = Math.round((domainCounts[d] / allCsvRows.length) * targetCount);
+            targets[d] = count;
+            allocated += count;
+        });
+
+        // 3. Fix rounding drifts
+        let diff = targetCount - allocated;
+        if (diff !== 0) targets['Domain I'] += diff;
+
+        // 4. Sample original rows
+        let sampledData = [];
+        ['Domain I', 'Domain II', 'Domain III', 'Domain IV'].forEach(d => {
+            const rowsInDomain = allCsvRows.filter(r => getDomainBucket(r['Thematic Domain']) === d);
+            for (let i = 0; i < targets[d]; i++) {
+                sampledData.push(rowsInDomain[i % rowsInDomain.length]);
+            }
+        });
+
+        // 5. Plot physically
+        const bounds = geoJsonLayer.getBounds();
+        const features = geoJsonLayer.toGeoJSON().features;
+
+        // We map these dummy points logically to the end of the real array temporarily, 
+        // to not disrupt real records during India. But wait, Haryana state filter already hides standard points.
+        // It's cleaner to just overwrite the dummy states.
+
+        sampledData.forEach((row, i) => {
+            let pt = null;
+            let attempts = 0;
+            while (!pt && attempts < 200) {
+                attempts++;
+                const lat = bounds.getSouth() + Math.random() * (bounds.getNorth() - bounds.getSouth());
+                const lng = bounds.getWest() + Math.random() * (bounds.getEast() - bounds.getWest());
+
+                for (let f of features) {
+                    const ringsList = extractRings(f.geometry);
+                    let inside = false;
+                    for (let rings of ringsList) {
+                        if (pointInPolygonCoords([lng, lat], rings)) { inside = true; break; }
+                    }
+                    if (inside) { pt = [lat, lng]; break; }
+                }
+            }
+
+            if (pt) {
+                // To allow these isolated rows to pass the filter while in Haryana mode
+                row['_state'] = 'Haryana';
+                row['_is_dummy'] = true;
+
+                const bucket = getDomainBucket(row['Thematic Domain']);
+                const marker = L.marker(pt, { icon: createMarkerIcon(bucket, false) });
+                const isNew = (row['Classification'] || '').toLowerCase() === 'new';
+                const clsBadge = `<span class="class-badge ${isNew ? 'class-new' : 'class-repair'}">${row['Classification'] || '—'}</span>`;
+
+                const popupHtml = `
+                    <div class="popup-header" style="background: ${DOMAIN_COLORS[bucket].bg}; border: 1px solid ${DOMAIN_COLORS[bucket].bd}; border-radius: 8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                        <h3 class="popup-title">${row['Work Name'] || 'Unnamed Work'}</h3>
+                        ${clsBadge}
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            <p class="popup-subtitle" style="margin:0; font-weight:700;">${DOMAIN_COLORS[bucket].name}</p>
+                            <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${row['Group Name'] || '—'}</p>
+                        </div>
+                    </div>
+                `;
+                marker.bindPopup(popupHtml);
+                marker.on('click', () => {
+                    // Find actual row idx in array
+                    const idx = allCsvRows.indexOf(row);
+                    if (idx !== -1) flyToRow(idx);
+                });
+
+                markerGroup.addLayer(marker);
+                rowMarkerMap.set(allCsvRows.indexOf(row), marker);
+            }
+        });
+
+        document.getElementById('map-status').textContent = `Spawning ${targetCount} randomized markers inside Haryana boundaries.`;
+        applyFilters();
+        hideLoader();
+    }
+
+    function createMarkerIcon(bucket, focused) {
+        const color = DOMAIN_COLORS[bucket].c;
+        const size = focused ? 36 : 24;
+        const shadow = focused ? '0 4px 12px rgba(0,0,0,0.5)' : '0 2px 6px rgba(0,0,0,0.3)';
+        return L.divIcon({
+            html: `<i class="fa-solid fa-location-pin" style="color: ${color}; font-size: ${size}px; text-shadow: ${shadow}; transition: all 0.2s; display: block; transform: translateY(-${size / 2}px)"></i>`,
+            className: 'custom-pin',
+            iconSize: [size, size],
+            iconAnchor: [size / 2, size],
+            popupAnchor: [0, -size + 4]
+        });
+    }
+
+    /* --- Removed plotData since assignment merges everything --- */
+
+    /* --- GEOSERVER LAYER LOGIC --- */
+
+    function showLoader(msg) {
+        document.getElementById('loader-msg').textContent = msg;
+        document.getElementById('map-loader').classList.add('is-active');
+    }
+
+    function hideLoader() {
+        document.getElementById('map-loader').classList.remove('is-active');
+    }
+
+    async function loadIndiaLayer() {
+        showLoader('Fetching India State Boundaries...');
+        try {
+            const res = await fetch(STATES_GEOJSON);
+            const geojson = await res.json();
+
+            if (stateLayer) map.removeLayer(stateLayer);
+
+            stateLayer = L.geoJSON(geojson, {
+                style: function (feature) {
+                    const stateName = feature.properties.State_Name || feature.properties.LGD_ST_Nam || '';
+                    // Highlight Haryana
+                    if (stateName.toUpperCase() === 'HARYANA') {
+                        return { color: '#0369a1', weight: 3, fillOpacity: 0.3, fillColor: '#bae6fd' };
+                    }
+                    return { color: '#475569', weight: 2, fillOpacity: 0.05, fillColor: '#f1f5f9' };
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.on('click', function (e) {
+                        const stName = feature.properties.State_Name || feature.properties.LGD_ST_Nam || '';
+
+                        // Set active state filter
+                        if (activeStateFilter === stName) {
+                            activeStateFilter = null; // Toggle off if clicked again
+                            map.flyToBounds(stateLayer.getBounds(), { padding: [50, 50], duration: 0.8 });
+                            if (villageLayer) map.removeLayer(villageLayer);
+                        } else {
+                            activeStateFilter = stName;
+                            map.flyToBounds(layer.getBounds(), { padding: [50, 50], duration: 0.8 });
+                            if (stName.toUpperCase() === 'HARYANA') {
+                                loadHaryanaVillages();
+                            } else {
+                                if (villageLayer) map.removeLayer(villageLayer);
+                            }
+                        }
+
+                        applyFilters();
+                    });
+
+                    layer.on('mouseover', function () {
+                        const stName = feature.properties.State_Name || feature.properties.LGD_ST_Nam || '';
+                        if (stName.toUpperCase() === 'HARYANA') {
+                            layer.setStyle({ fillOpacity: 0.5 });
+                        } else {
+                            layer.setStyle({ fillOpacity: 0.15 });
+                        }
+                    });
+                    layer.on('mouseout', function () {
+                        const stName = feature.properties.State_Name || feature.properties.LGD_ST_Nam || '';
+                        if (stName.toUpperCase() === 'HARYANA') {
+                            layer.setStyle({ fillOpacity: 0.3 });
+                        } else {
+                            layer.setStyle({ fillOpacity: 0.05 });
+                        }
+                    });
+                }
+            }).addTo(map);
+
+            map.fitBounds(stateLayer.getBounds());
+            currentState = 'INDIA';
+            document.getElementById('reset-map-btn').classList.remove('visible');
+
+            // Boot entire dataset geometry distribution
+            assignMarkersToStates(stateLayer);
+
+        } catch (e) {
+            console.error("GeoJSON Error:", e);
+        }
+    }
+
+    async function loadHaryanaVillages() {
+        showLoader('Loading Haryana Village Boundaries...');
+        // Disable state layer visually
+        if (stateLayer) map.removeLayer(stateLayer);
+
+        if (villageLayer) map.removeLayer(villageLayer);
+
+        try {
+            const resp = await fetch(HR_VILLAGES_GEOJSON);
+            const data = await resp.json();
+
+            villageLayer = L.geoJSON(data, {
+                style: function () {
+                    return { color: '#0f172a', weight: 2, fillOpacity: 0.1, fillColor: '#bae6fd' };
+                }
+            }).addTo(map);
+
+            map.fitBounds(villageLayer.getBounds(), { padding: [50, 50] });
+
+            currentState = 'HARYANA';
+            document.getElementById('reset-map-btn').classList.add('visible');
+
+            // Generate exactly 20 dummy markers
+            generateRatioBoundedMarkers(20, villageLayer);
+
+            // The loader is hidden inside generateRatioBoundedMarkers since it runs synchronously but we can hide it here too just in case
+            hideLoader();
+        } catch (e) {
+            console.error("GeoJSON Error:", e);
+            if (stateLayer) stateLayer.addTo(map);
+            hideLoader();
+        }
+    }
+
+    window.resetToIndia = function () {
+        showLoader('Returning to India map...');
+        setTimeout(() => {
+            if (villageLayer) map.removeLayer(villageLayer);
+            if (stateLayer) stateLayer.addTo(map);
+            map.fitBounds(stateLayer.getBounds());
+
+            currentState = 'INDIA';
+            activeStateFilter = null;
+
+            // Reset dummy markers state
+            allCsvRows.forEach(r => { if (r._is_dummy) delete r._is_dummy; });
+
+            // Re-calculate the 278 point state mapping 
+            assignMarkersToStates(stateLayer); // This hides the loader when done
+
+            document.getElementById('reset-map-btn').classList.remove('visible');
+        }, 100);
+    };
+
+    /* --- UI & INTERACTIVITY --- */
+
+    function renderLegend() {
+        const legendCounts = { 'Domain I': 0, 'Domain II': 0, 'Domain III': 0, 'Domain IV': 0 };
+        allCsvRows.forEach(r => {
+            // Respect State filtering for legend counts
+            if (!activeStateFilter || r['_state'] === activeStateFilter) {
+                const bucket = getDomainBucket(r['Thematic Domain']);
+                legendCounts[bucket]++;
+            }
+        });
+
+        const container = document.getElementById('domain-legend');
+        container.innerHTML = ['Domain I', 'Domain II', 'Domain III', 'Domain IV'].map(bucket => {
+            const cfg = DOMAIN_COLORS[bucket];
+            const isActive = activeDomainFilter === bucket;
+            const isDimmed = activeDomainFilter !== null && activeDomainFilter !== bucket;
+
+            return `
+                <div class="legend-item ${isActive ? 'is-active' : ''} ${isDimmed ? 'is-dimmed' : ''}"
+                     style="--item-color: ${cfg.c}; --item-bg: ${cfg.bg}"
+                     onclick="toggleDomainFilter('${bucket}')">
+                    <div class="li-dot"></div>
+                    <span class="li-text">${cfg.name} (${legendCounts[bucket]})</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.toggleDomainFilter = function (bucket) {
+        activeDomainFilter = (activeDomainFilter === bucket) ? null : bucket;
+        applyFilters();
+    };
+
+    function applyFilters() {
+        renderLegend();
+
+        const q = searchTerm.toLowerCase();
+        let visibleCount = 0;
+
+        // Filter Table 
+        const rows = document.querySelectorAll('#table-body tr');
+        rows.forEach(tr => {
+            const idx = parseInt(tr.dataset.idx);
+            const data = allCsvRows[idx];
+            if (!data) return;
+
+            const bucket = getDomainBucket(data['Thematic Domain']);
+            const textMatch = q === '' ||
+                (data['Work Name'] || '').toLowerCase().includes(q) ||
+                (data['Group Name'] || '').toLowerCase().includes(q);
+
+            const domainMatch = !activeDomainFilter || bucket === activeDomainFilter;
+            const stateMatch = !activeStateFilter || data['_state'] === activeStateFilter;
+
+            if (textMatch && domainMatch && stateMatch) {
+                tr.style.display = '';
+                visibleCount++;
+            } else {
+                tr.style.display = 'none';
+            }
+        });
+
+        const filterSummary = activeStateFilter ? ` in ${activeStateFilter}` : '';
+        document.getElementById('table-count').innerHTML = `<b>${visibleCount}</b> of ${allCsvRows.length} records${filterSummary}`;
+
+        // Filter Map
+        rowMarkerMap.forEach((marker, idx) => {
+            const data = allCsvRows[idx];
+            if (!data) return;
+            const bucket = getDomainBucket(data['Thematic Domain']);
+
+            const textMatch = q === '' ||
+                (data['Work Name'] || '').toLowerCase().includes(q) ||
+                (data['Group Name'] || '').toLowerCase().includes(q);
+            const domainMatch = !activeDomainFilter || bucket === activeDomainFilter;
+            const stateMatch = !activeStateFilter || data['_state'] === activeStateFilter;
+
+            if (textMatch && domainMatch && stateMatch) {
+                if (!markerGroup.hasLayer(marker)) markerGroup.addLayer(marker);
+            } else {
+                if (markerGroup.hasLayer(marker)) markerGroup.removeLayer(marker);
+            }
+        });
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('table-body');
+        // Render all rows initially, CSS filtering hides them
+        tbody.innerHTML = allCsvRows.map((row, idx) => {
+            const bucket = getDomainBucket(row['Thematic Domain']);
+            const cfg = DOMAIN_COLORS[bucket];
+
+            const isNew = (row['Classification'] || '').toLowerCase() === 'new';
+
+            return `
+            <tr data-idx="${idx}" onclick="flyToRow(${idx})">
+              <td><b>${row['S.No.']}</b></td>
+              <td>
+                 <div class="domain-badge" style="--badge-color: ${cfg.c}; --badge-bg: ${cfg.bg}; --badge-border: ${cfg.bd}">
+                   <div class="db-dot"></div> ${cfg.name}
+                 </div>
+              </td>
+              <td><span class="work-group">${row['Group Name'] || '—'}</span></td>
+              <td><div class="work-name-cell">${row['Work Name'] || '—'}</div></td>
+              <td><span class="class-badge ${isNew ? 'class-new' : 'class-repair'}">${row['Classification'] || '—'}</span></td>
+            </tr>
+          `;
+        }).join('');
+    }
+
+    let focusedIdx = null;
+    window.flyToRow = function (idx) {
+        if (focusedIdx !== null && rowMarkerMap.has(focusedIdx)) {
+            const m = rowMarkerMap.get(focusedIdx);
+            const d = allCsvRows[focusedIdx];
+            m.setIcon(createMarkerIcon(getDomainBucket(d['Thematic Domain']), false));
+            m.setZIndexOffset(0);
+        }
+
+        focusedIdx = idx;
+        const marker = rowMarkerMap.get(idx);
+        if (marker) {
+            const d = allCsvRows[idx];
+            marker.setIcon(createMarkerIcon(getDomainBucket(d['Thematic Domain']), true));
+            marker.setZIndexOffset(1000);
+
+            map.flyTo(marker.getLatLng(), map.getZoom() > 8 ? map.getZoom() : 8, { duration: 0.6 });
+            marker.openPopup();
+        }
+
+        document.querySelectorAll('#table-body tr').forEach(tr => {
+            tr.classList.toggle('focused', parseInt(tr.dataset.idx) === idx);
+        });
+        const el = document.querySelector(`#table-body tr[data-idx="${idx}"]`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+
+    /* --- INIT --- */
+    async function init() {
+        // Setup Map
+        map = L.map('map', {
+            zoomControl: true, minZoom: 4,
+        });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap contributors © CARTO'
+        }).addTo(map);
+        map.fitBounds([[6, 68], [37.5, 97.5]]); // Default India bounds
+
+        markerGroup = L.featureGroup().addTo(map);
+
+        // Load CSV Data
+        try {
+            const res = await fetch(CSV_URL);
+            const text = await res.text();
+            allCsvRows = parseCSV(text).slice(0, TOTAL_CSV_ROWS);
+
+            document.getElementById('table-search').addEventListener('input', (e) => {
+                searchTerm = e.target.value;
+                applyFilters();
+            });
+
+            // Now fetch India WFS
+            await loadIndiaLayer();
+
+        } catch (e) {
+            console.error("Init Error:", e);
+            document.getElementById('map-status').textContent = 'Failed to load initial data.';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+
+</script>
+{% endblock %}

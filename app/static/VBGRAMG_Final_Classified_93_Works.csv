@@ -1,0 +1,94 @@
+S.No.,Thematic Domain,Group Name,Work Name,Classification
+1,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Boulder Check Dam,New
+2,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Boulder Check Dam,Repair
+3,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Earthen Check Dam,New
+4,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Earthen Check Dam,Repair
+5,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Gabion Check Dam,New
+6,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Gabion Check Dam,Repair
+7,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Masonry Check Dam,New
+8,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Masonry Check Dam,Repair
+9,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Brushwood Gully Plug,New
+10,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Earthen Gully Plug,New
+11,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Stone Boulder Gully Plug,New
+12,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Main Canal,New
+13,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Main Canal,Repair
+14,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Branch Canal,New
+15,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Branch Canal,Repair
+16,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Major Distributary Canal,New
+17,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Major Distributary Canal,Repair
+18,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Minor Distributary Canal,New
+19,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Minor Distributary Canal,Repair
+20,Domain I: Water Security (Water Harvesting),Surface Structures,Lining of Canal,New
+21,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Water Courses and Field Channels,New
+22,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Diversion Channel,New
+23,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Diversion Channel,Repair
+24,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Flood Diversion Drain,New
+25,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Flood Diversion Drain,Repair
+26,Domain I: Water Security (Water Harvesting),Surface Structures,Construction of Underground Dyke,New
+27,Domain I: Water Security (Water Harvesting),Surface Structures,Repair & Maintenance of Underground Dyke,Repair
+28,Domain I: Water Security (Water Harvesting),Recharge Structures,Construction of Collection Chamber for Spring Shed,New
+29,Domain I: Water Security (Water Harvesting),Recharge Structures,Repair & Maintenance of Collection Chamber for Spring Shed,Repair
+30,Domain I: Water Security (Water Harvesting),Recharge Structures,Construction of Farm Pond,New
+31,Domain I: Water Security (Water Harvesting),Recharge Structures,Construction of Filtration Chamber for Defunct Borewell,New
+32,Domain I: Water Security (Water Harvesting),Recharge Structures,Repair & Maintenance of Filteration chamber in defunct bore well,Repair
+33,Domain I: Water Security (Water Harvesting),Recharge Structures,Construction of Filtration Pond with Recharge Shaft along Escape Channel,New
+34,Domain I: Water Security (Water Harvesting),Recharge Structures,Repair & Maintenance of Filtration Pond with Recharge Shaft along Escape Channel,Repair
+35,Domain I: Water Security (Water Harvesting),Recharge Structures,Construction of Injection Well in Channels,New
+36,Domain I: Water Security (Water Harvesting),Recharge Structures,Repair & Maintenance of Injection Well in Channels,Repair
+37,Domain I: Water Security (Water Harvesting),Recharge Structures,Construction of Injection Well in Water Bodies,New
+38,Domain I: Water Security (Water Harvesting),Recharge Structures,Repair & Maintenance of Injection Well in Water Bodies,Repair
+39,Domain I: Water Security (Water Harvesting),Recharge Structures,Construction of Percolation Tank,New
+40,Domain I: Water Security (Water Harvesting),Recharge Structures,Repair & Maintenance of Percolation Tank,Repair
+41,Domain I: Water Security (Water Harvesting),Recharge Structures,Construction of Recharge Pit,New
+42,Domain I: Water Security (Water Harvesting),Recharge Structures,Construction of Recharge Shaft,New
+43,Domain I: Water Security (Water Harvesting),Recharge Structures,Repair & Maintenance of Recharge Shaft,Repair
+44,Domain I: Water Security (Water Harvesting),Recharge Structures,Rejuvenation of Pond,Repair
+45,Domain I: Water Security (Water Harvesting),Recharge Structures,Rejuvenation of Step Well,Repair
+46,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Construction of Cross Drainage Structure,New
+47,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Repair & Maintenance of Cross Drainage Structure,Repair
+48,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Construction of Culvert,New
+49,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Repair & Maintenance of Culvert,Repair
+50,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Construction of Rural Foot Over Bridge,New
+51,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Repair & Maintenance of Rural Foot Over Bridge,Repair
+52,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Construction of Bitumen Road,New
+53,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Repair & Maintenance of Bitumen Road,Repair
+54,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Construction of Cement Concrete Road,New
+55,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Repair & Maintenance of Cement Concrete Road,Repair
+56,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Construction of Interlocking Paver Block Road,New
+57,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Repair & Maintenance of Interlocking Paver Block Road,Repair
+58,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Construction of Kharanja Road,New
+59,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Repair & Maintenance of Kharanja Road,Repair
+60,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Construction of WBM Road,New
+61,Domain II: Core Rural Infrastructure (Rural Amenities),Rural Connectivity,Repair & Maintenance of WBM Road,Repair
+62,Domain II: Core Rural Infrastructure (Rural Amenities),Civic Buildings,Construction of Anganwadi Centre Building,New
+63,Domain II: Core Rural Infrastructure (Rural Amenities),Civic Buildings,Repair & Maintenance of Anganwadi Centre Building,Repair
+64,Domain II: Core Rural Infrastructure (Rural Amenities),Civic Buildings,Construction of Anganwadi Toilet,New
+65,Domain III: Livelihood Infrastructure (Livelihood Assets),Skill Infrastructure,Construction of Training and Skill Development Centre Building,New
+66,Domain III: Livelihood Infrastructure (Livelihood Assets),Skill Infrastructure,Repair & Maintenance of Training and Skill Development Centre Building,Repair
+67,Domain III: Livelihood Infrastructure (Livelihood Assets),Skill Infrastructure,Construction of Workshed for SHG,New
+68,Domain III: Livelihood Infrastructure (Livelihood Assets),Skill Infrastructure,Repair & Maintenance of Workshed for SHG,Repair
+69,Domain III: Livelihood Infrastructure (Livelihood Assets),Market Infrastructure,Construction of Rural Haat Building,New
+70,Domain III: Livelihood Infrastructure (Livelihood Assets),Market Infrastructure,Repair & Maintenance of Rural Haat Building,Repair
+71,Domain III: Livelihood Infrastructure (Livelihood Assets),Market Infrastructure,Construction of Market Yard,New
+72,Domain III: Livelihood Infrastructure (Livelihood Assets),Market Infrastructure,Repair & Maintenance of Market Yard,Repair
+73,Domain III: Livelihood Infrastructure (Livelihood Assets),Agri Storage,Construction of Agricultural Produce Storage Building,New
+74,Domain III: Livelihood Infrastructure (Livelihood Assets),Agri Storage,Repair & Maintenance of Agricultural Produce Storage Building,Repair
+75,Domain III: Livelihood Infrastructure (Livelihood Assets),Agri Storage,Construction of Cold Storage Unit,New
+76,Domain III: Livelihood Infrastructure (Livelihood Assets),Agri Storage,Repair & Maintenance of Cold Storage Unit,Repair
+77,Domain III: Livelihood Infrastructure (Livelihood Assets),Agri Storage,Construction of Food Grain Storage Building,New
+78,Domain III: Livelihood Infrastructure (Livelihood Assets),Agri Storage,Repair & Maintenance of Food Grain Storage Building,Repair
+79,Domain III: Livelihood Infrastructure (Livelihood Assets),Agri Storage,Construction of Threshing Yard,New
+80,Domain III: Livelihood Infrastructure (Livelihood Assets),SHG Infrastructure,Construction of SHG Building,New
+81,Domain III: Livelihood Infrastructure (Livelihood Assets),SHG Infrastructure,Repair & Maintenance SHG Building,Repair
+82,Domain IV: Climate Resilience (Climate Resilience),Disaster Shelters,Construction of Cyclone Shelter,New
+83,Domain IV: Climate Resilience (Climate Resilience),Disaster Shelters,Repair & Maintenance of Cyclone Shelters,Repair
+84,Domain IV: Climate Resilience (Climate Resilience),Disaster Shelters,Construction of Flood Retention Shelter,New
+85,Domain IV: Climate Resilience (Climate Resilience),Disaster Shelters,Repair & Maintenance of Flood Retension Shelters,Repair
+86,Domain IV: Climate Resilience (Climate Resilience),Protective Works,Construction of Embankment,New
+87,Domain IV: Climate Resilience (Climate Resilience),Protective Works,Strengthening of Embankment,New
+88,Domain IV: Climate Resilience (Climate Resilience),Protective Works,Construction of Earthen Spur,New
+89,Domain IV: Climate Resilience (Climate Resilience),Protective Works,Construction of Gabion Spur,New
+90,Domain IV: Climate Resilience (Climate Resilience),Protective Works,Construction of Stone Spur,New
+91,Domain IV: Climate Resilience (Climate Resilience),Protective Works,Repair & Maintenance of Spur,Repair
+92,Domain IV: Climate Resilience (Climate Resilience),Protective Works,Construction of Storm Water Drain,New
+93,Domain IV: Climate Resilience (Climate Resilience),Protective Works,Repair & Maintenance of Storm Water Drain,Repair
