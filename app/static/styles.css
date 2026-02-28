@@ -6,6 +6,73 @@
 }
 
 .progress-container {
+  display: flex;
+  justify-content: space-between;
+  width: 700px;
+  position: relative;
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: flex-start;
+}
+
+/* Horizontal connector line */
+.progress-container::before {
+  content: "";
+  position: absolute;
+  top: 18px; /* half of step height (36px / 2) */
+  left: 40px;
+  right: 18px;
+  height: 2px;
+  background: #555;
+  z-index: 0;
+}
+
+.step-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+.step {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #555;
+  color: #aaa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 15px;
+  z-index: 1;
+  transition: background 0.3s ease, color 0.3s ease;
+  text-decoration: none;
+}
+
+.step.active {
+  background: #4d9de0;
+  color: #fff;
+}
+
+.step-label {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.step-label.active {
+  color: #4d9de0;
+  font-weight: bold;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* .progress-container {
     display: flex;
     justify-content: space-between;
     width: 600px;
@@ -48,4 +115,4 @@
 
 a {
     text-decoration: none;
-}
+} */
