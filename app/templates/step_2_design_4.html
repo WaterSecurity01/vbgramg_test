@@ -1,0 +1,555 @@
+{% extends 'base.html' %}
+{% block title %} Step 2 Design 4 {% endblock %}
+{% block content %}
+<section id="step2-d4">
+    <div class="wrap">
+        <aside class="left card">
+            <h1>Work Builder</h1>
+            <p class="caption">Design 4: a compact command-board layout.</p>
+
+            <div class="field-stack">
+                <label><span>Theme</span><select id="themeSelect"><option value="">Select Theme</option></select></label>
+                <label><span>Group</span><select id="groupSelect" disabled><option value="">Select Group</option></select></label>
+                <label><span>Work</span><select id="workSelect" disabled><option value="">Select Work</option></select></label>
+            </div>
+
+            <div class="radios">
+                <div>
+                    <p>Beneficiary Type</p>
+                    <label><input type="radio" name="beneficiary_type" value="Individual"> <span>Individual</span></label>
+                    <label><input type="radio" name="beneficiary_type" value="Community"> <span>Community</span></label>
+                </div>
+
+                <div>
+                    <p>Work Type</p>
+                    <label><input type="radio" name="work_type" value="New"> <span>New</span></label>
+                    <label><input type="radio" name="work_type" value="Repair"> <span>Repair</span></label>
+                </div>
+            </div>
+
+            <button id="addWorkBtn" type="button"><i class="fa-solid fa-plus"></i> Add Work</button>
+            <p id="statusMsg">Loading master data...</p>
+        </aside>
+
+        <section class="main">
+            <header class="summary card">
+                <div>
+                    <h2>Domain Pulse</h2>
+                    <p>Counts update as you add and remove works.</p>
+                </div>
+                <div class="domains" id="domainCards"></div>
+            </header>
+
+            <div class="content-grid">
+                <article class="table card">
+                    <div class="row-head">
+                        <h2>Work Stack</h2>
+                        <p id="stackCount">0 items</p>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Theme</th>
+                                    <th>Group</th>
+                                    <th>Work</th>
+                                    <th>Beneficiary</th>
+                                    <th>Type</th>
+                                    <th class="icon"><i class="fa-solid fa-eye"></i></th>
+                                    <th class="icon"><i class="fa-solid fa-trash"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="workTableBody"><tr><td colspan="7" class="empty">No works added yet.</td></tr></tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="about card">
+                    <h2>Inspection Panel</h2>
+                    <div id="aboutWorkContent" class="about-box muted">Select any row and click eye icon to inspect details.</div>
+                </article>
+            </div>
+        </section>
+    </div>
+</section>
+
+<style>
+    @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css");
+    @import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap");
+
+    html, body { margin: 0; padding: 0; background: #f8f9fa; }
+
+    #step2-d4 {
+        --nav-h: 96px;
+        --bg: #f8f9fa;
+        --card: #ffffff;
+        --line: #d7dde8;
+        --text: #161b26;
+        --muted: #667086;
+        --accent: #0f766e;
+        --danger: #b91c1c;
+        --c1: linear-gradient(150deg,#e67e22,#cf4e00);
+        --c2: linear-gradient(150deg,#7c3aed,#5b21b6);
+        --c3: linear-gradient(150deg,#16a34a,#15803d);
+        --c4: linear-gradient(150deg,#0284c7,#0369a1);
+
+        height: calc(100vh - var(--nav-h));
+        background: var(--bg);
+        overflow: hidden;
+        padding: 10px 12px;
+        box-sizing: border-box;
+        font-family: "DM Sans", "Segoe UI", sans-serif;
+        color: var(--text);
+    }
+
+    #step2-d4 * { box-sizing: border-box; }
+
+    #step2-d4 .wrap {
+        max-width: 1520px;
+        height: 100%;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 10px;
+    }
+
+    #step2-d4 .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+    }
+
+    #step2-d4 h1,
+    #step2-d4 h2 { margin: 0; font-family: "Sora", sans-serif; }
+
+    #step2-d4 .left {
+        padding: 12px;
+        display: grid;
+        grid-template-rows: auto auto auto auto auto;
+        gap: 10px;
+        align-content: start;
+    }
+
+    #step2-d4 .left h1 { font-size: 24px; }
+    #step2-d4 .caption { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+
+    #step2-d4 .field-stack { display: grid; gap: 8px; }
+    #step2-d4 label span { display: block; margin-bottom: 4px; font-size: 12px; font-weight: 700; color: #3f4959; }
+    #step2-d4 select {
+        width: 100%;
+        height: 38px;
+        border: 1px solid #ccd5e4;
+        border-radius: 9px;
+        padding: 0 10px;
+        background: #fff;
+        font-size: 13px;
+    }
+
+    #step2-d4 .radios { display: grid; gap: 10px; }
+    #step2-d4 .radios p { margin: 0 0 5px; font-size: 12px; font-weight: 700; color: #3f4959; }
+    #step2-d4 .radios label {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-right: 8px;
+        margin-bottom: 6px;
+        border: 1px solid #d6ddeb;
+        border-radius: 999px;
+        padding: 5px 9px;
+        font-size: 12px;
+        background: #fcfdff;
+    }
+
+    #step2-d4 button#addWorkBtn {
+        height: 40px;
+        border: 0;
+        border-radius: 10px;
+        background: linear-gradient(90deg,#0f766e,#0d9488);
+        color: #fff;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    #step2-d4 #statusMsg { margin: 0; min-height: 16px; color: #5d687d; font-size: 12px; }
+
+    #step2-d4 .main {
+        min-height: 0;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 10px;
+    }
+
+    #step2-d4 .summary {
+        padding: 10px 12px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 16px;
+        align-items: center;
+    }
+
+    #step2-d4 .summary p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+
+    #step2-d4 .domains {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    #step2-d4 .domain-item {
+        border-radius: 10px;
+        min-height: 60px;
+        padding: 8px;
+        color: #fff;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #step2-d4 .domain-item .label { font-size: 11px; font-weight: 700; line-height: 1.2; }
+    #step2-d4 .domain-item .count { font-size: 22px; font-weight: 700; }
+
+    #step2-d4 .content-grid {
+        min-height: 0;
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 10px;
+    }
+
+    #step2-d4 .table,
+    #step2-d4 .about { min-height: 0; padding: 10px; }
+
+    #step2-d4 .row-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    #step2-d4 .row-head p { margin: 0; color: var(--muted); font-size: 12px; }
+
+    #step2-d4 .table-wrap {
+        height: calc(100% - 32px);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    #step2-d4 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    #step2-d4 th,
+    #step2-d4 td {
+        border-bottom: 1px solid #e8edf5;
+        padding: 8px;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #step2-d4 th {
+        background: #f8fbff;
+        color: #59657d;
+        font-size: 11px;
+        text-transform: uppercase;
+    }
+
+    #step2-d4 .icon { width: 34px; text-align: center; }
+    #step2-d4 .icon-btn { border: 0; background: transparent; cursor: pointer; font-size: 14px; }
+    #step2-d4 .view-btn { color: #3a5e91; }
+    #step2-d4 .delete-btn { color: var(--danger); }
+    #step2-d4 .empty { text-align: center; color: #74819a; padding: 14px 8px; }
+
+    #step2-d4 .about-box {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #f8fbff;
+        padding: 10px;
+        min-height: 120px;
+        font-size: 13px;
+        line-height: 1.35;
+        white-space: pre-line;
+    }
+
+    #step2-d4 .about-box.muted { color: #74819a; }
+
+    @media (max-width: 1300px) {
+        #step2-d4 { overflow: auto; height: auto; }
+        #step2-d4 .wrap { grid-template-columns: 1fr; }
+        #step2-d4 .domains { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        #step2-d4 .content-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<script>
+(function () {
+    const CSV_PATH = "/static/VBGRAMG_Final_Classified_278_Works.csv";
+    const themeSelect = document.getElementById("themeSelect");
+    const groupSelect = document.getElementById("groupSelect");
+    const workSelect = document.getElementById("workSelect");
+    const addWorkBtn = document.getElementById("addWorkBtn");
+    const statusMsg = document.getElementById("statusMsg");
+    const stackCount = document.getElementById("stackCount");
+    const workTableBody = document.getElementById("workTableBody");
+    const aboutWorkContent = document.getElementById("aboutWorkContent");
+    const domainCards = document.getElementById("domainCards");
+
+    const beneficiaryRadios = Array.from(document.querySelectorAll('input[name="beneficiary_type"]'));
+    const workTypeRadios = Array.from(document.querySelectorAll('input[name="work_type"]'));
+    const domainColors = ["var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)"];
+
+    let masterRows = [];
+    let addedRows = [];
+    let domainThemes = [];
+
+    function parseCSV(text) {
+        const rows = []; let current = ""; let row = []; let inQuotes = false;
+        for (let i = 0; i < text.length; i += 1) {
+            const ch = text[i]; const nx = text[i + 1];
+            if (ch === '"') {
+                if (inQuotes && nx === '"') { current += '"'; i += 1; }
+                else { inQuotes = !inQuotes; }
+            } else if (ch === "," && !inQuotes) { row.push(current); current = ""; }
+            else if ((ch === "\n" || ch === "\r") && !inQuotes) {
+                if (ch === "\r" && nx === "\n") i += 1;
+                row.push(current);
+                if (row.length > 1 || (row[0] && row[0].trim())) rows.push(row);
+                row = []; current = "";
+            } else { current += ch; }
+        }
+        if (current.length || row.length) { row.push(current); rows.push(row); }
+        return rows;
+    }
+
+    function csvToObjects(text) {
+        const matrix = parseCSV(text);
+        if (!matrix.length) return [];
+        const headers = matrix[0].map(function (h) { return h.trim(); });
+        return matrix.slice(1).map(function (line) {
+            const obj = {};
+            headers.forEach(function (h, i) { obj[h] = (line[i] || "").trim(); });
+            return {
+                theme: (obj["Thematic Domain"] || "").trim(),
+                group: (obj["Group Name"] || "").trim(),
+                work: (obj["Work Name"] || "").trim(),
+                classification: (obj["Classification"] || "").trim()
+            };
+        }).filter(function (r) { return r.theme && r.group && r.work; });
+    }
+
+    function uniqSort(list) { return Array.from(new Set(list)).sort(function (a, b) { return a.localeCompare(b); }); }
+
+    function setSelectOptions(selectEl, values, placeholder) {
+        selectEl.innerHTML = "";
+        const p = document.createElement("option"); p.value = ""; p.textContent = placeholder; selectEl.appendChild(p);
+        values.forEach(function (v) {
+            const o = document.createElement("option"); o.value = v; o.textContent = v; selectEl.appendChild(o);
+        });
+    }
+
+    function getSelectedRadio(name) {
+        const checked = document.querySelector('input[name="' + name + '"]:checked');
+        return checked ? checked.value : "";
+    }
+
+    function setRadioGroupEnabled(radios, enabled) {
+        radios.forEach(function (radio) {
+            radio.disabled = !enabled;
+            if (!enabled) radio.checked = false;
+        });
+    }
+
+    function headingFromTheme(theme) {
+        const m = theme.match(/\(([^)]+)\)/);
+        return m ? m[1].trim() : theme;
+    }
+
+    function renderDomainCards() {
+        const counts = {};
+        domainThemes.forEach(function (theme) { counts[theme] = 0; });
+        addedRows.forEach(function (row) {
+            if (Object.prototype.hasOwnProperty.call(counts, row.theme)) counts[row.theme] += 1;
+        });
+        domainCards.innerHTML = "";
+        domainThemes.forEach(function (theme, i) {
+            const card = document.createElement("div");
+            card.className = "domain-item";
+            card.style.background = domainColors[i % domainColors.length];
+            card.innerHTML = '<div class="label">' + headingFromTheme(theme) + '</div><div class="count">' + counts[theme] + '</div>';
+            domainCards.appendChild(card);
+        });
+    }
+
+    function renderTable() {
+        workTableBody.innerHTML = "";
+        if (!addedRows.length) {
+            workTableBody.innerHTML = '<tr><td colspan="7" class="empty">No works added yet.</td></tr>';
+            stackCount.textContent = "0 items";
+            return;
+        }
+        addedRows.forEach(function (row, idx) {
+            const tr = document.createElement("tr");
+            tr.innerHTML =
+                '<td>' + row.theme + '</td>' +
+                '<td>' + row.group + '</td>' +
+                '<td>' + row.work + '</td>' +
+                '<td>' + row.beneficiary + '</td>' +
+                '<td>' + row.workType + '</td>' +
+                '<td class="icon"><button type="button" class="icon-btn view-btn" data-action="view" data-index="' + idx + '"><i class="fa-solid fa-eye"></i></button></td>' +
+                '<td class="icon"><button type="button" class="icon-btn delete-btn" data-action="delete" data-index="' + idx + '"><i class="fa-solid fa-trash"></i></button></td>';
+            workTableBody.appendChild(tr);
+        });
+        stackCount.textContent = addedRows.length + (addedRows.length === 1 ? " item" : " items");
+    }
+
+    function updateWorkTypeAvailability() {
+        const theme = themeSelect.value; const group = groupSelect.value; const work = workSelect.value;
+        if (!theme) { setRadioGroupEnabled(workTypeRadios, false); return; }
+        const filtered = masterRows.filter(function (r) {
+            if (r.theme !== theme) return false;
+            if (group && r.group !== group) return false;
+            if (work && r.work !== work) return false;
+            return true;
+        });
+        const available = new Set(filtered.map(function (r) { return r.classification.toLowerCase(); }));
+        workTypeRadios.forEach(function (radio) {
+            const allowed = available.has(radio.value.toLowerCase());
+            radio.disabled = !allowed;
+            if (!allowed) radio.checked = false;
+        });
+        if (work && available.size === 1) {
+            const one = Array.from(available)[0];
+            const target = workTypeRadios.find(function (r) { return r.value.toLowerCase() === one; });
+            if (target) target.checked = true;
+        }
+    }
+
+    function updateBeneficiaryAvailability() { setRadioGroupEnabled(beneficiaryRadios, Boolean(workSelect.value)); }
+
+    function updateGroups() {
+        const theme = themeSelect.value;
+        if (!theme) {
+            setSelectOptions(groupSelect, [], "Select Group");
+            setSelectOptions(workSelect, [], "Select Work");
+            groupSelect.disabled = true; workSelect.disabled = true;
+            updateWorkTypeAvailability(); updateBeneficiaryAvailability();
+            return;
+        }
+        const groups = uniqSort(masterRows.filter(function (r) { return r.theme === theme; }).map(function (r) { return r.group; }));
+        setSelectOptions(groupSelect, groups, "Select Group");
+        groupSelect.disabled = groups.length === 0;
+        setSelectOptions(workSelect, [], "Select Work");
+        workSelect.disabled = true;
+        updateWorkTypeAvailability(); updateBeneficiaryAvailability();
+    }
+
+    function updateWorks() {
+        const theme = themeSelect.value; const group = groupSelect.value;
+        if (!theme || !group) {
+            setSelectOptions(workSelect, [], "Select Work");
+            workSelect.disabled = true;
+            updateWorkTypeAvailability(); updateBeneficiaryAvailability();
+            return;
+        }
+        const works = uniqSort(masterRows.filter(function (r) { return r.theme === theme && r.group === group; }).map(function (r) { return r.work; }));
+        setSelectOptions(workSelect, works, "Select Work");
+        workSelect.disabled = works.length === 0;
+        updateWorkTypeAvailability(); updateBeneficiaryAvailability();
+    }
+
+    function resetComposer() {
+        themeSelect.value = "";
+        setSelectOptions(groupSelect, [], "Select Group");
+        setSelectOptions(workSelect, [], "Select Work");
+        groupSelect.disabled = true; workSelect.disabled = true;
+        setRadioGroupEnabled(workTypeRadios, false);
+        setRadioGroupEnabled(beneficiaryRadios, false);
+    }
+
+    function addWork() {
+        const theme = themeSelect.value;
+        const group = groupSelect.value;
+        const work = workSelect.value;
+        const beneficiary = getSelectedRadio("beneficiary_type");
+        const workType = getSelectedRadio("work_type");
+        if (!theme || !group || !work || !beneficiary || !workType) {
+            statusMsg.textContent = "Complete all fields before adding.";
+            return;
+        }
+        const duplicate = addedRows.some(function (r) {
+            return r.theme === theme && r.group === group && r.work === work && r.beneficiary === beneficiary && r.workType === workType;
+        });
+        if (duplicate) {
+            statusMsg.textContent = "This entry already exists.";
+            return;
+        }
+        addedRows.push({ theme: theme, group: group, work: work, beneficiary: beneficiary, workType: workType });
+        renderTable(); renderDomainCards(); resetComposer();
+        statusMsg.textContent = "Work added.";
+    }
+
+    function showDetails(index) {
+        const row = addedRows[index]; if (!row) return;
+        aboutWorkContent.classList.remove("muted");
+        aboutWorkContent.textContent =
+            "Theme: " + row.theme + "\n" +
+            "Group: " + row.group + "\n" +
+            "Work: " + row.work + "\n" +
+            "Beneficiary: " + row.beneficiary + "\n" +
+            "Work Type: " + row.workType;
+    }
+
+    function deleteRow(index) {
+        if (!addedRows[index]) return;
+        addedRows.splice(index, 1);
+        renderTable(); renderDomainCards();
+        aboutWorkContent.classList.add("muted");
+        aboutWorkContent.textContent = "Select any row and click eye icon to inspect details.";
+        statusMsg.textContent = "Work removed.";
+    }
+
+    themeSelect.addEventListener("change", updateGroups);
+    groupSelect.addEventListener("change", updateWorks);
+    workSelect.addEventListener("change", function () { updateWorkTypeAvailability(); updateBeneficiaryAvailability(); });
+    addWorkBtn.addEventListener("click", addWork);
+
+    workTableBody.addEventListener("click", function (event) {
+        const btn = event.target.closest("button[data-action]");
+        if (!btn) return;
+        const action = btn.getAttribute("data-action");
+        const index = Number(btn.getAttribute("data-index"));
+        if (action === "view") showDetails(index);
+        if (action === "delete") deleteRow(index);
+    });
+
+    function fitViewport() {
+        const nav = document.querySelector(".navbar");
+        const navH = nav ? nav.offsetHeight : 96;
+        document.getElementById("step2-d4").style.setProperty("--nav-h", navH + "px");
+    }
+
+    async function init() {
+        fitViewport();
+        setRadioGroupEnabled(workTypeRadios, false);
+        setRadioGroupEnabled(beneficiaryRadios, false);
+        try {
+            const res = await fetch(CSV_PATH, { cache: "no-store" });
+            if (!res.ok) throw new Error("CSV missing");
+            const text = await res.text();
+            masterRows = csvToObjects(text);
+            domainThemes = uniqSort(masterRows.map(function (r) { return r.theme; }));
+            setSelectOptions(themeSelect, domainThemes, "Select Theme");
+            renderDomainCards();
+            statusMsg.textContent = "Master data loaded (" + masterRows.length + " rows).";
+        } catch (err) {
+            domainThemes = [];
+            renderDomainCards();
+            statusMsg.textContent = "CSV load failed. Expected at /static/VBGRAMG_Final_Classified_278_Works.csv";
+        }
+    }
+
+    window.addEventListener("resize", fitViewport);
+    init();
+}());
+</script>
+{% endblock %}

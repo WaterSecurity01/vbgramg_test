@@ -1,5 +1,2277 @@
 {% extends 'base.html' %}
 {% block title %} Home {% endblock %}
 {% block content %}
-Step 1
+<style>
+    .container {
+        width: 100%;
+        /* max-width: 1200px; */
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    .two-equal-columns {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+    }
+
+    .p-5{
+        padding: 20px;
+        /* background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 4px; */
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+        color: #333;
+    }
+
+    .table thead th {
+        background-color: #007bff;
+        color: white;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        border: 1px solid #dee2e6;
+    }
+
+    .table tbody td {
+        padding: 12px;
+        border: 1px solid #dee2e6;
+    }
+
+    .table tbody tr {
+        border-bottom: 1px solid #dee2e6;
+        transition: background-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .table-border {
+        border: 1px solid #dee2e6;
+    }
+
+    .table-border thead th {
+        border: 1px solid #dee2e6;
+    }
+
+    .table-border tbody td {
+        border: 1px solid #dee2e6;
+    }
+
+    .text-center{
+        text-align: center;
+    }
+    .text-end{
+        text-align: end;
+    }
+    .rounded-4{
+        border-radius: 4px;
+    }
+    .mb-5{
+        margin-bottom: 20px;
+    }
+    .w-100{
+        width: 100%;
+    }
+    .h-auto{
+        height: auto;
+    }
+    .text-gray{
+        color: #666
+    }
+    .text-darkgray{
+        color: #555
+    }
+    .p-0{
+        padding:0
+    }
+    .line-3{
+        line-height: 1.2rem;
+    }
+    .justify-content-between{
+        justify-content:space-between;
+    }
+    .align-items-center{
+        align-items: center;
+    }
+    .flex-container{
+        display:flex;  
+    }
+    @media (max-width: 768px) {
+        .two-equal-columns {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="two-equal-columns">
+        <div class="p-5">
+            <!-- Thematic Domain and Group Name Selectors -->
+            <div class="mb-5 flex-container" style="gap: 15px;">
+                <div style="flex: 1;">
+                    <label for="thematicdomain" style="display: block; margin-bottom: 8px; font-weight: 600;">Thematic Domain</label>
+                    <select id="thematicdomain" class="form-control" onchange="updateGroupNames()">
+                        <option value="">-- Select Thematic Domain --</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label for="groupname" style="display: block; margin-bottom: 8px; font-weight: 600;">Group Name</label>
+                    <select id="groupname" class="form-control" onchange="populateTable()">
+                        <option value="">-- Select Group Name --</option>
+                    </select>
+                </div>
+            </div>
+
+            <script>
+            
+            </script>
+            <div  class="mb-5 flex-container align-items-center justify-content-between">
+                <div>
+                    <label class="me-3">
+                        <input type="radio" name="classification" value="All" checked onchange="populateTable()">
+                        All
+                    </label>
+                    <label class="me-3">
+                        <input type="radio" name="classification" value="New" onchange="populateTable()">
+                        New
+                    </label>
+                    <label>
+                        <input type="radio" name="classification" value="Repair" onchange="populateTable()">
+                        Repair
+                    </label>
+                </div>
+                <div>
+                    <strong>Total Records: <span id="recordCount">278</span></strong>
+                </div>
+            </div>
+
+            <div style="height: calc(100vh - 300px); overflow-y: auto; border: 1px solid #dee2e6; border-radius: 4px;padding:3px;">
+                <table class="table table-border">
+                    <thead>
+                        <tr>
+                            <th>S.No.</th>
+                            <th>Thematic Domain</th>
+                            <th>Group Name</th>
+                            <th>Work Name</th>
+                            <th>Classification</th>
+                            <th style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+            <div>
+                <div class="p-5">
+                    <img src="https://images.pexels.com/photos/12270467/pexels-photo-12270467.jpeg" alt="Work Details" 
+                    class="rounded-4 mb-5 w-100 h-auto">                    
+                    <h2 class="text-center text-darkgray">Selected Work Information</h2>                    
+                    <p class="mb-5 text-gray line-3">
+                        This section displays comprehensive details about the selected work from the list. You can view information including the work name, thematic domain, group classification, and project status. Click on any work item from the table on the left to view its complete information here. This helps in understanding the scope and category of different rural development projects across various domains.
+                    </p>
+                    <div class="text-end text-darkgray p-0">Ministry of Rural Development</div>
+                    <div class="text-end text-darkgray p-0">Government of India</div>
+                </div>
+            </div>
+    </div>
+</div>
+
+<script>
+works_list=[
+ {
+   "S.No.": 1,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Boulder Check Dam",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 2,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Boulder Check Dam",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 3,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Earthen Check Dam",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 4,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Earthen Check Dam",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 5,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Gabion Check Dam",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 6,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Gabion Check Dam",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 7,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Masonry Check Dam",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 8,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Masonry Check Dam",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 9,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Brushwood Gully Plug",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 10,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Earthen Gully Plug",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 11,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Stone Boulder Gully Plug",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 12,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Main Canal",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 13,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Main Canal",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 14,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Branch Canal",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 15,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Branch Canal",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 16,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Major Distributary Canal",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 17,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Major Distributary Canal",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 18,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Minor Distributary Canal",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 19,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Minor Distributary Canal",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 20,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Lining of Canal",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 21,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Water Courses and Field Channels",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 22,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Diversion Channel",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 23,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Diversion Channel",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 24,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Flood Diversion Drain",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 25,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Flood Diversion Drain",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 26,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Construction of Underground Dyke",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 27,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Surface Structures",
+   "Work Name": "Repair & Maintenance of Underground Dyke",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 28,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Collection Chamber for Spring Shed",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 29,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Repair & Maintenance of Collection Chamber for Spring Shed",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 30,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Farm Pond",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 31,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Filtration Chamber for Defunct Borewell",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 32,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Repair & Maintenance of Filteration chamber in defunct bore well",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 33,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Filtration Pond with Recharge Shaft along Escape Channel",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 34,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Repair & Maintenance of Filtration Pond with Recharge Shaft along Escape Channel",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 35,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Injection Well in Channels",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 36,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Repair & Maintenance of Injection Well in Channels",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 37,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Injection Well in Water Bodies",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 38,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Repair & Maintenance of Injection Well in Water Bodies",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 39,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Percolation Tank",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 40,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Repair & Maintenance of Percolation Tank",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 41,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Recharge Pit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 42,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Recharge Shaft",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 43,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Repair & Maintenance of Recharge Shaft",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 44,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Rejuvenation of Pond",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 45,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Rejuvenation of Step Well",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 46,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Sand-Filled Groundwater Recharge in Borewell",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 47,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Repair & Maintenance of Sand-Filled Groundwater Recharge in Borewell",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 48,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Sand-Filled Groundwater Recharge in Dug Well",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 49,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Repair & Maintenance of Sand-Filled Groundwater Recharge in Dug Well",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 50,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Tanka (Water Storage Structure)",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 51,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Water Harvesting Pond",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 52,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Repair & Maintenance of Water Harvesting Pond",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 53,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Recharge Structures",
+   "Work Name": "Construction of Artificial Wetland for Waste Water Management",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 54,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Irrigation Systems",
+   "Work Name": "Construction of Drip Irrigation Channels",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 55,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Irrigation Systems",
+   "Work Name": "Construction of Irrigation Channels for Field Distribution",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 56,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Irrigation Systems",
+   "Work Name": "Construction of Irrigation Well",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 57,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Irrigation Systems",
+   "Work Name": "Repair & Maintenance of Irrigation Well",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 58,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Irrigation Systems",
+   "Work Name": "Installation of Sprinkler Irrigation System",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 59,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Land Reclamation",
+   "Work Name": "Development of Waterlogged Land",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 60,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Land Reclamation",
+   "Work Name": "Construction of Drainage Works in Waterlogged Land",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 61,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Construction of Continuous Contour Trench",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 62,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Construction of Staggered Contour Trench",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 63,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Plantation in Coastal Area",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 64,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Bio-drainage Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 65,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Agro Forestry Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 66,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Bamboo Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 67,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Cactus Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 68,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Mango Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 69,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Cashew Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 70,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Apple Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 71,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Custard Apple Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 72,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Lemon Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 73,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Coconut Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 74,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Moringa Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 75,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Orange Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 76,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Guava Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 77,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Pear Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 78,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Dragon Fruit Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 79,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Apricot Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 80,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Chickoo Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 81,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Pomegranate Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 82,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Litchi Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 83,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Sweet Lime Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 84,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Avocado Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 85,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Grape Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 86,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Jack Fruit Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 87,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Other Horticulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 88,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Mangrove Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 89,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Amla medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 90,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Neem medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 91,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Aswagandha medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 92,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Arjunamedicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 93,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Satavari medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 94,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Mulethi medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 95,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Tulsi medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 96,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Peepal medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 97,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Bael medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 98,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Ashoka medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 99,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Golden Sower  medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 100,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Kachnar medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 101,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Other Medicinal Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 102,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Plantation in Community Institutions",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 103,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Avenue Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 104,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Canal Line Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 105,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Tea Plantation in Community Wasteland",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 106,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Coffee Plantation in Community Wasteland",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 107,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Other Plantation in Community Wasteland",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 108,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Plantation in Forest Area",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 109,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Sericulture Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 110,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Jatropha Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 111,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Karanj Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 112,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Wild Apricot Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 113,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Simaoubha Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 114,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Mohua Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 115,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Kokum Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 116,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Jojoba Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 117,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Neem Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 118,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Anjeer Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 119,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Cheura Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 120,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Tung Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 121,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Olive Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 122,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Oil Palm Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 123,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Soil Conservation",
+   "Work Name": "Raising of Other Tree Borne Oil Seed Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 124,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Rainwater Harvesting",
+   "Work Name": "Construction of Roof Top Rain Water Harvesting Structure",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 125,
+   "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+   "Group Name (AI)": "Rainwater Harvesting",
+   "Work Name": "Repair & Maintenance of Roof Top Rain Water Harvesting Structure",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 126,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Construction of Cross Drainage Structure",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 127,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Repair & Maintenance of Cross Drainage Structure",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 128,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Construction of Culvert",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 129,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Repair & Maintenance of Culvert",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 130,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Construction of Rural Foot Over Bridge",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 131,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Repair & Maintenance of Rural Foot Over Bridge",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 132,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Construction of Bitumen Road",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 133,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Repair & Maintenance of Bitumen Road",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 134,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Construction of Cement Concrete Road",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 135,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Repair & Maintenance of Cement Concrete Road",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 136,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Construction of Interlocking Paver Block Road",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 137,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Repair & Maintenance of Interlocking Paver Block Road",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 138,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Construction of Kharanja Road",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 139,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Repair & Maintenance of Kharanja Road",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 140,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Construction of WBM Road",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 141,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Connectivity",
+   "Work Name": "Repair & Maintenance of WBM Road",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 142,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Construction of Anganwadi Centre Building",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 143,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Repair & Maintenance of Anganwadi Centre Building",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 144,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Construction of Anganwadi Toilet",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 145,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Repair & Maintenance of Anganwadi Toilet",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 146,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Construction of Gram Panchayat Building",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 147,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Repair & Maintenance of Gram Panchayat Building",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 148,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Construction of Boundary Wall for Government Institutions",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 149,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Construction of Marriage/Community Hall",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 150,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Repair & Maintenance of Marriage/Community Hall",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 151,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Construction of Rural Health Centre",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 152,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Repair & Maintenance of Rural Health Centre",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 153,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Construction of Rural Library Building",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 154,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Repair & Maintenance of Rural Library Building",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 155,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Construction of Veterinary Health Centre",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 156,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Civic Buildings",
+   "Work Name": "Repair & Maintenance of Veterinary Health Centre",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 157,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Construction of Additional Classroom for Government School",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 158,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Repair & Maintenance of Additional Classroom for Government School",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 159,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Construction of Compound Wall for Government School",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 160,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Repair & Maintenance of Compound Wall for Government School",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 161,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Construction of Kitchen Shed for Government School",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 162,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Repair & Maintenance of Kitchen Shed for Government School",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 163,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Construction of Laboratory for Government School",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 164,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Repair & Maintenance of Laboratory for Government School",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 165,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Construction of Play Ground for Government School",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 166,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Construction of Toilet for Government School",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 167,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Education Infrastructure",
+   "Work Name": "Repair & Maintenance of Toilet for Government School",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 168,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Community Assets",
+   "Work Name": "Construction of Crematorium",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 169,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Community Assets",
+   "Work Name": "Repair & Maintenance of Crematorium",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 170,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Community Assets",
+   "Work Name": "Construction of Graveyard",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 171,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Community Assets",
+   "Work Name": "Repair & Maintenance of Graveyard",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 172,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Water Supply",
+   "Work Name": "Repair and Maintenance of Storage Structure for Water Supply Project (JJM)",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 173,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Water Supply",
+   "Work Name": "Repair and Maintenance of Distribution Structure Water Supply Project (JJM)",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 174,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Waste Management",
+   "Work Name": "Construction of Community Sanitary Complex",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 175,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Waste Management",
+   "Work Name": "Construction of IHHL",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 176,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Waste Management",
+   "Work Name": "Construction of Compost Collection Pit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 177,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Waste Management",
+   "Work Name": "Construction of Segregation Shed",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 178,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Waste Management",
+   "Work Name": "Construction of Soak Pit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 179,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Waste Management",
+   "Work Name": "Construction of Soakage Channel",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 180,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Waste Management",
+   "Work Name": "Construction of Liquid Waste Chamber",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 181,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Renewable Energy",
+   "Work Name": "Construction of Biogas Plant",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 182,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Renewable Energy",
+   "Work Name": "Installation of Solar Street Light",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 183,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Common Facilities",
+   "Work Name": "Construction of Rural Bus Stand",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 184,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Common Facilities",
+   "Work Name": "Repair & Maintenance of Rural Bus Stand",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 185,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Common Facilities",
+   "Work Name": "Construction of Parking Shed",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 186,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Common Facilities",
+   "Work Name": "Repair & Maintenance of Parking Shed",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 187,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Common Facilities",
+   "Work Name": "Construction of Rural Park",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 188,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Common Facilities",
+   "Work Name": "Construction of Sitting Chaupal/Pandal",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 189,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Common Facilities",
+   "Work Name": "Construction of CC/Paver Block Flooring in Community Institutions",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 190,
+   "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+   "Group Name (AI)": "Rural Housing",
+   "Work Name": "Construction of PMAY-G House",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 191,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Skill Infrastructure",
+   "Work Name": "Construction of Training and Skill Development Centre Building",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 192,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Skill Infrastructure",
+   "Work Name": "Repair & Maintenance of Training and Skill Development Centre Building",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 193,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Skill Infrastructure",
+   "Work Name": "Construction of Workshed for SHG",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 194,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Skill Infrastructure",
+   "Work Name": "Repair & Maintenance of Workshed for SHG",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 195,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Market Infrastructure",
+   "Work Name": "Construction of Rural Haat Building",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 196,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Market Infrastructure",
+   "Work Name": "Repair & Maintenance of Rural Haat Building",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 197,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Market Infrastructure",
+   "Work Name": "Construction of Market Yard",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 198,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Market Infrastructure",
+   "Work Name": "Repair & Maintenance of Market Yard",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 199,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Agri Storage",
+   "Work Name": "Construction of Agricultural Produce Storage Building",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 200,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Agri Storage",
+   "Work Name": "Repair & Maintenance of Agricultural Produce Storage Building",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 201,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Agri Storage",
+   "Work Name": "Construction of Cold Storage Unit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 202,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Agri Storage",
+   "Work Name": "Repair & Maintenance of Cold Storage Unit",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 203,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Agri Storage",
+   "Work Name": "Construction of Food Grain Storage Building",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 204,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Agri Storage",
+   "Work Name": "Repair & Maintenance of Food Grain Storage Building",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 205,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Agri Storage",
+   "Work Name": "Construction of Threshing Yard",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 206,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "SHG Infrastructure",
+   "Work Name": "Construction of SHG Building",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 207,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "SHG Infrastructure",
+   "Work Name": "Repair & Maintenance SHG Building",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 208,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "SHG Infrastructure",
+   "Work Name": "Construction of Federation Building",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 209,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "SHG Infrastructure",
+   "Work Name": "Repair & Maintenance Federation Building",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 210,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Bio-fertilizer and Organic Manure Units",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 211,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Vertical Greywater Treatment Unit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 212,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Horizontal Greywater Treatment Unit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 213,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Mini Flour Mill Processing Unit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 214,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Cashew Processing Unit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 215,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Oil Seed Processing Unit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 216,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Integrated Agro Processing Unit (Cleaning/Grading/Packaging)",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 217,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Forest Produce Processing Unit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 218,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Handloom Processing Unit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 219,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Hot Press Biodegradable Processing Unit (Plates/Bowls)",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 220,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Bamboo Craft Processing Unit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 221,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Other Processing Unit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 222,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Circular Economy",
+   "Work Name": "Construction of Recycling Plant",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 223,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Organic Inputs",
+   "Work Name": "Construction of Berkeley Compost Pit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 224,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Organic Inputs",
+   "Work Name": "Construction of Compost Pit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 225,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Organic Inputs",
+   "Work Name": "Construction of NADEP Compost Pit",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 226,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Organic Inputs",
+   "Work Name": "Construction of Vermi Compost Structure",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 227,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Livestock Assets",
+   "Work Name": "Construction of Cattle Shelter",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 228,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Livestock Assets",
+   "Work Name": "Construction of Cattle/Animal Trough",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 229,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Livestock Assets",
+   "Work Name": "Raising of Fodder Cultivation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 230,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Livestock Assets",
+   "Work Name": "Construction of Goat Shelter",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 231,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Livestock Assets",
+   "Work Name": "Construction of Milk Production Centre",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 232,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Livestock Assets",
+   "Work Name": "Repair & Maintenance of Milk Production Centre",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 233,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Livestock Assets",
+   "Work Name": "Construction of Piggery Shed",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 234,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Livestock Assets",
+   "Work Name": "Construction of Poultry Shelter",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 235,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Fisheries Assets",
+   "Work Name": "Construction of Aquaculture Structure for Shrimp Farming",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 236,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Fisheries Assets",
+   "Work Name": "Construction of Aquaculture Structure for Fish Farming",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 237,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Fisheries Assets",
+   "Work Name": "Construction of Aquaculture Structure for Crab Farming",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 238,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Fisheries Assets",
+   "Work Name": "Construction of Fish Drying Yard",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 239,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Fisheries Assets",
+   "Work Name": "Construction of Fishery Pond",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 240,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Fisheries Assets",
+   "Work Name": "Repair & Maintenance of Fishery Pond",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 241,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Production Units",
+   "Work Name": "Production of Building Material",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 242,
+   "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+   "Group Name (AI)": "Production Units",
+   "Work Name": "Raising of Nursery",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 243,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Disaster Shelters",
+   "Work Name": "Construction of Cyclone Shelter",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 244,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Disaster Shelters",
+   "Work Name": "Repair & Maintenance of Cyclone Shelters",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 245,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Disaster Shelters",
+   "Work Name": "Construction of Flood Retention Shelter",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 246,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Disaster Shelters",
+   "Work Name": "Repair & Maintenance of Flood Retension Shelters",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 247,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Embankment",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 248,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Strengthening of Embankment",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 249,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Earthen Spur",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 250,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Gabion Spur",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 251,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Stone Spur",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 252,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Repair & Maintenance of Spur",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 253,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Storm Water Drain",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 254,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Repair & Maintenance of Storm Water Drain",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 255,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Flood Diversion Channel",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 256,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Repair & Maintenance of Flood Diversion Channel",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 257,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Flood Protection Wall",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 258,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Repair & Maintenance of Flood protection wall",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 259,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Masonry Bund",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 260,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Earthen Retaining Wall",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 261,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Repair & Maintenance of Earthen Retaining Wall",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 262,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Stone/Gabion Retaining Wall",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 263,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Repair & Maintenance of Stone/Gabion Retaining Wall",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 264,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of Masonry Retaining Wall",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 265,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Repair & Maintenance of Masonry Retaining Wall",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 266,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Construction of RCC Retaining Wall",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 267,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Works",
+   "Work Name": "Repair & Maintenance of RCC Retaining Wall",
+   "Classification": "Repair"
+ },
+ {
+   "S.No.": 268,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Flood Control",
+   "Work Name": "Construction of 3/5 Pond for Grey Water Management",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 269,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Flood Control",
+   "Work Name": "Construction of Masonry Greywater Drain",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 270,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Flood Control",
+   "Work Name": "Construction of Stabilisation Pond",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 271,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Asset Restoration",
+   "Work Name": "Post-Disaster Restoration of Rural Roads",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 272,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Asset Restoration",
+   "Work Name": "Post-Disaster Restoration of Other Community Assests",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 273,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Asset Restoration",
+   "Work Name": "Post-Disaster Restoration of Community Building Assests",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 274,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Protective Plantations",
+   "Work Name": "Raising of Shelterbelt Plantation",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 275,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Fire Management",
+   "Work Name": "Construction of Animal Protection Trenches",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 276,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Fire Management",
+   "Work Name": "Raising of Fire Break Hedges",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 277,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Fire Management",
+   "Work Name": "Construction of Forest Fire Line",
+   "Classification": "New"
+ },
+ {
+   "S.No.": 278,
+   "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+   "Group Name (AI)": "Fire Management",
+   "Work Name": "Raising of Fuel Buffer Zone",
+   "Classification": "New"
+ }
+]
+
+// function populateTable() {
+//     const selectedFilter = document.querySelector('input[name="classification"]:checked').value;
+//     const tableBody = document.getElementById('tableBody');
+//     const spanRecordCount = document.getElementById('recordCount');
+    
+//     tableBody.innerHTML = '';
+    
+//     const filteredList = selectedFilter === 'All' 
+//         ? works_list 
+//         : works_list.filter(work => work.Classification === selectedFilter);
+    
+//     let i = 0;
+//     filteredList.forEach(work => {
+//         const row = document.createElement('tr');
+//         const classColor = work.Classification === 'New' ? 'table-success' : 'table-warning';
+//         row.classList.add(classColor);
+//         i++;
+//         row.innerHTML = `
+//             <td>${i}</td>
+//             <td>${work['Thematic Domain']}</td>
+//             <td>${work['Group Name (AI)']}</td>
+//             <td>${work['Work Name']}</td>
+//             <td>
+//                 <span>
+//                     ${work.Classification}
+//                 </span>
+//             </td>
+//             <td style="text-align: center;">
+//                 <button onclick="viewWork(${work['S.No.']})" class="btn btn-sm btn-primary">
+//                     View
+//                 </button>
+//             </td>
+//         `;
+//         tableBody.appendChild(row);
+//     });
+//     spanRecordCount.innerHTML = i;
+// }
+function populateTable() {
+    const selectedClassification = document.querySelector('input[name="classification"]:checked').value;
+    const selectedDomain = document.getElementById('thematicdomain').value;
+    const selectedGroup = document.getElementById('groupname').value;
+    const tableBody = document.getElementById('tableBody');
+    const spanRecordCount = document.getElementById('recordCount');
+    
+    tableBody.innerHTML = '';
+    
+    let filteredList = works_list;
+    
+    // Filter by Thematic Domain
+    if(selectedDomain) {
+        filteredList = filteredList.filter(work => work['Thematic Domain'] === selectedDomain);
+    }
+    
+    // Filter by Group Name
+    if(selectedGroup) {
+        filteredList = filteredList.filter(work => work['Group Name (AI)'] === selectedGroup);
+    }
+    
+    // Filter by Classification
+    if(selectedClassification !== 'All') {
+        filteredList = filteredList.filter(work => work.Classification === selectedClassification);
+    }
+    
+    let i = 0;
+    filteredList.forEach(work => {
+        const row = document.createElement('tr');
+        const classColor = work.Classification === 'New' ? 'table-success' : 'table-warning';
+        row.classList.add(classColor);
+        i++;
+        row.innerHTML = `
+            <td>${i}</td>
+            <td>${work['Thematic Domain']}</td>
+            <td>${work['Group Name (AI)']}</td>
+            <td>${work['Work Name']}</td>
+            <td>
+                <span>
+                    ${work.Classification}
+                </span>
+            </td>
+            <td style="text-align: center;">
+                <button onclick="viewWork(${work['S.No.']})" class="btn btn-sm btn-primary">
+                    View
+                </button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+    spanRecordCount.innerHTML = i;
+}
+
+function viewWork(sno) {
+    const work = works_list.find(w => w['S.No.'] === sno);
+    if(work) {
+        alert(`Work Details:\n\nS.No.: ${work['S.No.']}\nWork Name: ${work['Work Name']}\nThematic Domain: ${work['Thematic Domain']}\nGroup: ${work['Group Name (AI)']}\nClassification: ${work.Classification}`);
+    }
+}
+
+// Populate thematic domains on page load
+function initializeSelects() {
+    const thematicdomainSelect = document.getElementById('thematicdomain');
+    const uniqueDomains = [...new Set(works_list.map(work => work['Thematic Domain']))];
+    
+    uniqueDomains.forEach(domain => {
+        const option = document.createElement('option');
+        option.value = domain;
+        option.textContent = domain;
+        thematicdomainSelect.appendChild(option);
+    });
+}
+
+// Update group names based on selected thematic domain
+function updateGroupNames() {
+    const thematicdomainSelect = document.getElementById('thematicdomain');
+    const groupnameSelect = document.getElementById('groupname');
+    const selectedDomain = thematicdomainSelect.value;
+    
+    groupnameSelect.innerHTML = '<option value="">-- Select Group Name --</option>';
+    
+    if(selectedDomain) {
+        const uniqueGroups = [...new Set(
+            works_list
+                .filter(work => work['Thematic Domain'] === selectedDomain)
+                .map(work => work['Group Name (AI)'])
+        )];
+        
+        uniqueGroups.forEach(group => {
+            const option = document.createElement('option');
+            option.value = group;
+            option.textContent = group;
+            groupnameSelect.appendChild(option);
+        });
+    }
+    populateTable();
+}
+
+// Initialize selects when page loads
+initializeSelects();
+
+populateTable();
+</script>
 {% endblock %}
