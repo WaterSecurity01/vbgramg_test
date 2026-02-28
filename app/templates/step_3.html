@@ -37,11 +37,8 @@
         overflow: hidden;
     }
 
-    #step3-ui * {
-        box-sizing: border-box;
-    }
+    #step3-ui * { box-sizing: border-box; }
 
-    /* ── Main Layout */
     #step3-ui .step3-layout {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -60,11 +57,8 @@
         flex-direction: column;
     }
 
-    #step3-ui .left-panel {
-        border-right: 2px solid var(--line);
-    }
+    #step3-ui .left-panel { border-right: 2px solid var(--line); }
 
-    /* ── Panel Headings */
     #step3-ui .panel-heading {
         text-align: center;
         font-size: 20px;
@@ -73,7 +67,6 @@
         margin: 0 0 10px;
     }
 
-    /* Tables */
     #step3-ui .table-wrap {
         border: 2px solid var(--line);
         overflow-y: auto;
@@ -104,7 +97,7 @@
     }
 
     #step3-ui td {
-        padding: 6px 8px;
+        padding: 4px 6px;
         font-size: 12px;
         border: 1px solid #a5a5a5;
         text-align: left;
@@ -114,10 +107,8 @@
         color: var(--text);
     }
 
-    #step3-ui .icon-col {
-        text-align: center;
-        width: 36px;
-    }
+    #step3-ui .icon-col { text-align: center; width: 36px; }
+    #step3-ui .qty-col  { text-align: center; width: 50px; }
 
     #step3-ui .icon-btn {
         border: 0;
@@ -127,14 +118,45 @@
         line-height: 1;
     }
 
-    #step3-ui .view-btn  { color: #5f5f5f; }
-    #step3-ui .arrow-btn { color: #0091ff; }
+    #step3-ui .view-btn   { color: #5f5f5f; }
+    #step3-ui .arrow-btn  { color: #0091ff; }
+    #step3-ui .arrow-btn[disabled] { color: #c0c0c0 !important; cursor: not-allowed !important; opacity: 0.4; }
     #step3-ui .delete-btn { color: #c11414; }
+
+    /* Qty value */
+    #step3-ui .qty-value {
+        font-size: 13px;
+        font-weight: 700;
+        color: #2f2f2f;
+        text-align: center;
+        display: block;
+    }
+
+    /* AAP qty badge */
+    #step3-ui .aap-qty-badge {
+        display: inline-block;
+        background: #0091ff;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 1px 7px;
+        min-width: 22px;
+        text-align: center;
+    }
 
     #step3-ui .empty-row {
         text-align: center;
         color: #757575;
         padding: 18px 8px;
+    }
+
+    #step3-ui .status-msg {
+        font-size: 12px;
+        color: #666;
+        margin: 6px 0 0;
+        min-height: 16px;
+        flex-shrink: 0;
     }
 
     /* Domain Cards */
@@ -164,13 +186,21 @@
         display: grid;
         place-items: center;
         box-shadow: inset 0 2px 7px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+        user-select: none;
     }
 
-    /* Right Panel */
-    #step3-ui .about-work {
-        margin-top: 12px;
-        flex-shrink: 0;
+    #step3-ui .domain-item .count-card:hover { transform: scale(1.04); }
+
+    #step3-ui .domain-item .count-card.active-filter {
+        outline: 3px solid #fff;
+        box-shadow: 0 0 0 5px rgba(0,0,0,0.35), inset 0 2px 7px rgba(0,0,0,0.2);
+        transform: scale(1.04);
     }
+
+    /* About Work */
+    #step3-ui .about-work { margin-top: 12px; flex-shrink: 0; }
 
     #step3-ui .about-work h4 {
         margin: 0 0 8px;
@@ -194,11 +224,9 @@
         color: var(--text);
     }
 
-    #step3-ui .about-content.muted {
-        color: var(--muted);
-    }
+    #step3-ui .about-content.muted { color: var(--muted); }
 
-    /* Footer Buttons */
+    /* Footer */
     #step3-ui .step3-footer {
         display: flex;
         justify-content: flex-end;
@@ -208,46 +236,31 @@
     }
 
     #step3-ui .btn-back {
-        height: 40px;
-        padding: 0 24px;
-        border: 2px solid #747474;
-        border-radius: 20px;
+        height: 40px; padding: 0 24px;
+        border: 2px solid #747474; border-radius: 20px;
         background: linear-gradient(180deg, #9a9a9a, #7e7e7e);
-        color: #fff;
-        font-size: 15px;
-        font-weight: 700;
-        cursor: pointer;
-        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        color: #fff; font-size: 15px; font-weight: 700;
+        cursor: pointer; font-family: "Trebuchet MS", "Segoe UI", sans-serif;
     }
 
-    #step3-ui .btn-next {
-        height: 40px;
-        padding: 0 24px;
-        border: 2px solid #0070cc;
-        border-radius: 20px;
+    #step3-ui .btn-approve {
+        height: 40px; padding: 0 24px;
+        border: 2px solid #0070cc; border-radius: 20px;
         background: linear-gradient(180deg, #33aaff, #0070cc);
-        color: #fff;
-        font-size: 15px;
-        font-weight: 700;
-        cursor: pointer;
-        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        color: #fff; font-size: 15px; font-weight: 700;
+        cursor: pointer; font-family: "Trebuchet MS", "Segoe UI", sans-serif;
     }
 
     @media (max-width: 900px) {
-        #step3-ui .step3-layout {
-            grid-template-columns: 1fr;
-        }
-        #step3-ui .left-panel {
-            border-right: none;
-            border-bottom: 2px solid var(--line);
-        }
+        #step3-ui .step3-layout { grid-template-columns: 1fr; }
+        #step3-ui .left-panel { border-right: none; border-bottom: 2px solid var(--line); }
     }
 </style>
 
 <section id="step3-ui">
     <div class="step3-layout">
 
-        <!-- Viksit Gram Panchayat Stack -->
+        <!--Viksit Gram Panchayat Stack -->
         <div class="panel left-panel">
             <div class="panel-heading">Viksit Gram Panchayat Stack</div>
 
@@ -258,102 +271,62 @@
                             <th>Theme</th>
                             <th>Group</th>
                             <th>Work</th>
-                            <th>Beneficiary</th>
-                            <th>Type</th>
-                            <th class="icon-col"><i class="fa-solid fa-eye"></i></th>
+                            <th>Classification</th>
+                            <th class="qty-col">Qty</th>
                             <th class="icon-col"><i class="fa-solid fa-arrow-right"></i></th>
                         </tr>
                     </thead>
                     <tbody id="schemeTableBody">
-                        {% for scheme in schemes %}
-                        <tr>
-                            <td>{{ scheme.theme }}</td>
-                            <td>{{ scheme.group }}</td>
-                            <td>{{ scheme.work }}</td>
-                            <td>{{ scheme.beneficiary }}</td>
-                            <td>{{ scheme.work_type }}</td>
-                            <td class="icon-col">
-                                <button class="icon-btn view-btn" title="View">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-                            </td>
-                            <td class="icon-col">
-                                <button class="icon-btn arrow-btn" title="Go">
-                                    <i class="fa-solid fa-arrow-right"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="7" class="empty-row">No data available.</td>
-                        </tr>
-                        {% endfor %}
+                        <tr><td colspan="6" class="empty-row">Loading data...</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Domain Cards  -->
-            <div class="domain-grid" id="domainCards">
+            <p class="status-msg" id="statusMsg">Loading CSV...</p>
+
+            <!-- Domain Cards -->
+            <div class="domain-grid">
                 <div class="domain-item">
                     <div class="label">Water Security</div>
-                    <div class="count-card" style="background: var(--water)">
-                        {{ stats.water_security if stats.water_security is defined and stats.water_security != None else '-' }}
-                    </div>
+                    <div class="count-card" style="background: var(--water)" id="count-water" data-filter="water">-</div>
                 </div>
                 <div class="domain-item">
                     <div class="label">Rural Infrastructure</div>
-                    <div class="count-card" style="background: var(--infra)">
-                        {{ stats.rural_infrastructure if stats.rural_infrastructure is defined and stats.rural_infrastructure != None else '-' }}
-                    </div>
+                    <div class="count-card" style="background: var(--infra)" id="count-infra" data-filter="infrastructure">-</div>
                 </div>
                 <div class="domain-item">
                     <div class="label">Rural Livelihood</div>
-                    <div class="count-card" style="background: var(--live)">
-                        {{ stats.rural_livelihood if stats.rural_livelihood is defined and stats.rural_livelihood != None else '-' }}
-                    </div>
+                    <div class="count-card" style="background: var(--live)" id="count-live" data-filter="livelihood">-</div>
                 </div>
                 <div class="domain-item">
                     <div class="label">Disaster Management</div>
-                    <div class="count-card" style="background: var(--disaster)">
-                        {{ stats.disaster_management if stats.disaster_management is defined and stats.disaster_management != None else '-' }}
-                    </div>
+                    <div class="count-card" style="background: var(--disaster)" id="count-disaster" data-filter="disaster">-</div>
                 </div>
             </div>
         </div>
 
-        <!--  Annual Action Plan -->
+        <!-- Annual Action Plan -->
         <div class="panel right-panel">
             <div class="panel-heading">Annual Action Plan</div>
 
             <div class="table-wrap">
-                <table>
+                <table style="table-layout: fixed;">
+                    <colgroup>
+                        <col style="width: auto;">
+                        <col style="width: auto;">
+                        <col style="width: 42px;">
+                        <col style="width: 36px;">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>Work</th>
-                            <th class="icon-col"><i class="fa-solid fa-eye"></i></th>
-                            <th class="icon-col"><i class="fa-solid fa-trash"></i></th>
+                            <th>Theme</th>
+                            <th style="text-align:center;">Qty</th>
+                            <th style="text-align:center;"><i class="fa-solid fa-trash"></i></th>
                         </tr>
                     </thead>
                     <tbody id="aapTableBody">
-                        {% for item in aap_items %}
-                        <tr>
-                            <td>{{ item.activity }}</td>
-                            <td class="icon-col">
-                                <button class="icon-btn view-btn" title="View">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-                            </td>
-                            <td class="icon-col">
-                                <button class="icon-btn delete-btn" title="Delete">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="3" class="empty-row">No work added yet.</td>
-                        </tr>
-                        {% endfor %}
+                        <tr><td colspan="4" class="empty-row">No work added yet.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -369,7 +342,7 @@
             <!-- Footer -->
             <div class="step3-footer">
                 <button class="btn-back" onclick="window.location.href='{{ url_for('routes.step_2') }}'">Back</button>
-                <button class="btn-next" onclick="window.location.href='{{ url_for('routes.step_4') }}'">Next</button>
+                <button class="btn-approve" onclick="window.location.href='{{ url_for('routes.step_4') }}'">Approve</button>
             </div>
         </div>
 
@@ -378,6 +351,233 @@
 
 <script>
 (function () {
+
+    const CSV_PATH = "/static/VBGRAMG_Final_Classified_278_Works.csv";
+
+    const schemeTableBody  = document.getElementById("schemeTableBody");
+    const aapTableBody     = document.getElementById("aapTableBody");
+    const aboutWorkContent = document.getElementById("aboutWorkContent");
+    const statusMsg        = document.getElementById("statusMsg");
+
+    const countEls = {
+        water:    document.getElementById("count-water"),
+        infra:    document.getElementById("count-infra"),
+        live:     document.getElementById("count-live"),
+        disaster: document.getElementById("count-disaster")
+    };
+
+    let allRows    = [];   // full CSV rows with qty
+    let aapRows    = [];   // { rowRef, qty } objects in AAP
+    let activeFilter = null;
+
+    // CSV parser
+    function parseCSV(text) {
+        const rows = [];
+        let current = "", row = [], inQuotes = false;
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i], next = text[i + 1];
+            if (char === '"') {
+                if (inQuotes && next === '"') { current += '"'; i++; }
+                else { inQuotes = !inQuotes; }
+            } else if (char === "," && !inQuotes) {
+                row.push(current); current = "";
+            } else if ((char === "\n" || char === "\r") && !inQuotes) {
+                if (char === "\r" && next === "\n") { i++; }
+                row.push(current); current = "";
+                if (row.length > 1 || (row[0] && row[0].trim())) { rows.push(row); }
+                row = [];
+            } else { current += char; }
+        }
+        if (current.length > 0 || row.length > 0) { row.push(current); rows.push(row); }
+        return rows;
+    }
+
+    function csvToObjects(csvText) {
+        const matrix = parseCSV(csvText);
+        if (!matrix.length) return [];
+        const headers = matrix[0].map(function (h) { return h.trim(); });
+        return matrix.slice(1).map(function (line) {
+            const item = {};
+            headers.forEach(function (header, idx) { item[header] = (line[idx] || "").trim(); });
+            const work           = (item["Work Name"]       || "").trim();
+            const classification = (item["Classification"]  || "").trim();
+            // Deterministic qty based on work name 
+            function hashQty(str) {
+                let h = 0;
+                for (let i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) & 0xffff; }
+                return (h % 7) + 2; // 2-8
+            }
+            const isRepair = work.toLowerCase().includes("repair") ||
+                             work.toLowerCase().includes("maintenance");
+            const qty = isRepair ? 1 : hashQty(work);
+            return {
+                theme:          (item["Thematic Domain"] || "").trim(),
+                group:          (item["Group Name"]      || "").trim(),
+                work:           work,
+                classification: classification,
+                totalQty:       qty,   // original max
+                availQty:       qty    // remaining available
+            };
+        }).filter(function (r) { return r.theme && r.group && r.work; });
+    }
+
+    // Render left table
+    function renderSchemeTable() {
+        schemeTableBody.innerHTML = "";
+        const rowsToShow = activeFilter
+            ? allRows.filter(function (r) { return r.theme.toLowerCase().includes(activeFilter); })
+            : allRows;
+
+        if (!rowsToShow.length) {
+            schemeTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">No data available.</td></tr>';
+            return;
+        }
+
+        rowsToShow.forEach(function (row) {
+            const idx      = allRows.indexOf(row);
+            const depleted = row.availQty <= 0;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML =
+                '<td>' + row.theme          + '</td>' +
+                '<td>' + row.group          + '</td>' +
+                '<td>' + row.work           + '</td>' +
+                '<td>' + row.classification + '</td>' +
+                '<td class="qty-col"><span class="qty-value" id="qty-val-' + idx + '">' + row.availQty + '</span></td>' +
+                '<td class="icon-col">' +
+                    '<button class="icon-btn arrow-btn" data-action="add-to-aap" data-index="' + idx + '"' +
+                    (depleted ? ' disabled style="color:#c0c0c0;opacity:0.4;cursor:not-allowed;" title="No quantity left"' : '') +
+                    '><i class="fa-solid fa-arrow-right"></i></button>' +
+                '</td>';
+            schemeTableBody.appendChild(tr);
+        });
+    }
+
+    function renderAapTable() {
+        aapTableBody.innerHTML = "";
+        if (!aapRows.length) {
+            aapTableBody.innerHTML = '<tr><td colspan="4" class="empty-row">No work added yet.</td></tr>';
+            return;
+        }
+        aapRows.forEach(function (entry, idx) {
+            const tr = document.createElement("tr");
+            tr.innerHTML =
+                '<td>' + entry.rowRef.work  + '</td>' +
+                '<td>' + entry.rowRef.theme + '</td>' +
+                '<td style="text-align:center;"><span class="aap-qty-badge">' + entry.qty + '</span></td>' +
+                '<td style="text-align:center;"><button class="icon-btn delete-btn" data-action="delete-aap" data-index="' + idx + '"><i class="fa-solid fa-trash"></i></button></td>';
+            aapTableBody.appendChild(tr);
+        });
+    }
+
+    // Domain card counts
+    function renderDomainCounts() {
+        function sumQty(keyword) {
+            return allRows
+                .filter(function (r) { return r.theme.toLowerCase().includes(keyword); })
+                .reduce(function (acc, r) { return acc + r.availQty; }, 0);
+        }
+        countEls.water.textContent    = sumQty("water");
+        countEls.infra.textContent    = sumQty("infrastructure");
+        countEls.live.textContent     = sumQty("livelihood");
+        countEls.disaster.textContent = sumQty("disaster");
+    }
+
+    // Domain card filter on click
+    document.querySelectorAll('.count-card[data-filter]').forEach(function (card) {
+        card.addEventListener("click", function () {
+            const filter = card.getAttribute("data-filter");
+            if (activeFilter === filter) {
+                activeFilter = null;
+                document.querySelectorAll('.count-card[data-filter]').forEach(function (c) { c.classList.remove("active-filter"); });
+                statusMsg.textContent = "Showing all " + allRows.length + " works.";
+            } else {
+                activeFilter = filter;
+                document.querySelectorAll('.count-card[data-filter]').forEach(function (c) { c.classList.remove("active-filter"); });
+                card.classList.add("active-filter");
+                const count = allRows.filter(function (r) { return r.theme.toLowerCase().includes(filter); }).length;
+                statusMsg.textContent = "Showing " + count + " works for selected domain.";
+            }
+            renderSchemeTable();
+        });
+    });
+
+    // Show about
+    function showAbout(row) {
+        aboutWorkContent.classList.remove("muted");
+        aboutWorkContent.textContent =
+            "Theme: "          + row.theme          + "\n" +
+            "Group: "          + row.group          + "\n" +
+            "Work: "           + row.work           + "\n" +
+            "Classification: " + row.classification + "\n" +
+            "Available Qty: "  + row.availQty       + " / " + row.totalQty;
+    }
+
+    // Main click handler
+    document.getElementById("step3-ui").addEventListener("click", function (e) {
+        const btn = e.target.closest("button[data-action]");
+        if (!btn) return;
+
+        const action = btn.getAttribute("data-action");
+        const index  = Number(btn.getAttribute("data-index"));
+
+        // Add to AAP(arrow).... 1 qty at a time
+        if (action === "add-to-aap") {
+            const row = allRows[index];
+            if (row.availQty <= 0) {
+                statusMsg.textContent = "No quantity available for: " + row.work;
+                return;
+            }
+            // Send 1 unit to AAP
+            row.availQty--;
+            const existing = aapRows.find(function (a) { return a.rowRef === row; });
+            if (existing) {
+                existing.qty++;
+            } else {
+                aapRows.push({ rowRef: row, qty: 1 });
+            }
+            renderAapTable();
+            renderSchemeTable();
+            renderDomainCounts();
+            statusMsg.textContent = "Added 1 to AAP: " + row.work + " (Remaining: " + row.availQty + ")";
+
+        //  Delete from AAP.... 1 qty at a time 
+        } else if (action === "delete-aap") {
+            const entry = aapRows[index];
+            entry.rowRef.availQty++;
+            if (entry.rowRef.availQty > entry.rowRef.totalQty) {
+                entry.rowRef.availQty = entry.rowRef.totalQty;
+            }
+            entry.qty--;
+            if (entry.qty <= 0) {
+                aapRows.splice(index, 1);
+            }
+            renderAapTable();
+            renderSchemeTable();
+            renderDomainCounts();
+            aboutWorkContent.classList.add("muted");
+            aboutWorkContent.textContent = "Select a row using the eye icon to view details.";
+            statusMsg.textContent = "Removed 1 from AAP: " + entry.rowRef.work + " (AAP remaining: " + (entry.qty || 0) + ")";
+        }
+    });
+
+    // Load CSV 
+    async function init() {
+        try {
+            const res = await fetch(CSV_PATH, { cache: "no-store" });
+            if (!res.ok) throw new Error("CSV not found");
+            const text = await res.text();
+            allRows = csvToObjects(text);
+            renderSchemeTable();
+            renderDomainCounts();
+            statusMsg.textContent = "Loaded " + allRows.length + " works from CSV.";
+        } catch (err) {
+            schemeTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Could not load CSV.</td></tr>';
+            statusMsg.textContent = "Error loading CSV.";
+        }
+    }
+
+    // Fit to viewport
     function fitToViewport() {
         const navbar = document.querySelector(".navbar");
         const navHeight = navbar ? navbar.offsetHeight : 96;
@@ -385,6 +585,8 @@
     }
     window.addEventListener("resize", fitToViewport);
     fitToViewport();
+
+    init();
 }());
 </script>
 

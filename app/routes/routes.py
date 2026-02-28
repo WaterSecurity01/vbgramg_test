@@ -35,7 +35,7 @@ def step_2_design_4():
 
 @blp.route('/step-3')
 def step_3():
-    return render_template('step_3.html', current_step=3, schemes=[], aap_items=[], stats={})
+    return render_template('step_3.html', current_step=3)
 
 @blp.route('/step-4')
 def step_4():
