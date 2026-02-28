@@ -49,15 +49,23 @@
                             <th>Work</th>
                             <th>Beneficiary</th>
                             <th>Type</th>
+                            <th class="count-col">Count</th>
                             <th class="icon-col"><i class="fa-solid fa-eye"></i></th>
                             <th class="icon-col"><i class="fa-solid fa-trash"></i></th>
                         </tr>
                     </thead>
                     <tbody id="workTableBody">
                         <tr>
-                            <td colspan="7" class="empty-row">No work added yet.</td>
+                            <td colspan="8" class="empty-row">No work added yet.</td>
                         </tr>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5" class="total-label">Total</td>
+                            <td id="totalCountCell" class="count-col">0</td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </main>
@@ -126,6 +134,10 @@
     #step2-ui .panel {
         padding: 16px 14px;
         min-height: 0;
+    }
+
+    #step2-ui .right-panel {
+        overflow: auto;
     }
 
     #step2-ui .left-panel,
@@ -198,7 +210,8 @@
 
     #step2-ui .table-wrap {
         border: 2px solid var(--line);
-        overflow: hidden;
+        overflow: auto;
+        overscroll-behavior: contain;
         background: #f8f9fa;
         height: calc(100% - 46px);
     }
@@ -228,9 +241,22 @@
         z-index: 1;
     }
 
+    #step2-ui .work-table tfoot td {
+        background: #f0f0f0;
+        font-weight: 700;
+    }
+
+    #step2-ui .work-table .total-label {
+        text-align: center;
+    }
+
     #step2-ui .work-table .icon-col {
         text-align: center;
         width: 40px;
+    }
+
+    #step2-ui .work-table .count-col {
+        text-align: right;
     }
 
     #step2-ui .icon-btn {
@@ -301,12 +327,12 @@
         border-radius: 10px;
         background: #f8f9fa;
         min-height: 120px;
-        max-height: 170px;
+        height: auto;
         padding: 10px;
         font-size: 12px;
         line-height: 1.35;
         white-space: pre-line;
-        overflow: hidden;
+        overflow: visible;
     }
 
     #step2-ui .about-content.muted {
@@ -331,16 +357,15 @@
 
         #step2-ui .table-wrap {
             height: 300px;
-            overflow: hidden;
+            overflow: auto;
         }
     }
 </style>
 
 <script>
 (function () {
-    const CSV_CANDIDATE_PATHS = [
-        "/static/VBGRAMG_Final_Classified_278_Works.csv"
-    ];
+    const WORKS_JSON_PATH = "/static/works_list.json";
+    const PREFILLED_JSON_PATH = "/static/prefilled_works.json";
 
     const themeSelect = document.getElementById("themeSelect");
     const groupSelect = document.getElementById("groupSelect");
@@ -348,6 +373,7 @@
     const addWorkBtn = document.getElementById("addWorkBtn");
     const statusMsg = document.getElementById("statusMsg");
     const workTableBody = document.getElementById("workTableBody");
+    const totalCountCell = document.getElementById("totalCountCell");
     const domainCards = document.getElementById("domainCards");
     const aboutWorkContent = document.getElementById("aboutWorkContent");
     const beneficiaryRadios = Array.from(document.querySelectorAll('input[name="beneficiary_type"]'));
@@ -359,88 +385,33 @@
     let addedRows = [];
     let domainThemes = [];
 
-    function parseCSV(text) {
-        const rows = [];
-        let current = "";
-        let row = [];
-        let inQuotes = false;
-
-        for (let i = 0; i < text.length; i += 1) {
-            const char = text[i];
-            const next = text[i + 1];
-
-            if (char === '"') {
-                if (inQuotes && next === '"') {
-                    current += '"';
-                    i += 1;
-                } else {
-                    inQuotes = !inQuotes;
-                }
-            } else if (char === "," && !inQuotes) {
-                row.push(current);
-                current = "";
-            } else if ((char === "\n" || char === "\r") && !inQuotes) {
-                if (char === "\r" && next === "\n") {
-                    i += 1;
-                }
-                row.push(current);
-                current = "";
-                if (row.length > 1 || (row[0] && row[0].trim())) {
-                    rows.push(row);
-                }
-                row = [];
-            } else {
-                current += char;
-            }
-        }
-
-        if (current.length > 0 || row.length > 0) {
-            row.push(current);
-            rows.push(row);
-        }
-
-        return rows;
-    }
-
     function normalizeRowObj(obj) {
         return {
             theme: (obj["Thematic Domain"] || "").trim(),
-            group: (obj["Group Name"] || "").trim(),
+            group: (obj["Group Name"] || obj["Group Name (AI)"] || "").trim(),
             work: (obj["Work Name"] || "").trim(),
-            classification: (obj["Classification"] || "").trim()
+            classification: (obj["Classification"] || "").trim(),
+            content: (obj.content || "").trim(),
+            imageLink: (obj.image_link || "").trim()
         };
     }
 
-    function csvToObjects(csvText) {
-        const matrix = parseCSV(csvText);
-        if (!matrix.length) {
+    function jsonToObjects(jsonData) {
+        if (!Array.isArray(jsonData)) {
             return [];
         }
 
-        const headers = matrix[0].map(function (h) { return h.trim(); });
-        return matrix.slice(1).map(function (line) {
-            const item = {};
-            headers.forEach(function (header, idx) {
-                item[header] = (line[idx] || "").trim();
-            });
-            return normalizeRowObj(item);
-        }).filter(function (r) {
+        return jsonData.map(normalizeRowObj).filter(function (r) {
             return r.theme && r.group && r.work;
         });
     }
 
-    async function fetchCSVText() {
-        for (const path of CSV_CANDIDATE_PATHS) {
-            try {
-                const response = await fetch(path, { cache: "no-store" });
-                if (response.ok) {
-                    return await response.text();
-                }
-            } catch (err) {
-                continue;
-            }
+    async function fetchJson(path) {
+        const response = await fetch(path, { cache: "no-store" });
+        if (!response.ok) {
+            throw new Error("Failed to load JSON: " + path);
         }
-        throw new Error("CSV file not accessible from browser path.");
+        return response.json();
     }
 
     function setSelectOptions(selectEl, values, placeholder) {
@@ -536,7 +507,7 @@
 
         addedRows.forEach(function (row) {
             if (Object.prototype.hasOwnProperty.call(counts, row.theme)) {
-                counts[row.theme] += 1;
+                counts[row.theme] += row.count;
             }
         });
 
@@ -553,13 +524,16 @@
 
     function renderTable() {
         workTableBody.innerHTML = "";
+        let totalCount = 0;
 
         if (!addedRows.length) {
-            workTableBody.innerHTML = '<tr><td colspan="7" class="empty-row">No work added yet.</td></tr>';
+            workTableBody.innerHTML = '<tr><td colspan="8" class="empty-row">No work added yet.</td></tr>';
+            totalCountCell.textContent = "0";
             return;
         }
 
         addedRows.forEach(function (row, idx) {
+            totalCount += row.count;
             const tr = document.createElement("tr");
             tr.innerHTML =
                 '<td>' + row.theme + '</td>' +
@@ -567,10 +541,13 @@
                 '<td>' + row.work + '</td>' +
                 '<td>' + row.beneficiary + '</td>' +
                 '<td>' + row.workType + '</td>' +
+                '<td class="count-col">' + row.count + '</td>' +
                 '<td class="icon-col"><button type="button" class="icon-btn view-btn" data-action="view" data-index="' + idx + '"><i class="fa-solid fa-eye"></i></button></td>' +
                 '<td class="icon-col"><button type="button" class="icon-btn delete-btn" data-action="delete" data-index="' + idx + '"><i class="fa-solid fa-trash"></i></button></td>';
             workTableBody.appendChild(tr);
         });
+
+        totalCountCell.textContent = String(totalCount);
     }
 
     function updateGroups() {
@@ -638,16 +615,31 @@
             return;
         }
 
-        const duplicate = addedRows.some(function (row) {
+        const duplicate = addedRows.find(function (row) {
             return row.theme === theme && row.group === group && row.work === work && row.beneficiary === beneficiary && row.workType === workType;
         });
 
         if (duplicate) {
-            statusMsg.textContent = "This exact work entry is already in the table.";
-            return;
+            duplicate.count += 1;
+            statusMsg.textContent = "Work already exists. Count increased.";
+        } else {
+            const match = masterRows.find(function (item) {
+                return item.theme === theme && item.group === group && item.work === work && item.classification.toLowerCase() === workType.toLowerCase();
+            }) || masterRows.find(function (item) {
+                return item.theme === theme && item.group === group && item.work === work;
+            });
+            addedRows.push({
+                theme: theme,
+                group: group,
+                work: work,
+                beneficiary: beneficiary,
+                workType: workType,
+                count: 1,
+                content: match ? match.content : "",
+                imageLink: match ? match.imageLink : ""
+            });
+            statusMsg.textContent = "Work added.";
         }
-
-        addedRows.push({ theme: theme, group: group, work: work, beneficiary: beneficiary, workType: workType });
         renderTable();
         renderDomainCards();
         themeSelect.value = "";
@@ -657,7 +649,6 @@
         workSelect.disabled = true;
         setRadioGroupEnabled(workTypeRadios, false);
         setRadioGroupEnabled(beneficiaryRadios, false);
-        statusMsg.textContent = "Work added.";
     }
 
     function showAbout(index) {
@@ -669,17 +660,89 @@
             "Group: " + row.group + "\n" +
             "Work: " + row.work + "\n" +
             "Beneficiary: " + row.beneficiary + "\n" +
-            "Work Type: " + row.workType;
+            "Work Type: " + row.workType + "\n" +
+            "Count: " + row.count + (row.content ? "\n\n" + row.content : "");
     }
 
     function deleteRow(index) {
         if (!addedRows[index]) return;
-        addedRows.splice(index, 1);
+        if (addedRows[index].count > 1) {
+            addedRows[index].count -= 1;
+            statusMsg.textContent = "Work count reduced.";
+        } else {
+            addedRows.splice(index, 1);
+            statusMsg.textContent = "Work removed.";
+        }
         renderTable();
         renderDomainCards();
         aboutWorkContent.classList.add("muted");
         aboutWorkContent.textContent = "Select a row using the eye icon to view details.";
-        statusMsg.textContent = "Work removed.";
+    }
+
+    function normalizePrefilledItem(obj) {
+        const countValue = Number(obj.count || obj.Count || 1);
+        return {
+            theme: (obj["Thematic Domain"] || obj.theme || "").trim(),
+            group: (obj["Group Name"] || obj["Group Name (AI)"] || obj.group || "").trim(),
+            work: (obj["Work Name"] || obj.work || "").trim(),
+            beneficiary: (obj["Beneficiary Type"] || obj.beneficiary || "Individual").trim(),
+            workType: (obj["Work Type"] || obj["Classification"] || obj.workType || "New").trim(),
+            count: Number.isFinite(countValue) && countValue > 0 ? Math.floor(countValue) : 1
+        };
+    }
+
+    function mergeOrInsertRow(newRow) {
+        const existing = addedRows.find(function (row) {
+            return row.theme === newRow.theme &&
+                row.group === newRow.group &&
+                row.work === newRow.work &&
+                row.beneficiary === newRow.beneficiary &&
+                row.workType === newRow.workType;
+        });
+
+        if (existing) {
+            existing.count += newRow.count;
+            return;
+        }
+
+        const match = masterRows.find(function (item) {
+            return item.theme === newRow.theme &&
+                item.group === newRow.group &&
+                item.work === newRow.work &&
+                item.classification.toLowerCase() === newRow.workType.toLowerCase();
+        }) || masterRows.find(function (item) {
+            return item.theme === newRow.theme &&
+                item.group === newRow.group &&
+                item.work === newRow.work;
+        });
+
+        if (!match) {
+            return;
+        }
+
+        addedRows.push({
+            theme: newRow.theme,
+            group: newRow.group,
+            work: newRow.work,
+            beneficiary: newRow.beneficiary,
+            workType: newRow.workType,
+            count: newRow.count,
+            content: match.content || "",
+            imageLink: match.imageLink || ""
+        });
+    }
+
+    async function loadPrefilledEntries() {
+        try {
+            const prefilledData = await fetchJson(PREFILLED_JSON_PATH);
+            if (!Array.isArray(prefilledData)) {
+                return 0;
+            }
+            prefilledData.map(normalizePrefilledItem).forEach(mergeOrInsertRow);
+            return prefilledData.length;
+        } catch (err) {
+            return 0;
+        }
     }
 
     themeSelect.addEventListener("change", function () {
@@ -724,19 +787,22 @@
         setRadioGroupEnabled(beneficiaryRadios, false);
 
         try {
-            const csvText = await fetchCSVText();
-            masterRows = csvToObjects(csvText);
+            const worksData = await fetchJson(WORKS_JSON_PATH);
+            masterRows = jsonToObjects(worksData);
             domainThemes = uniqueSorted(masterRows.map(function (r) { return r.theme; }));
             const themes = uniqueSorted(masterRows.map(function (r) { return r.theme; }));
             setSelectOptions(themeSelect, themes, "Select Theme");
+            const prefilledCount = await loadPrefilledEntries();
+            renderTable();
             renderDomainCards();
             updateWorkTypeAvailability();
             updateBeneficiaryAvailability();
-            statusMsg.textContent = "Master data loaded (" + masterRows.length + " rows).";
+            statusMsg.textContent = "Master data loaded (" + masterRows.length + " rows). Prefilled items: " + prefilledCount + ".";
         } catch (err) {
             domainThemes = [];
             renderDomainCards();
-            statusMsg.textContent = "Could not load CSV. Put CSV at /app/static/VBGRAMG_Final_Classified_278_Works.csv and refresh.";
+            renderTable();
+            statusMsg.textContent = "Could not load works_list.json from /static.";
         }
     }
 

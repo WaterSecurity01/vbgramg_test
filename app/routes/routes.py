@@ -21,18 +21,6 @@ def step_1():
 def step_2():
     return render_template('step_2.html', current_step=2)
 
-@blp.route('/step-2-design-2')
-def step_2_design_2():
-    return render_template('step_2_design_2.html', current_step=2)
-
-@blp.route('/step-2-design-3')
-def step_2_design_3():
-    return render_template('step_2_design_3.html', current_step=2)
-
-@blp.route('/step-2-design-4')
-def step_2_design_4():
-    return render_template('step_2_design_4.html', current_step=2)
-
 @blp.route('/step-3')
 def step_3():
     return render_template('step_3.html', current_step=3)
