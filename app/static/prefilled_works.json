@@ -1,0 +1,322 @@
+[
+  {
+    "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+    "Group Name (AI)": "Surface Structures",
+    "Work Name": "Construction of Boulder Check Dam",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+    "Group Name (AI)": "Surface Structures",
+    "Work Name": "Repair & Maintenance of Boulder Check Dam",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 2
+  },
+  {
+    "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+    "Group Name (AI)": "Surface Structures",
+    "Work Name": "Construction of Earthen Check Dam",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 1
+  },
+  {
+    "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+    "Group Name (AI)": "Surface Structures",
+    "Work Name": "Repair & Maintenance of Earthen Check Dam",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 2
+  },
+  {
+    "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+    "Group Name (AI)": "Surface Structures",
+    "Work Name": "Construction of Gabion Check Dam",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 1
+  },
+  {
+    "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+    "Group Name (AI)": "Surface Structures",
+    "Work Name": "Repair & Maintenance of Gabion Check Dam",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 4
+  },
+  {
+    "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+    "Group Name (AI)": "Surface Structures",
+    "Work Name": "Construction of Masonry Check Dam",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+    "Group Name (AI)": "Surface Structures",
+    "Work Name": "Repair & Maintenance of Masonry Check Dam",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+    "Group Name (AI)": "Surface Structures",
+    "Work Name": "Construction of Brushwood Gully Plug",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 4
+  },
+  {
+    "Thematic Domain": "Domain I: Water Security (Water Harvesting)",
+    "Group Name (AI)": "Surface Structures",
+    "Work Name": "Construction of Earthen Gully Plug",
+    "Classification": "New",
+    "Beneficiary Type": "Community",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+    "Group Name (AI)": "Rural Connectivity",
+    "Work Name": "Construction of Cross Drainage Structure",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 4
+  },
+  {
+    "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+    "Group Name (AI)": "Rural Connectivity",
+    "Work Name": "Repair & Maintenance of Cross Drainage Structure",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 2
+  },
+  {
+    "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+    "Group Name (AI)": "Rural Connectivity",
+    "Work Name": "Construction of Culvert",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+    "Group Name (AI)": "Rural Connectivity",
+    "Work Name": "Repair & Maintenance of Culvert",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+    "Group Name (AI)": "Rural Connectivity",
+    "Work Name": "Construction of Rural Foot Over Bridge",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 1
+  },
+  {
+    "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+    "Group Name (AI)": "Rural Connectivity",
+    "Work Name": "Repair & Maintenance of Rural Foot Over Bridge",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+    "Group Name (AI)": "Rural Connectivity",
+    "Work Name": "Construction of Bitumen Road",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 4
+  },
+  {
+    "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+    "Group Name (AI)": "Rural Connectivity",
+    "Work Name": "Repair & Maintenance of Bitumen Road",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 1
+  },
+  {
+    "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+    "Group Name (AI)": "Rural Connectivity",
+    "Work Name": "Construction of Cement Concrete Road",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 2
+  },
+  {
+    "Thematic Domain": "Domain II: Core Rural Infrastructure (Rural Amenities)",
+    "Group Name (AI)": "Rural Connectivity",
+    "Work Name": "Repair & Maintenance of Cement Concrete Road",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 4
+  },
+  {
+    "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+    "Group Name (AI)": "Skill Infrastructure",
+    "Work Name": "Construction of Training and Skill Development Centre Building",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 4
+  },
+  {
+    "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+    "Group Name (AI)": "Skill Infrastructure",
+    "Work Name": "Repair & Maintenance of Training and Skill Development Centre Building",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+    "Group Name (AI)": "Skill Infrastructure",
+    "Work Name": "Construction of Workshed for SHG",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 1
+  },
+  {
+    "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+    "Group Name (AI)": "Skill Infrastructure",
+    "Work Name": "Repair & Maintenance of Workshed for SHG",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 2
+  },
+  {
+    "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+    "Group Name (AI)": "Market Infrastructure",
+    "Work Name": "Construction of Rural Haat Building",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 2
+  },
+  {
+    "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+    "Group Name (AI)": "Market Infrastructure",
+    "Work Name": "Repair & Maintenance of Rural Haat Building",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 2
+  },
+  {
+    "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+    "Group Name (AI)": "Market Infrastructure",
+    "Work Name": "Construction of Market Yard",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 2
+  },
+  {
+    "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+    "Group Name (AI)": "Market Infrastructure",
+    "Work Name": "Repair & Maintenance of Market Yard",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+    "Group Name (AI)": "Agri Storage",
+    "Work Name": "Construction of Agricultural Produce Storage Building",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 4
+  },
+  {
+    "Thematic Domain": "Domain III: Livelihood Infrastructure (Livelihood Assets)",
+    "Group Name (AI)": "Agri Storage",
+    "Work Name": "Repair & Maintenance of Agricultural Produce Storage Building",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+    "Group Name (AI)": "Disaster Shelters",
+    "Work Name": "Construction of Cyclone Shelter",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+    "Group Name (AI)": "Disaster Shelters",
+    "Work Name": "Repair & Maintenance of Cyclone Shelters",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 1
+  },
+  {
+    "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+    "Group Name (AI)": "Disaster Shelters",
+    "Work Name": "Construction of Flood Retention Shelter",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 1
+  },
+  {
+    "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+    "Group Name (AI)": "Disaster Shelters",
+    "Work Name": "Repair & Maintenance of Flood Retension Shelters",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 1
+  },
+  {
+    "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+    "Group Name (AI)": "Protective Works",
+    "Work Name": "Construction of Embankment",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 4
+  },
+  {
+    "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+    "Group Name (AI)": "Protective Works",
+    "Work Name": "Strengthening of Embankment",
+    "Classification": "New",
+    "Beneficiary Type": "Community",
+    "count": 4
+  },
+  {
+    "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+    "Group Name (AI)": "Protective Works",
+    "Work Name": "Construction of Earthen Spur",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 4
+  },
+  {
+    "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+    "Group Name (AI)": "Protective Works",
+    "Work Name": "Construction of Gabion Spur",
+    "Classification": "New",
+    "Beneficiary Type": "Community",
+    "count": 1
+  },
+  {
+    "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+    "Group Name (AI)": "Protective Works",
+    "Work Name": "Construction of Stone Spur",
+    "Classification": "New",
+    "Beneficiary Type": "Individual",
+    "count": 3
+  },
+  {
+    "Thematic Domain": "Domain IV: Climate Resilience (Climate Resilience)",
+    "Group Name (AI)": "Protective Works",
+    "Work Name": "Repair & Maintenance of Spur",
+    "Classification": "Repair",
+    "Beneficiary Type": "Community",
+    "count": 4
+  }
+]
