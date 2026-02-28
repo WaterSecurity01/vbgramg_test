@@ -1,4 +1,7 @@
-from flask import Blueprint, render_template
+import json
+import os
+
+from flask import Blueprint, jsonify, render_template
 
 
 blp = Blueprint('routes', __name__)
@@ -9,7 +12,10 @@ def home():
 
 @blp.route('/step-1')
 def step_1():
-    return render_template('step_1.html', current_step=1)
+    works_list_file = os.path.join(os.path.dirname(__file__).split('app')[0], 'app/static/works_list.json')
+    with open(works_list_file, 'r') as f:
+        works_list = json.load(f)
+    return render_template('step_1.html', current_step=1, works_list=works_list)
 
 @blp.route('/step-2')
 def step_2():
