@@ -94,6 +94,7 @@ let map, stateLayer, villageLayer;
 let markerGroup; // Will be initialized later with L.layerGroup().addTo(map);
 let allCsvRows = [];
 let filteredRows = [];
+let visibleIndices = [];
 let rowMarkerMap = new Map(); // maps row index (in csv) to Leaflet marker
 let activeDomainFilter = null;
 let activeStateFilter = null;
@@ -363,7 +364,7 @@ let focusedIdx = null;
 window.flyToRow = function (idx) {
     if (focusedIdx !== null && rowMarkerMap.has(focusedIdx)) {
         const m = rowMarkerMap.get(focusedIdx);
-        const d = filteredRows[focusedIdx];
+        const d = allCsvRows[focusedIdx];
         m.setIcon(createMarkerIcon(getDomainBucket(d['theme']), false));
         m.setZIndexOffset(0);
     }
@@ -371,7 +372,7 @@ window.flyToRow = function (idx) {
     focusedIdx = idx;
     const marker = rowMarkerMap.get(idx);
     if (marker) {
-        const d = filteredRows[idx];
+        const d = allCsvRows[idx];
         marker.setIcon(createMarkerIcon(getDomainBucket(d['theme']), true));
         marker.setZIndexOffset(1000);
 
@@ -379,10 +380,10 @@ window.flyToRow = function (idx) {
         marker.openPopup();
     }
 
-    document.querySelectorAll('#table-body tr').forEach(tr => {
+    document.querySelectorAll('#tbody tr').forEach(tr => {
         tr.classList.toggle('focused', parseInt(tr.dataset.idx) === idx);
     });
-    const el = document.querySelector(`#table-body tr[data-idx="${idx}"]`);
+    const el = document.querySelector(`#tbody tr[data-idx="${idx}"]`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 };
 
@@ -399,7 +400,7 @@ window.resetToIndia = function () {
             // Strip generated clones from array completely
             allCsvRows = allCsvRows.filter(r => !r._is_dummy);
 
-            renderTable(); // Re-render original TR roots
+            applyAllFilters();
 
             // Re-render the saved 278 point state mapping (instantly using row['_pt'] cache)
             assignMarkersToStates(stateLayer);
@@ -547,8 +548,8 @@ function generateRatioBoundedMarkers(targetCount, geoJsonLayer, filterStateName)
         });
 
         document.getElementById('map-status').textContent = 'Map data updated.';
-        renderTable(); // Completely reconstruct the Table DOM since we mutated allCsvRows items
-        // applyFilters();
+        allCsvRows = filteredRows.slice();
+        applyAllFilters();
         hideLoader();
     }, 50); // small delay for loader paint
 }
@@ -666,9 +667,7 @@ function assignMarkersToStates(stateGeoJsonLayer) {
             setTimeout(processChunk, 10);
         } else {
             document.getElementById('map-status').textContent = `Plotted ${allCsvRows.length} works strictly mapped to states.`;
-            renderTable();
-            updateLabels();
-            // applyFilters();
+            applyAllFilters();
             hideLoader();
         }
     }, 10);
@@ -711,8 +710,7 @@ async function loadIndiaLayer() {
                             if (villageLayer) map.removeLayer(villageLayer);
                         }
                     }
-                    renderTable();
-                    // applyFilters();
+                    applyAllFilters();
                 });
 
                 layer.on('mouseover', function () {
@@ -748,11 +746,16 @@ async function loadIndiaLayer() {
 
 function renderTable() {
     const tbody = document.getElementById('tbody');
-    // Render all rows initially, CSS filtering hides them
-    tbody.innerHTML = filteredRows.map((row, idx) => {
+    if (!visibleIndices.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No works match current filters.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = visibleIndices.map((idx, rank) => {
+        const row = allCsvRows[idx];
         return `
         <tr data-idx="${idx}" onclick="flyToRow(${idx})">
-            <td>${idx+1}</td>
+            <td>${rank + 1}</td>
             <td class="uuid-cell"><span class="uuid-pill">${genUUID()}</span></td>
             <td><span class="${domainBadge(row['dk'])}">${domainLabel(row['dk']) || '—'}</span></td>
             <td>${row['work'] || '—'}</td>
@@ -764,9 +767,10 @@ function renderTable() {
 
 function updateLabels(){
     var lc={water:0,rural:0,livelihood:0,climate:0};
-    // var rc={water:0,rural:0,livelihood:0,climate:0};
-    filteredRows.forEach(function(r){ lc[r.dk]++; });
-    // rightRows.forEach(function(r){ rc[r.dk]++; });
+    const srcRows = allCsvRows.filter(function (r) {
+        return !activeStateFilter || r['_state'] === activeStateFilter;
+    });
+    srcRows.forEach(function(r){ if (lc[r.dk] !== undefined) lc[r.dk]++; });
 
     document.getElementById('lsWater').textContent=lc.water;
     document.getElementById('lsRural').textContent=lc.rural;
@@ -777,78 +781,52 @@ function updateLabels(){
     // document.getElementById('rsRural').textContent=rc.rural;
     // document.getElementById('rsLivelihood').textContent=rc.livelihood;
     // document.getElementById('rsClimate').textContent=rc.climate;
+    document.getElementById('rightCount').innerHTML = `${visibleIndices.length} Works`;
+}
+
+function rowMatchesFilters(row) {
+    const q = (searchTerm || '').toLowerCase().trim();
+    const textMatch = !q ||
+        (row['work'] || '').toLowerCase().includes(q) ||
+        (row['group'] || '').toLowerCase().includes(q) ||
+        (row['theme'] || '').toLowerCase().includes(q);
+    const domainMatch = !activeDomainFilter || row['dk'] === activeDomainFilter;
+    const stateMatch = !activeStateFilter || row['_state'] === activeStateFilter;
+    return textMatch && domainMatch && stateMatch;
+}
+
+function applyAllFilters() {
+    visibleIndices = [];
+    filteredRows = [];
+    allCsvRows.forEach(function (row, idx) {
+        if (rowMatchesFilters(row)) {
+            visibleIndices.push(idx);
+            filteredRows.push(row);
+        }
+    });
+
+    renderTable();
+    updateLabels();
+
+    rowMarkerMap.forEach((marker, idx) => {
+        const row = allCsvRows[idx];
+        if (!row) return;
+        if (rowMatchesFilters(row)) {
+            if (!markerGroup.hasLayer(marker)) markerGroup.addLayer(marker);
+        } else {
+            if (markerGroup.hasLayer(marker)) markerGroup.removeLayer(marker);
+        }
+    });
 }
 
 function applyFilter(bucket) {
-    // const q = searchTerm.toLowerCase();
-    let visibleCount = 0;
     // Toggle filter: if same bucket clicked, clear filter; otherwise set it
     if (activeDomainFilter === bucket) {
         activeDomainFilter = null;
     } else {
         activeDomainFilter = bucket;
     }
-
-    // Filter allCsvRows based on active domain filter
-    filteredRows = activeDomainFilter 
-        ? allCsvRows.filter(r => r['dk'] === activeDomainFilter)
-        : allCsvRows;
-
-    // Re-render table and update labels with filtered data
-    renderTable();
-    updateLabels();
-    // Filter Table 
-    // const rows = document.querySelectorAll('#tbody tr');
-    filteredRows.forEach(row => {
-        // const idx = parseInt(tr.dataset.idx);
-        // const data = allCsvRows[idx];
-        if (!row) return;
-
-        // const bucket = getDomainBucket(data['Thematic Domain']);
-        const textMatch = bucket === '' || bucket == row['dk'] ;
-            // || (data['work'] || '').toLowerCase().includes(bucket) ||
-            // (data['group'] || '').toLowerCase().includes(bucket);
-
-        const domainMatch = !activeDomainFilter || bucket === activeDomainFilter;
-        const stateMatch = !activeStateFilter || row['_state'] === activeStateFilter;
-
-
-        // if (textMatch && domainMatch && stateMatch) {
-        //     visibleCount++;
-        //     // tr.querySelector('td b').textContent = visibleCount; // Increment continuous S.No correctly
-        //     tr.style.display = '';
-        // } else {
-        //     tr.style.display = 'none';
-        // }
-    });
-
-    // Resolve Table Filter Title
-    let naturalFilterText = activeStateFilter || '';
-    if (naturalFilterText === 'Haryana_State_Drill') naturalFilterText = 'Haryana';
-    if (naturalFilterText === 'Haryana_Village_Drill') naturalFilterText = 'Village Details';
-
-    const filterSummary = naturalFilterText ? ` in ${naturalFilterText}` : '';
-    // document.getElementById('table-count').innerHTML = `<b>${visibleCount}</b> of ${allCsvRows.length} records${filterSummary}`;
-
-    // Filter Map
-    rowMarkerMap.forEach((marker, idx) => {
-        const row = allCsvRows[idx];
-        if (!row) return;
-        // const bucket = getDomainBucket(row['dk']);
-
-        const textMatch = bucket === '' || bucket === row['dk'];
-            // || (row['dk'] || '').toLowerCase().includes(bucket) ||
-            // (row['group'] || '').toLowerCase().includes(bucket);
-        const domainMatch = !activeDomainFilter || bucket === activeDomainFilter;
-        const stateMatch = !activeStateFilter || row['_state'] === activeStateFilter;
-
-        if (textMatch && domainMatch && stateMatch) {
-            if (!markerGroup.hasLayer(marker)) markerGroup.addLayer(marker);
-        } else {
-            if (markerGroup.hasLayer(marker)) markerGroup.removeLayer(marker);
-        }
-    });
-    document.getElementById('rightCount').innerHTML = `${filteredRows.length} Works`
+    applyAllFilters();
 }
 
 
@@ -880,10 +858,14 @@ async function init() {
         allCsvRows = sampleRowsByDomainRatio(normalizedRows, IMPORT_ROW_COUNT);
         appendOverlayRows(allCsvRows);
         filteredRows = allCsvRows;
-        // document.getElementById('table-search').addEventListener('input', (e) => {
-        //     searchTerm = e.target.value;
-        //     applyFilters();
-        // });
+        visibleIndices = allCsvRows.map((_, idx) => idx);
+        const searchInput = document.getElementById('table-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                searchTerm = e.target.value || '';
+                applyAllFilters();
+            });
+        }
 
         // Now fetch India WFS
         await loadIndiaLayer();
