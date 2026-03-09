@@ -1,540 +1,232 @@
 {% extends 'base.html' %}
-{% block title %} Step 2 {% endblock %}
+{% block title %} Step 2{% endblock %}
 {% block content %}
-<section id="step2-ui">
-    <div class="step2-layout">
-        <aside class="panel left-panel">
-            <div class="field">
-                <select id="themeSelect">
-                    <option value="">Select Theme</option>
-                </select>
+<div class="app-body">
+    <div class="panel">
+        <div class="panel-header">
+            <div class="dot"></div> Viksit Gram Panchayat Works
+            <div class="panel-header-right" id="leftCount">0 Works</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat-chip water" onclick="filter('water')">
+                <div class="val" id="lsWater">100</div>
+                <div class="lbl">Water</div>
             </div>
-
-            <div class="field">
-                <select id="groupSelect" disabled>
-                    <option value="">Select Group</option>
-                </select>
+            <div class="stat-chip rural" onclick="filter('rural')">
+                <div class="val" id="lsRural">0</div>
+                <div class="lbl">Rural</div>
             </div>
-
-            <div class="field">
-                <select id="workSelect" disabled>
-                    <option value="">Select Work</option>
-                </select>
+            <div class="stat-chip livelihood" onclick="filter('livelihood')">
+                <div class="val" id="lsLivelihood">0</div>
+                <div class="lbl">Livelihood</div>
             </div>
-
-            <div class="radio-group">
-                <p>Beneficiary Type</p>
-                <label><input type="radio" name="beneficiary_type" value="Individual"> Individual</label>
-                <label><input type="radio" name="beneficiary_type" value="Community"> Community</label>
+            <div class="stat-chip climate" onclick="filter('climate')">
+                <div class="val" id="lsClimate">0</div>
+                <div class="lbl">Climate</div>
             </div>
-
-            <div class="radio-group">
-                <p>Work Type</p>
-                <label><input type="radio" name="work_type" value="New"> New</label>
-                <label><input type="radio" name="work_type" value="Repair"> Repair</label>
+        </div>
+        <div class="table-wrapper">
+            <div id="leftEmpty" class="empty-state" style="display: none;">
+                <div class="icon">📋</div>
+                <div class="title">No Works in Stack</div>
+                <div class="desc">Go back to the dashboard and generate 100 random works to populate this list.</div>
             </div>
-
-            <button id="addWorkBtn" class="add-work-btn" type="button">Add Work</button>
-            <p id="statusMsg" class="status-msg">Loading master data...</p>
-        </aside>
-
-        <main class="panel center-panel">
-            <h2>Viksit Gram Panchayat Stack</h2>
-            <div class="table-wrap">
-                <table class="work-table">
-                    <thead>
-                        <tr>
-                            <th>Theme</th>
-                            <th>Group</th>
-                            <th>Work</th>
-                            <th>Beneficiary</th>
-                            <th>Type</th>
-                            <th class="count-col">Count</th>
-                            <th class="icon-col"><i class="fa-solid fa-eye"></i></th>
-                            <th class="icon-col"><i class="fa-solid fa-trash"></i></th>
-                        </tr>
-                    </thead>
-                    <tbody id="workTableBody">
-                        <tr>
-                            <td colspan="8" class="empty-row">No work added yet.</td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="5" class="total-label">Total</td>
-                            <td id="totalCountCell" class="count-col">0</td>
-                            <td colspan="2"></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </main>
-
-        <aside class="panel right-panel">
-            <h3>Domain Wise Works</h3>
-            <div id="domainCards" class="domain-grid"></div>
-
-            <div class="about-work">
-                <h4>About the Work</h4>
-                <div id="aboutWorkContent" class="about-content muted">Select a row using the eye icon to view details.</div>
-            </div>
-        </aside>
+            <table id="leftTable">
+                <thead>
+                    <tr>
+                        <th style="width:32px;">#</th>
+                        <!-- <th style="width:90px;">UUID</th> -->
+                        <th>Work Name</th>
+                        <th>Theme</th>
+                        <th>Type</th>
+                        <th style="width:40px;text-align:center;">→</th>
+                    </tr>
+                </thead>
+                <tbody id="leftBody">
+                </tbody>
+            </table>
+        </div>
     </div>
-</section>
-
+    <div class="panel">
+        <div class="panel-header">
+            <div class="dot"></div> Viksit Gram Panchayat Stack Creation
+            <div class="panel-header-right" id="rightCount">0 Works</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat-chip water">
+                <div class="val" id="rsWater">0</div>
+                <div class="lbl">Water</div>
+            </div>
+            <div class="stat-chip rural">
+                <div class="val" id="rsRural">0</div>
+                <div class="lbl">Rural</div>
+            </div>
+            <div class="stat-chip livelihood">
+                <div class="val" id="rsLivelihood">0</div>
+                <div class="lbl">Livelihood</div>
+            </div>
+            <div class="stat-chip climate">
+                <div class="val" id="rsClimate">0</div>
+                <div class="lbl">Climate</div>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <div id="rightEmpty" class="empty-state" style="display: none;">
+                <div class="icon">📋</div>
+                <div class="title">No Works in Stack</div>
+                <div class="desc">Go back to the dashboard and generate 100 random works to populate this list.</div>
+            </div>
+            <table id="rightTable">
+                <thead>
+                    <tr class="row-animate-left">
+                        <th style="width:40px;text-align:center;">←</th>
+                        <th style="width:32px;">#</th>
+                        <th style="width:90px;">UUID</th>
+                        <th>Work Name</th>
+                        <th>Theme</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody id="rightBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="{{url_for('static', filename='js/base.js')}}"></script>
 <script>
-(function () {
-    const WORKS_JSON_PATH = "/static/works_list.json";
-    const PREFILLED_JSON_PATH = "/static/prefilled_works.json";
 
-    const themeSelect = document.getElementById("themeSelect");
-    const groupSelect = document.getElementById("groupSelect");
-    const workSelect = document.getElementById("workSelect");
-    const addWorkBtn = document.getElementById("addWorkBtn");
-    const statusMsg = document.getElementById("statusMsg");
-    const workTableBody = document.getElementById("workTableBody");
-    const totalCountCell = document.getElementById("totalCountCell");
-    const domainCards = document.getElementById("domainCards");
-    const aboutWorkContent = document.getElementById("aboutWorkContent");
-    const beneficiaryRadios = Array.from(document.querySelectorAll('input[name="beneficiary_type"]'));
-    const workTypeRadios = Array.from(document.querySelectorAll('input[name="work_type"]'));
 
-    const domainColorPalette = ["var(--water)", "var(--infra)", "var(--live)", "var(--disaster)"];
 
-    let masterRows = [];
-    let addedRows = [];
-    let domainThemes = [];
+var activeFilter = null;
 
-    function normalizeRowObj(obj) {
-        return {
-            theme: (obj["Thematic Domain"] || "").trim(),
-            group: (obj["Group Name"] || obj["Group Name (AI)"] || "").trim(),
-            work: (obj["Work Name"] || "").trim(),
-            classification: (obj["Classification"] || "").trim(),
-            content: (obj.content || "").trim(),
-            imageLink: (obj.image_link || "").trim()
-        };
-    }
-
-    function jsonToObjects(jsonData) {
-        if (!Array.isArray(jsonData)) {
-            return [];
-        }
-
-        return jsonData.map(normalizeRowObj).filter(function (r) {
-            return r.theme && r.group && r.work;
+function filter(theme){
+    if(activeFilter === theme){
+        // Click same filter again: remove filter
+        activeFilter = null;
+        leftRows = masterRows;
+    } else {
+        // Click new filter: apply it
+        activeFilter = theme;
+        leftRows = masterRows.filter(function(r){
+            return r.dk === theme;
         });
     }
+    render();
+}
 
-    async function fetchJson(path) {
-        const response = await fetch(path, { cache: "no-store" });
-        if (!response.ok) {
-            throw new Error("Failed to load JSON: " + path);
-        }
-        return response.json();
+
+
+function render(){
+  renderLeft();
+  renderRight();
+  updateStats();
+}
+// ================================================================
+// MOVE RIGHT
+// ================================================================
+function moveRight(work_serial){
+    var idx = leftRows.findIndex(function(r){return r.serial.toString()===work_serial;});
+    if(idx===-1) return;
+    var row = leftRows[idx];
+    rightRows.push(row);
+    render();
+}
+
+// ================================================================
+// MOVE LEFT
+// ================================================================
+function moveLeft(uuid){
+    var idx = rightRows.findIndex(function(r){return r.uuid===uuid;});
+    if(idx===-1) return;
+    var row = rightRows.splice(idx,1)[0];
+    leftRows.push(row);
+    render();
+}
+
+// ================================================================
+// UPDATE STATS BARS
+// ================================================================
+   
+function renderLeft(){
+    var tbody = document.getElementById('leftBody');
+    var empty = document.getElementById('leftEmpty');
+    var table = document.getElementById('leftTable');
+    var countEl = document.getElementById('leftCount');
+
+    countEl.textContent = leftRows.length + ' Work' + (leftRows.length!==1?'s':'');
+
+    if(!leftRows.length){
+        empty.style.display=''; table.style.display='none'; return;
     }
+    empty.style.display='none'; table.style.display='';
+    tbody.innerHTML='';
 
-    function setSelectOptions(selectEl, values, placeholder) {
-        selectEl.innerHTML = "";
-        const p = document.createElement("option");
-        p.value = "";
-        p.textContent = placeholder;
-        selectEl.appendChild(p);
-
-        values.forEach(function (value) {
-            const option = document.createElement("option");
-            option.value = value;
-            option.textContent = value;
-            selectEl.appendChild(option);
-        });
-    }
-
-    function uniqueSorted(values) {
-        return Array.from(new Set(values)).sort(function (a, b) {
-            return a.localeCompare(b);
-        });
-    }
-
-    function getSelectedRadio(name) {
-        const checked = document.querySelector('input[name="' + name + '"]:checked');
-        return checked ? checked.value : "";
-    }
-
-    function setRadioGroupEnabled(radios, enabled) {
-        radios.forEach(function (radio) {
-            radio.disabled = !enabled;
-            if (!enabled) {
-                radio.checked = false;
-            }
-        });
-    }
-
-    function updateBeneficiaryAvailability() {
-        const enabled = Boolean(workSelect.value);
-        setRadioGroupEnabled(beneficiaryRadios, enabled);
-    }
-
-    function updateWorkTypeAvailability() {
-        const selectedTheme = themeSelect.value;
-        const selectedGroup = groupSelect.value;
-        const selectedWork = workSelect.value;
-
-        if (!selectedTheme) {
-            setRadioGroupEnabled(workTypeRadios, false);
-            return;
-        }
-
-        const filtered = masterRows.filter(function (r) {
-            if (r.theme !== selectedTheme) return false;
-            if (selectedGroup && r.group !== selectedGroup) return false;
-            if (selectedWork && r.work !== selectedWork) return false;
-            return true;
-        });
-
-        const availableTypes = new Set(filtered.map(function (r) {
-            return r.classification.toLowerCase();
-        }));
-
-        workTypeRadios.forEach(function (radio) {
-            const allowed = availableTypes.has(radio.value.toLowerCase());
-            radio.disabled = !allowed;
-            if (!allowed) {
-                radio.checked = false;
-            }
-        });
-
-        if (selectedWork && availableTypes.size === 1) {
-            const onlyType = Array.from(availableTypes)[0];
-            const autoRadio = workTypeRadios.find(function (r) {
-                return r.value.toLowerCase() === onlyType;
-            });
-            if (autoRadio) {
-                autoRadio.checked = true;
-            }
-        }
-    }
-
-    function renderDomainCards() {
-        function getCardHeading(theme) {
-            const match = theme.match(/\(([^)]+)\)/);
-            return match ? match[1].trim() : theme;
-        }
-
-        const counts = {};
-        domainThemes.forEach(function (theme) {
-            counts[theme] = 0;
-        });
-
-        addedRows.forEach(function (row) {
-            if (Object.prototype.hasOwnProperty.call(counts, row.theme)) {
-                counts[row.theme] += row.count;
-            }
-        });
-
-        domainCards.innerHTML = "";
-        domainThemes.forEach(function (theme, idx) {
-            const item = document.createElement("div");
-            item.className = "domain-item";
-            item.innerHTML =
-                '<div class="label">' + getCardHeading(theme) + '</div>' +
-                '<div class="count-card" style="background:' + domainColorPalette[idx % domainColorPalette.length] + '">' + counts[theme] + '</div>';
-            domainCards.appendChild(item);
-        });
-    }
-
-    function renderTable() {
-        workTableBody.innerHTML = "";
-        let totalCount = 0;
-
-        if (!addedRows.length) {
-            workTableBody.innerHTML = '<tr><td colspan="8" class="empty-row">No work added yet.</td></tr>';
-            totalCountCell.textContent = "0";
-            return;
-        }
-
-        addedRows.forEach(function (row, idx) {
-            totalCount += row.count;
-            const tr = document.createElement("tr");
-            tr.innerHTML =
-                '<td>' + row.theme + '</td>' +
-                '<td>' + row.group + '</td>' +
-                '<td>' + row.work + '</td>' +
-                '<td>' + row.beneficiary + '</td>' +
-                '<td>' + row.workType + '</td>' +
-                '<td class="count-col">' + row.count + '</td>' +
-                '<td class="icon-col"><button type="button" class="icon-btn view-btn" data-action="view" data-index="' + idx + '"><i class="fa-solid fa-eye"></i></button></td>' +
-                '<td class="icon-col"><button type="button" class="icon-btn delete-btn" data-action="delete" data-index="' + idx + '"><i class="fa-solid fa-trash"></i></button></td>';
-            workTableBody.appendChild(tr);
-        });
-
-        totalCountCell.textContent = String(totalCount);
-    }
-
-    function updateGroups() {
-        const selectedTheme = themeSelect.value;
-
-        if (!selectedTheme) {
-            setSelectOptions(groupSelect, [], "Select Group");
-            groupSelect.disabled = true;
-            setSelectOptions(workSelect, [], "Select Work");
-            workSelect.disabled = true;
-            updateWorkTypeAvailability();
-            updateBeneficiaryAvailability();
-            return;
-        }
-
-        const groups = uniqueSorted(masterRows
-            .filter(function (r) {
-                return r.theme === selectedTheme;
-            })
-            .map(function (r) { return r.group; }));
-
-        setSelectOptions(groupSelect, groups, "Select Group");
-        groupSelect.disabled = groups.length === 0;
-
-        setSelectOptions(workSelect, [], "Select Work");
-        workSelect.disabled = true;
-        updateWorkTypeAvailability();
-        updateBeneficiaryAvailability();
-    }
-
-    function updateWorks() {
-        const selectedTheme = themeSelect.value;
-        const selectedGroup = groupSelect.value;
-
-        if (!selectedTheme || !selectedGroup) {
-            setSelectOptions(workSelect, [], "Select Work");
-            workSelect.disabled = true;
-            updateWorkTypeAvailability();
-            updateBeneficiaryAvailability();
-            return;
-        }
-
-        const works = uniqueSorted(masterRows
-            .filter(function (r) {
-                return r.theme === selectedTheme &&
-                    r.group === selectedGroup;
-            })
-            .map(function (r) { return r.work; }));
-
-        setSelectOptions(workSelect, works, "Select Work");
-        workSelect.disabled = works.length === 0;
-        updateWorkTypeAvailability();
-        updateBeneficiaryAvailability();
-    }
-
-    function addWork() {
-        const theme = themeSelect.value;
-        const group = groupSelect.value;
-        const work = workSelect.value;
-        const beneficiary = getSelectedRadio("beneficiary_type");
-        const workType = getSelectedRadio("work_type");
-
-        if (!theme || !group || !work || !beneficiary || !workType) {
-            statusMsg.textContent = "Select theme, group, work, beneficiary type, and work type first.";
-            return;
-        }
-
-        const duplicate = addedRows.find(function (row) {
-            return row.theme === theme && row.group === group && row.work === work && row.beneficiary === beneficiary && row.workType === workType;
-        });
-
-        if (duplicate) {
-            duplicate.count += 1;
-            statusMsg.textContent = "Work already exists. Count increased.";
-        } else {
-            const match = masterRows.find(function (item) {
-                return item.theme === theme && item.group === group && item.work === work && item.classification.toLowerCase() === workType.toLowerCase();
-            }) || masterRows.find(function (item) {
-                return item.theme === theme && item.group === group && item.work === work;
-            });
-            addedRows.push({
-                theme: theme,
-                group: group,
-                work: work,
-                beneficiary: beneficiary,
-                workType: workType,
-                count: 1,
-                content: match ? match.content : "",
-                imageLink: match ? match.imageLink : ""
-            });
-            statusMsg.textContent = "Work added.";
-        }
-        renderTable();
-        renderDomainCards();
-        themeSelect.value = "";
-        setSelectOptions(groupSelect, [], "Select Group");
-        groupSelect.disabled = true;
-        setSelectOptions(workSelect, [], "Select Work");
-        workSelect.disabled = true;
-        setRadioGroupEnabled(workTypeRadios, false);
-        setRadioGroupEnabled(beneficiaryRadios, false);
-    }
-
-    function showAbout(index) {
-        const row = addedRows[index];
-        if (!row) return;
-        aboutWorkContent.classList.remove("muted");
-        aboutWorkContent.textContent =
-            "Theme: " + row.theme + "\n" +
-            "Group: " + row.group + "\n" +
-            "Work: " + row.work + "\n" +
-            "Beneficiary: " + row.beneficiary + "\n" +
-            "Work Type: " + row.workType + "\n" +
-            "Count: " + row.count + (row.content ? "\n\n" + row.content : "");
-    }
-
-    function deleteRow(index) {
-        if (!addedRows[index]) return;
-        if (addedRows[index].count > 1) {
-            addedRows[index].count -= 1;
-            statusMsg.textContent = "Work count reduced.";
-        } else {
-            addedRows.splice(index, 1);
-            statusMsg.textContent = "Work removed.";
-        }
-        renderTable();
-        renderDomainCards();
-        aboutWorkContent.classList.add("muted");
-        aboutWorkContent.textContent = "Select a row using the eye icon to view details.";
-    }
-
-    function normalizePrefilledItem(obj) {
-        const countValue = Number(obj.count || obj.Count || 1);
-        return {
-            theme: (obj["Thematic Domain"] || obj.theme || "").trim(),
-            group: (obj["Group Name"] || obj["Group Name (AI)"] || obj.group || "").trim(),
-            work: (obj["Work Name"] || obj.work || "").trim(),
-            beneficiary: (obj["Beneficiary Type"] || obj.beneficiary || "Individual").trim(),
-            workType: (obj["Work Type"] || obj["Classification"] || obj.workType || "New").trim(),
-            count: Number.isFinite(countValue) && countValue > 0 ? Math.floor(countValue) : 1
-        };
-    }
-
-    function mergeOrInsertRow(newRow) {
-        const existing = addedRows.find(function (row) {
-            return row.theme === newRow.theme &&
-                row.group === newRow.group &&
-                row.work === newRow.work &&
-                row.beneficiary === newRow.beneficiary &&
-                row.workType === newRow.workType;
-        });
-
-        if (existing) {
-            existing.count += newRow.count;
-            return;
-        }
-
-        const match = masterRows.find(function (item) {
-            return item.theme === newRow.theme &&
-                item.group === newRow.group &&
-                item.work === newRow.work &&
-                item.classification.toLowerCase() === newRow.workType.toLowerCase();
-        }) || masterRows.find(function (item) {
-            return item.theme === newRow.theme &&
-                item.group === newRow.group &&
-                item.work === newRow.work;
-        });
-
-        if (!match) {
-            return;
-        }
-
-        addedRows.push({
-            theme: newRow.theme,
-            group: newRow.group,
-            work: newRow.work,
-            beneficiary: newRow.beneficiary,
-            workType: newRow.workType,
-            count: newRow.count,
-            content: match.content || "",
-            imageLink: match.imageLink || ""
-        });
-    }
-
-    async function loadPrefilledEntries() {
-        try {
-            const prefilledData = await fetchJson(PREFILLED_JSON_PATH);
-            if (!Array.isArray(prefilledData)) {
-                return 0;
-            }
-            prefilledData.map(normalizePrefilledItem).forEach(mergeOrInsertRow);
-            return prefilledData.length;
-        } catch (err) {
-            return 0;
-        }
-    }
-
-    themeSelect.addEventListener("change", function () {
-        updateGroups();
+    leftRows.forEach(function(row){
+        var tr = document.createElement('tr');
+        tr.className = 'row-animate-left';
+        // uuid = genUUID();
+        // tr.setAttribute('data-uuid', row.serial);
+        var shortName = row.work.length > 42 ? row.work.substring(0,42)+'…' : row.work;
+        tr.innerHTML =
+        '<td class="sno-cell">'+(row.serial)+'</td>'+
+        // '<td class="uuid-cell">'+esc(uuid)+'</td>'+
+        '<td class="work-name-cell" title="'+esc(row.work)+'">'+esc(shortName)+'</td>'+
+        '<td><span class="domain-badge '+domainBadge(row.dk)+'">'+domainLabel(row.dk)+'</span></td>'+
+        '<td><span class="type-badge '+(row.type==='New'?'type-new':'type-repair')+'">'+esc(row.type)+'</span></td>'+
+        '<td style="text-align:center;">'+
+            '<button class="btn-icon btn-move-right" onclick="moveRight(\''+esc(row.serial)+'\')" title="Move to Action Plan">'+
+            '<span class="icon-arrow-right"></span>'+
+            '</button>'+
+        '</td>';
+        tbody.appendChild(tr);
     });
+}
 
-    groupSelect.addEventListener("change", function () {
-        updateWorks();
-    });
+function renderRight(){
+  var tbody = document.getElementById('rightBody');
+  var empty = document.getElementById('rightEmpty');
+  var table = document.getElementById('rightTable');
+  var countEl = document.getElementById('rightCount');
 
-    workSelect.addEventListener("change", function () {
-        updateWorkTypeAvailability();
-        updateBeneficiaryAvailability();
-    });
+  countEl.textContent = rightRows.length + ' Assigned';
+//   document.getElementById('certCount').textContent = rightRows.length;
 
-    document.querySelectorAll('input[name="work_type"]').forEach(function (radio) {
-        radio.addEventListener("change", function () {
-            if (!radio.disabled) {
-                statusMsg.textContent = "Work type selected: " + radio.value + ".";
-            }
-        });
-    });
+  if(!rightRows.length){
+    empty.style.display=''; table.style.display='none'; return;
+  }
+  empty.style.display='none'; table.style.display='';
+  tbody.innerHTML='';
 
-    addWorkBtn.addEventListener("click", addWork);
+  rightRows.forEach(function(row, idx){
+    var tr = document.createElement('tr');
+    tr.className = 'row-animate-right';
+    uuid = genUUID();
+    tr.setAttribute('data-uuid', uuid);
+    var shortName = row.work.length > 42 ? row.work.substring(0,42)+'…' : row.work;
+    tr.innerHTML =
+      '<td style="text-align:center;">'+
+        '<button class="btn-icon btn-move-left" onclick="moveLeft(\''+esc(row.serial)+'\')" title="Move back to Stack">'+
+          '<span class="icon-arrow-left"></span>'+
+        '</button>'+
+      '</td>'+
+      '<td class="sno-cell">'+(row.serial)+'</td>'+
+      '<td class="uuid-cell"><span class="uuid-pill">'+esc(uuid)+'</span></td>'+
+      '<td class="work-name-cell" title="'+esc(row.work)+'">'+esc(shortName)+'</td>'+
+      '<td><span class="domain-badge '+domainBadge(row.dk)+'">'+domainLabel(row.dk)+'</span></td>'+
+      '<td><span class="type-badge '+(row.type==='New'?'type-new':'type-repair')+'">'+esc(row.type)+'</span></td>';
+    tbody.appendChild(tr);
+  });
+}
 
-    workTableBody.addEventListener("click", function (event) {
-        const button = event.target.closest("button[data-action]");
-        if (!button) return;
+async function init(){
+    masterRows = await getMasterRows();
+    leftRows = masterRows;
+    const themes = uniqueSorted(masterRows.map(function (r) { return r.theme; }));
+    render();
+}
 
-        const action = button.getAttribute("data-action");
-        const index = Number(button.getAttribute("data-index"));
-
-        if (action === "view") {
-            showAbout(index);
-        } else if (action === "delete") {
-            deleteRow(index);
-        }
-    });
-
-    async function init() {
-        setRadioGroupEnabled(workTypeRadios, false);
-        setRadioGroupEnabled(beneficiaryRadios, false);
-
-        try {
-            const worksData = await fetchJson(WORKS_JSON_PATH);
-            masterRows = jsonToObjects(worksData);
-            domainThemes = uniqueSorted(masterRows.map(function (r) { return r.theme; }));
-            const themes = uniqueSorted(masterRows.map(function (r) { return r.theme; }));
-            setSelectOptions(themeSelect, themes, "Select Theme");
-            const prefilledCount = await loadPrefilledEntries();
-            renderTable();
-            renderDomainCards();
-            updateWorkTypeAvailability();
-            updateBeneficiaryAvailability();
-            statusMsg.textContent = "Master data loaded (" + masterRows.length + " rows). Prefilled items: " + prefilledCount + ".";
-        } catch (err) {
-            domainThemes = [];
-            renderDomainCards();
-            renderTable();
-            statusMsg.textContent = "Could not load works_list.json from /static.";
-        }
-    }
-
-    function fitToViewport() {
-        const navbar = document.querySelector(".navbar");
-        const navHeight = navbar ? navbar.offsetHeight : 96;
-        document.getElementById("step2-ui").style.setProperty("--nav-h", navHeight + "px");
-    }
-
-    window.addEventListener("resize", fitToViewport);
-    fitToViewport();
-    init();
-}());
+init();
 </script>
+
 {% endblock %}

@@ -1,303 +1,309 @@
 {% extends 'base.html' %}
-{% block title %} Step 3 {% endblock %}
-
+{% block title %} Step 3{% endblock %}
 {% block content %}
-
-<section id="step3-ui">
-    <div class="step3-layout">
-
-        <!--Viksit Gram Panchayat Stack -->
-        <div class="panel left-panel">
-            <div class="panel-heading">Viksit Gram Panchayat Stack</div>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Theme</th>
-                            <th>Group</th>
-                            <th>Work</th>
-                            <th>Classification</th>
-                            <th class="qty-col">Qty</th>
-                            <th class="icon-col"><i class="fa-solid fa-arrow-right"></i></th>
-                        </tr>
-                    </thead>
-                    <tbody id="schemeTableBody">
-                        <tr><td colspan="6" class="empty-row">Loading data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <p class="status-msg" id="statusMsg">Loading data...</p>
-
-            <!-- Domain Cards -->
-            <div class="domain-grid" id="domainCardsContainer"></div>
+<div class="app-body">
+    <div class="panel">
+        <div class="panel-header">
+            <div class="dot"></div> VGP Stack (Saturated)
+            <div class="panel-header-right" id="leftCount">0 Works</div>
         </div>
-
-        <!-- Annual Action Plan -->
-        <div class="panel right-panel">
-            <div class="panel-heading">Annual Action Plan</div>
-
-            <div class="table-wrap">
-                <table style="table-layout: fixed;">
-                    <colgroup>
-                        <col style="width: auto;">
-                        <col style="width: auto;">
-                        <col style="width: 42px;">
-                        <col style="width: 36px;">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th>Work</th>
-                            <th>Theme</th>
-                            <th style="text-align:center;">Qty</th>
-                            <th style="text-align:center;"><i class="fa-solid fa-trash"></i></th>
-                        </tr>
-                    </thead>
-                    <tbody id="aapTableBody">
-                        <tr><td colspan="4" class="empty-row">No work added yet.</td></tr>
-                    </tbody>
-                </table>
+        <div class="stats-bar">
+            <div class="stat-chip water" onclick="filter('water')">
+                <div class="val" id="lsWater">100</div>
+                <div class="lbl">Water</div>
             </div>
-
-            <!-- About Work -->
-            <div class="about-work">
-                <h4>About the Work</h4>
-                <div id="aboutWorkContent" class="about-content muted">
-                    Select a row using the eye icon to view details.
-                </div>
+            <div class="stat-chip rural" onclick="filter('rural')">
+                <div class="val" id="lsRural">0</div>
+                <div class="lbl">Rural</div>
             </div>
-
-            <!-- Footer -->
-            <div class="step3-footer">
-                <button class="btn-back" onclick="window.location.href='{{ url_for('routes.step_2') }}'">Back</button>
-                <button class="btn-approve" onclick="window.location.href='{{ url_for('routes.step_4') }}'">Approve</button>
+            <div class="stat-chip livelihood" onclick="filter('livelihood')">
+                <div class="val" id="lsLivelihood">0</div>
+                <div class="lbl">Livelihood</div>
+            </div>
+            <div class="stat-chip climate" onclick="filter('climate')">
+                <div class="val" id="lsClimate">0</div>
+                <div class="lbl">Climate</div>
             </div>
         </div>
-
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-box">
+                <div class="spinner"></div>
+                <div class="loading-text">Generating 100 Works</div>
+                <div class="loading-sub">Populating stack with random works...</div>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <div id="leftEmpty" class="empty-state" style="display: none;">
+                <div class="icon">📋</div>
+                <div class="title">No Works in Stack</div>
+                <div class="desc">Go back to the dashboard and generate 100 random works to populate this list.</div>
+            </div>
+            <table id="leftTable">
+                <thead>
+                    <tr>
+                        <!-- <th style="width:32px;">#</th> -->
+                        <th style="width:90px;">UUID</th>
+                        <th>Work Name</th>
+                        <th>Theme</th>
+                        <th>Type</th>
+                        <th style="width:40px;text-align:center;">→</th>
+                    </tr>
+                </thead>
+                <tbody id="leftBody">
+                </tbody>
+            </table>
+        </div>
     </div>
-</section>
+    <div class="panel">
+        <div class="panel-header">
+            <div class="dot"></div> VGP Annual Action Plan
+            <div class="panel-header-right" id="rightCount">0 Works</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat-chip water" onclick="filter('water')">
+                <div class="val" id="rsWater">0</div>
+                <div class="lbl">Water</div>
+            </div>
+            <div class="stat-chip rural" onclick="filter('rural')">
+                <div class="val" id="rsRural">0</div>
+                <div class="lbl">Rural</div>
+            </div>
+            <div class="stat-chip livelihood" onclick="filter('livelihood')">
+                <div class="val" id="rsLivelihood">0</div>
+                <div class="lbl">Livelihood</div>
+            </div>
+            <div class="stat-chip climate" onclick="filter('climate')">
+                <div class="val" id="rsClimate">0</div>
+                <div class="lbl">Climate</div>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <div id="rightEmpty" class="empty-state" style="display: none;">
+                <div class="icon">📋</div>
+                <div class="title">No Works in Stack</div>
+                <div class="desc">Go back to the dashboard and generate 100 random works to populate this list.</div>
+            </div>
+            <table id="rightTable">
+                <thead>
+                    <tr>
+                        <th style="width:40px;text-align:center;">←</th>
+                        <th style="width:32px;">#</th>
+                        <th style="width:90px;">UUID</th>
+                        <th>Work Name</th>
+                        <th>Theme</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody id="rightBody">
+                </tbody>
+            </table>
+        </div>
+         <!-- Bottom: Certificate -->
+        <div class="certificate-section">
+        <div class="cert-header-row">
+            <div class="cert-label">GP Resolution</div>
+            <button class="cert-print-btn" onclick="window.print()">
+            <span style="font-size:13px;">🖨</span> Print Certificate
+            </button>
+        </div>
 
+        <div class="certificate">
+            <div class="cert-stamp">GRAM<br>PANCHAYAT<br>SEAL</div>
+
+            <div class="cert-seal-row">
+            <div class="cert-govt-text">
+                Government of India
+                <span class="bold">Ministry of Rural Development</span>
+                VBGRAMG — Saturated Mode
+            </div>
+            <div class="cert-ref">
+                Ref. No.: <strong id="certRef">GP/VBGRAMG/2025-26/——</strong><br>
+                Date: <strong id="certDate"></strong>
+            </div>
+            </div>
+
+            <div class="cert-title">Gram Panchayat Resolution</div>
+            <div class="cert-subtitle">Viksit Bharat Guarantee Rozgar and Ajeevika Mission Gramin</div>
+            <hr class="cert-divider">
+
+            <div class="cert-body">
+            This is to certify that the Gram Panchayat of <span class="cert-blank">__________________</span>,
+            Block <span class="cert-blank">__________________</span>, District <span class="cert-blank">__________________</span>,
+            has under the Viksit Gram Panchayat Saturated Mode initiative, duly deliberated upon and resolved in its Gram Sabha
+            meeting to undertake a total of <span class="cert-count" id="certCount">0</span> works
+            under the Viksit Bharat Guarantee for Rozgar and Ajeevika Mission Gramin Scheme for the financial year
+            <span class="cert-blank">2025–26</span>. The said works span across
+            water security, rural infrastructure, livelihood assets, and climate resilience domains and have been
+            selected with due consideration of local needs, available resources, and community priorities as
+            mandated under the VBGRAMG operational guidelines. The Gram Panchayat hereby affirms that the
+            foregoing action plan has been prepared in a transparent and participatory manner.
+            </div>
+
+            <div class="cert-footer">
+            <div class="cert-place-date">
+                <strong>Place &amp; Date</strong>
+                <span id="certPlaceDate">__________________, <span id="certDateFull"></span></span>
+            </div>
+            <div class="cert-signature">
+                <div class="cert-sig-line"></div>
+                <div class="cert-sig-name">Gram Pradhan / Sarpanch</div>
+                <div class="cert-sig-title">Gram Panchayat, with seal</div>
+            </div>
+            <div class="cert-signature">
+                <div class="cert-sig-line"></div>
+                <div class="cert-sig-name">Panchayat Secretary</div>
+                <div class="cert-sig-title">Authorized Signatory</div>
+            </div>
+            <div class="cert-signature">
+                <div class="cert-sig-line"></div>
+                <div class="cert-sig-name">Block Development Officer</div>
+                <div class="cert-sig-title">Countersignature &amp; Seal</div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<script src="{{url_for('static', filename='js/base.js')}}"></script>
 <script>
-(function () {
 
-    const PREFILLED_JSON_PATH = "/static/prefilled_works.json";
+function renderLeft(){
+    var tbody = document.getElementById('leftBody');
+    var empty = document.getElementById('leftEmpty');
+    var table = document.getElementById('leftTable');
+    var countEl = document.getElementById('leftCount');
 
-    const schemeTableBody  = document.getElementById("schemeTableBody");
-    const aapTableBody     = document.getElementById("aapTableBody");
-    const aboutWorkContent = document.getElementById("aboutWorkContent");
-    const statusMsg        = document.getElementById("statusMsg");
-    const domainCardsContainer = document.getElementById("domainCardsContainer");
-    const domainColorPalette = ["var(--water)", "var(--infra)", "var(--live)", "var(--disaster)"];
+    countEl.textContent = leftRows.length + ' Work' + (leftRows.length!==1?'s':'');
 
-    let allRows    = [];   // full JSON rows with qty
-    let aapRows    = [];   // { rowRef, qty } objects in AAP
-    let activeFilterTheme = null;
-    let domainThemes = [];
-
-    function jsonToObjects(jsonArr) {
-        if (!Array.isArray(jsonArr)) return [];
-        return jsonArr.map(function (item) {
-            const work           = (item["Work Name"] || "").trim();
-            const classification = (item["Classification"] || "").trim();
-            const rawCount = Number(item.count || item.Count || 1);
-            const qty = Number.isFinite(rawCount) && rawCount > 0 ? Math.floor(rawCount) : 1;
-            return {
-                theme:          (item["Thematic Domain"] || "").trim(),
-                group:          (item["Group Name"] || item["Group Name (AI)"] || "").trim(),
-                work:           work,
-                classification: classification,
-                totalQty:       qty,   // original max
-                availQty:       qty    // remaining available
-            };
-        }).filter(function (r) { return r.theme && r.group && r.work; });
+    if(!leftRows.length){
+        empty.style.display=''; table.style.display='none'; return;
     }
+    empty.style.display='none'; table.style.display='';
+    tbody.innerHTML='';
 
-    // Render left table
-    function renderSchemeTable() {
-        schemeTableBody.innerHTML = "";
-        const rowsToShow = activeFilterTheme
-            ? allRows.filter(function (r) { return r.theme === activeFilterTheme; })
-            : allRows;
-
-        if (!rowsToShow.length) {
-            schemeTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">No data available.</td></tr>';
-            return;
-        }
-
-        rowsToShow.forEach(function (row) {
-            const idx      = allRows.indexOf(row);
-            const depleted = row.availQty <= 0;
-
-            const tr = document.createElement("tr");
-            tr.innerHTML =
-                '<td>' + row.theme          + '</td>' +
-                '<td>' + row.group          + '</td>' +
-                '<td>' + row.work           + '</td>' +
-                '<td>' + row.classification + '</td>' +
-                '<td class="qty-col"><span class="qty-value" id="qty-val-' + idx + '">' + row.availQty + '</span></td>' +
-                '<td class="icon-col">' +
-                    '<button class="icon-btn arrow-btn" data-action="add-to-aap" data-index="' + idx + '"' +
-                    (depleted ? ' disabled style="color:#c0c0c0;opacity:0.4;cursor:not-allowed;" title="No quantity left"' : '') +
-                    '><i class="fa-solid fa-arrow-right"></i></button>' +
-                '</td>';
-            schemeTableBody.appendChild(tr);
-        });
-    }
-
-    function renderAapTable() {
-        aapTableBody.innerHTML = "";
-        if (!aapRows.length) {
-            aapTableBody.innerHTML = '<tr><td colspan="4" class="empty-row">No work added yet.</td></tr>';
-            return;
-        }
-        aapRows.forEach(function (entry, idx) {
-            const tr = document.createElement("tr");
-            tr.innerHTML =
-                '<td>' + entry.rowRef.work  + '</td>' +
-                '<td>' + entry.rowRef.theme + '</td>' +
-                '<td style="text-align:center;"><span class="aap-qty-badge">' + entry.qty + '</span></td>' +
-                '<td style="text-align:center;"><button class="icon-btn delete-btn" data-action="delete-aap" data-index="' + idx + '"><i class="fa-solid fa-trash"></i></button></td>';
-            aapTableBody.appendChild(tr);
-        });
-    }
-
-    function getCardHeading(theme) {
-        const match = theme.match(/\(([^)]+)\)/);
-        return match ? match[1].trim() : theme;
-    }
-
-    function renderDomainCards() {
-        domainCardsContainer.innerHTML = "";
-        domainThemes.forEach(function (theme, idx) {
-            const item = document.createElement("div");
-            item.className = "domain-item";
-            item.innerHTML =
-                '<div class="label">' + getCardHeading(theme) + '</div>' +
-                '<div class="count-card" data-theme="' + theme.replace(/"/g, "&quot;") + '" style="background:' + domainColorPalette[idx % domainColorPalette.length] + '">0</div>';
-            domainCardsContainer.appendChild(item);
-        });
-    }
-
-    // Domain card counts
-    function renderDomainCounts() {
-        domainThemes.forEach(function (theme) {
-            const sum = allRows
-                .filter(function (r) { return r.theme === theme; })
-                .reduce(function (acc, r) { return acc + r.availQty; }, 0);
-            const card = Array.from(domainCardsContainer.querySelectorAll('.count-card[data-theme]'))
-                .find(function (el) { return el.dataset.theme === theme; });
-            if (card) card.textContent = String(sum);
-        });
-    }
-
-    // Domain card filter on click
-    domainCardsContainer.addEventListener("click", function (event) {
-        const card = event.target.closest('.count-card[data-theme]');
-        if (!card) return;
-        const theme = card.getAttribute("data-theme");
-        if (activeFilterTheme === theme) {
-                activeFilterTheme = null;
-                domainCardsContainer.querySelectorAll('.count-card[data-theme]').forEach(function (c) { c.classList.remove("active-filter"); });
-                statusMsg.textContent = "Showing all " + allRows.length + " works.";
-        } else {
-            activeFilterTheme = theme;
-            domainCardsContainer.querySelectorAll('.count-card[data-theme]').forEach(function (c) { c.classList.remove("active-filter"); });
-            card.classList.add("active-filter");
-            const count = allRows.filter(function (r) { return r.theme === theme; }).length;
-            statusMsg.textContent = "Showing " + count + " works for selected domain.";
-        }
-        renderSchemeTable();
+    leftRows.forEach(function(row){
+        var tr = document.createElement('tr');
+        tr.className = 'row-animate-left';
+        // uuid = genUUID();
+        tr.setAttribute('data-uuid', row.uuid);
+        var shortName = row.work.length > 42 ? row.work.substring(0,42)+'…' : row.work;
+        tr.innerHTML =
+        // '<td class="sno-cell">'+(row.serial)+'</td>'+
+        '<td class="uuid-cell">'+esc(row.uuid)+'</td>'+
+        '<td class="work-name-cell" title="'+esc(row.work)+'">'+esc(shortName)+'</td>'+
+        '<td><span class="domain-badge '+domainBadge(row.dk)+'">'+domainLabel(row.dk)+'</span></td>'+
+        '<td><span class="type-badge '+(row.type==='New'?'type-new':'type-repair')+'">'+esc(row.type)+'</span></td>'+
+        '<td style="text-align:center;">'+
+            '<button class="btn-icon btn-move-right" onclick="moveRight(\''+esc(row.uuid)+'\')" title="Move to Action Plan">'+
+            '<span class="icon-arrow-right"></span>'+
+            '</button>'+
+        '</td>';
+        tbody.appendChild(tr);
     });
+}
 
-    // Show about
-    function showAbout(row) {
-        aboutWorkContent.classList.remove("muted");
-        aboutWorkContent.textContent =
-            "Theme: "          + row.theme          + "\n" +
-            "Group: "          + row.group          + "\n" +
-            "Work: "           + row.work           + "\n" +
-            "Classification: " + row.classification + "\n" +
-            "Available Qty: "  + row.availQty       + " / " + row.totalQty;
-    }
+function renderRight(){
+  var tbody = document.getElementById('rightBody');
+  var empty = document.getElementById('rightEmpty');
+  var table = document.getElementById('rightTable');
+  var countEl = document.getElementById('rightCount');
 
-    // Main click handler
-    document.getElementById("step3-ui").addEventListener("click", function (e) {
-        const btn = e.target.closest("button[data-action]");
-        if (!btn) return;
+  countEl.textContent = rightRows.length + ' Assigned';
+//   document.getElementById('certCount').textContent = rightRows.length;
 
-        const action = btn.getAttribute("data-action");
-        const index  = Number(btn.getAttribute("data-index"));
+  if(!rightRows.length){
+    empty.style.display=''; table.style.display='none'; return;
+  }
+  empty.style.display='none'; table.style.display='';
+  tbody.innerHTML='';
 
-        // Add to AAP(arrow).... 1 qty at a time
-        if (action === "add-to-aap") {
-            const row = allRows[index];
-            if (row.availQty <= 0) {
-                statusMsg.textContent = "No quantity available for: " + row.work;
-                return;
-            }
-            // Send 1 unit to AAP
-            row.availQty--;
-            const existing = aapRows.find(function (a) { return a.rowRef === row; });
-            if (existing) {
-                existing.qty++;
-            } else {
-                aapRows.push({ rowRef: row, qty: 1 });
-            }
-            renderAapTable();
-            renderSchemeTable();
-            renderDomainCounts();
-            statusMsg.textContent = "Added 1 to AAP: " + row.work + " (Remaining: " + row.availQty + ")";
+  rightRows.forEach(function(row,idx){
+    var tr = document.createElement('tr');
+    tr.className = 'row-animate-right';
+    // uuid = genUUID();
+    tr.setAttribute('data-uuid', row.uuid);
+    var shortName = row.work.length > 42 ? row.work.substring(0,42)+'…' : row.work;
+    tr.innerHTML =
+      '<td style="text-align:center;">'+
+        '<button class="btn-icon btn-move-left" onclick="moveLeft(\''+esc(row.uuid)+'\')" title="Move back to Stack">'+
+          '<span class="icon-arrow-left"></span>'+
+        '</button>'+
+      '</td>'+
+      '<td class="sno-cell">'+(idx+1)+'</td>'+
+      '<td class="uuid-cell"><span class="uuid-pill">'+esc(row.uuid)+'</span></td>'+
+      '<td class="work-name-cell" title="'+esc(row.work)+'">'+esc(shortName)+'</td>'+
+      '<td><span class="domain-badge '+domainBadge(row.dk)+'">'+domainLabel(row.dk)+'</span></td>'+
+      '<td><span class="type-badge '+(row.type==='New'?'type-new':'type-repair')+'">'+esc(row.type)+'</span></td>';
+    tbody.appendChild(tr);
+  });
+}
 
-        //  Delete from AAP.... 1 qty at a time 
-        } else if (action === "delete-aap") {
-            const entry = aapRows[index];
-            entry.rowRef.availQty++;
-            if (entry.rowRef.availQty > entry.rowRef.totalQty) {
-                entry.rowRef.availQty = entry.rowRef.totalQty;
-            }
-            entry.qty--;
-            if (entry.qty <= 0) {
-                aapRows.splice(index, 1);
-            }
-            renderAapTable();
-            renderSchemeTable();
-            renderDomainCounts();
-            aboutWorkContent.classList.add("muted");
-            aboutWorkContent.textContent = "Select a row using the eye icon to view details.";
-            statusMsg.textContent = "Removed 1 from AAP: " + entry.rowRef.work + " (AAP remaining: " + (entry.qty || 0) + ")";
-        }
-    });
+function moveRight(uuid){
+    var idx = leftRows.findIndex(function(r){return r.uuid.toString()===uuid;});
+    if(idx===-1) return;
+    var row = leftRows.splice(idx,1)[0];
+    rightRows.push(row);
+    render();
+}
 
-    // Load JSON 
-    async function init() {
-        try {
-            const res = await fetch(PREFILLED_JSON_PATH, { cache: "no-store" });
-            if (!res.ok) throw new Error("JSON not found");
-            const data = await res.json();
-            allRows = jsonToObjects(data);
-            domainThemes = Array.from(new Set(allRows.map(function (r) { return r.theme; })));
-            renderDomainCards();
-            renderSchemeTable();
-            renderDomainCounts();
-            statusMsg.textContent = "Loaded " + allRows.length + " works from prefilled_works.json.";
-        } catch (err) {
-            schemeTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Could not load prefilled data.</td></tr>';
-            statusMsg.textContent = "Error loading prefilled_works.json.";
-        }
-    }
+function moveLeft(uuid){
+    var idx = rightRows.findIndex(function(r){return r.uuid===uuid;});
+    if(idx===-1) return;
+    var row = rightRows.splice(idx,1)[0];
+    leftRows.unshift(row);
+    render();
+}
 
-    // Fit to viewport
-    function fitToViewport() {
-        const navbar = document.querySelector(".navbar");
-        const navHeight = navbar ? navbar.offsetHeight : 96;
-        document.getElementById("step3-ui").style.setProperty("--nav-h", navHeight + "px");
-    }
-    window.addEventListener("resize", fitToViewport);
-    fitToViewport();
+function render(){
+    renderLeft();
+    renderRight();
+    updateStats();
+    document.getElementById('certCount').textContent = rightRows.length
+}
 
-    init();
-}());
+// ================================================================
+// GENERATE 100 RANDOM WORKS
+// ================================================================
+function generateRandom(){
+    var ww = masterRows.filter(function(r){return r.dk === 'water';}),
+        rw = masterRows.filter(function(r){return r.dk === 'rural';}),
+        lw = masterRows.filter(function(r){return r.dk === 'livelihood';}),
+        cw = masterRows.filter(function(r){return r.dk === 'climate';});
+
+  if(!ww.length||!rw.length||!lw.length||!cw.length){
+    showStatus('Dataset error — cannot generate works.','error'); return;
+  }
+  document.getElementById('loadingOverlay').classList.add('active');
+  setTimeout(function(){
+    var bene=['Individual','Community'];
+    function rnd(arr){return arr[Math.floor(Math.random()*arr.length)];}
+    function mkRow(w){return{uuid:genUUID(),sno:w.serial,work:w.work,theme:w.theme,dk:domainKey(w.theme),group:w.group,type:w.type,bene:rnd(bene),content:w.content};}
+    var rows=[];
+    for(var i=0;i<45;i++) rows.push(mkRow(rnd(ww)));
+    for(var i=0;i<23;i++) rows.push(mkRow(rnd(rw)));
+    for(var i=0;i<18;i++) rows.push(mkRow(rnd(lw)));
+    for(var i=0;i<14;i++) rows.push(mkRow(rnd(cw)));
+    // Fisher-Yates shuffle
+    for(var i=rows.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=rows[i];rows[i]=rows[j];rows[j]=t;}
+    masterRows=rows; leftRows=masterRows; activeFilter=null; viewedUUID=null;
+    // document.querySelectorAll('.domain-btn').forEach(function(b){b.classList.remove('active');});
+    // document.getElementById('filterBadge').classList.remove('visible');
+    // document.getElementById('detailCard').classList.remove('visible');
+    // document.getElementById('detailEmpty').style.display='';
+    renderLeft(); updateStats();
+    document.getElementById('loadingOverlay').classList.remove('active');
+    // showStatus('✓ 100 random works generated successfully!','success');
+  },700);
+}
+
+async function init(){
+    masterRows = await getMasterRows();
+    leftRows = masterRows;
+    const themes = uniqueSorted(masterRows.map(function (r) { return r.theme; }));
+    generateRandom();
+    // render();
+}
+
+init();
 </script>
-
 {% endblock %}

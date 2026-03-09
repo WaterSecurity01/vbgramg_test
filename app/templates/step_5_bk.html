@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Socio-economic Data Survey</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #2563EB;
+    --primary-light: #EFF6FF;
+    --primary-dark: #1D4ED8;
+    --text: #1E293B;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+    --bg: #F8FAFC;
+    --white: #FFFFFF;
+    --success: #10B981;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #DCE8F5;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px 0;
+  }
+
+  .phone {
+    width: 375px;
+    min-height: 812px;
+    background: var(--bg);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .header {
+    background: var(--white);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-back {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.15s;
+  }
+  .header-back:hover { background: var(--bg); }
+  .header-back svg { color: var(--text); }
+
+  .header-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.2px;
+  }
+
+  .header-check {
+    width: 32px; height: 32px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Progress */
+  .progress-bar-wrap {
+    background: var(--white);
+    padding: 12px 20px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .progress-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .progress-pct {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .progress-track {
+    height: 5px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #60A5FA);
+    border-radius: 10px;
+    width: 45%;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .section-label {
+    padding: 10px 20px 0;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+  }
+
+  /* Scroll area */
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .scroll-area::-webkit-scrollbar { width: 3px; }
+  .scroll-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+  /* Cards */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .card-header:hover { background: var(--bg); }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-icon {
+    width: 32px; height: 32px;
+    background: var(--primary-light);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+
+  .card-title-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .card-chevron {
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+    color: var(--text-muted);
+  }
+  .card-chevron.open { transform: rotate(180deg); }
+
+  .card-body {
+    padding: 0 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), padding 0.25s;
+  }
+  .card-body.open {
+    max-height: 800px;
+    padding: 0 16px 16px;
+  }
+
+  /* Form elements */
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.1px;
+  }
+
+  .input-field {
+    width: 100%;
+    height: 42px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+  .input-field::placeholder { color: #CBD5E1; }
+  .input-field:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .age-group-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 12px;
+    background: var(--bg);
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+  .age-group-row:last-child { margin-bottom: 0; }
+
+  .age-label { font-size: 13px; color: var(--text); font-weight: 400; }
+
+  .age-counter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .counter-btn {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--primary);
+    font-weight: 600;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .counter-btn:hover { background: var(--primary-light); border-color: var(--primary); }
+
+  .counter-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    min-width: 20px;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* Select */
+  .select-field {
+    width: 100%;
+    height: 42px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--white);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .select-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+  /* Toggle buttons */
+  .toggle-group { display: flex; gap: 8px; }
+  .toggle-btn {
+    flex: 1;
+    height: 38px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .toggle-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--white);
+  }
+  .toggle-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  /* Slider */
+  .slider-wrap { padding: 4px 0; }
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .slider-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+    font-family: 'DM Mono', monospace;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 5px;
+    background: var(--border);
+    border-radius: 10px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(37,99,235,0.35);
+    transition: transform 0.15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+  /* Bottom CTA */
+  .cta-wrap {
+    padding: 14px 16px 16px;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+  }
+
+  .cta-btn {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: none;
+    border-radius: 14px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+    letter-spacing: 0.1px;
+  }
+  .cta-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+  .cta-btn:active { transform: translateY(0); }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    background: var(--white);
+    display: flex;
+    border-top: 1px solid var(--border);
+    padding: 8px 0 4px;
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 0;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .nav-item:hover { opacity: 0.7; }
+
+  .nav-icon { font-size: 20px; }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+  }
+  .nav-item.active .nav-label { color: var(--primary); }
+  .nav-item.active .nav-icon-wrap svg { color: var(--primary); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-back" onclick="history.back()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <path d="M19 12H5M5 12l7-7M5 12l7 7"/>
+      </svg>
+    </div>
+    <span class="header-title">Socio-economic Data</span>
+    <div class="header-check">
+      <svg width="15" height="15" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar-wrap">
+    <div class="progress-header">
+      <span class="progress-label">Survey Progress</span>
+      <span class="progress-pct" id="pctLabel">45% Complete</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="section-label">Section 3 of 7: Household Dynamics</div>
+
+  <!-- Scroll content -->
+  <div class="scroll-area">
+
+    <!-- 1. Population Data -->
+    <div class="card">
+      <div class="card-header" onclick="toggleCard('pop')">
+        <div class="card-title">
+          <!-- <div class="card-icon">👥</div> -->
+          <span class="card-title-text">1.1 Population Demography</span>
+        </div>
+        <div class="card-chevron open" id="chevron-pop">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </div>
+      </div>
+      <div class="card-body open" id="body-pop">
+        <div class="field">
+          <div class="field-label">Total Population</div>
+          <input class="input-field" type="number" placeholder="Enter total count" id="totalPop">
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <div class="field-label">Male</div>
+            <input class="input-field" type="number" placeholder="0" id="male">
+          </div>
+          <div class="field">
+            <div class="field-label">Female</div>
+            <input class="input-field" type="number" placeholder="0" id="female">
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Age Groups Distribution</div>
+          <div class="age-group-row">
+            <span class="age-label">0–14 Years</span>
+            <div class="age-counter">
+              <button class="counter-btn" onclick="changeCount('age1',-1)">−</button>
+              <span class="counter-val" id="age1">0</span>
+              <button class="counter-btn" onclick="changeCount('age1',1)">+</button>
+            </div>
+          </div>
+          <div class="age-group-row">
+            <span class="age-label">15–64 Years</span>
+            <div class="age-counter">
+              <button class="counter-btn" onclick="changeCount('age2',-1)">−</button>
+              <span class="counter-val" id="age2">0</span>
+              <button class="counter-btn" onclick="changeCount('age2',1)">+</button>
+            </div>
+          </div>
+          <div class="age-group-row">
+            <span class="age-label">65+ Years</span>
+            <div class="age-counter">
+              <button class="counter-btn" onclick="changeCount('age3',-1)">−</button>
+              <span class="counter-val" id="age3">0</span>
+              <button class="counter-btn" onclick="changeCount('age3',1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Households Data -->
+    <div class="card">
+      <div class="card-header" onclick="toggleCard('hh')">
+        <div class="card-title">
+          <!-- <div class="card-icon">🏠</div> -->
+          <span class="card-title-text">1.2 Households</span>
+        </div>
+        <div class="card-chevron open" id="chevron-hh">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </div>
+      </div>
+      <div class="card-body open" id="body-hh">
+        <div class="field">
+          <div class="field-label">Total Households</div>
+          <input class="input-field" type="number" placeholder="Enter total households" id="totalHH">
+        </div>
+        <div class="field">
+          <div class="field-label">Type of Housing</div>
+          <select class="select-field" id="housingType">
+            <option value="">Select type</option>
+            <option>Permanent</option>
+            <option>Semi-permanent</option>
+            <option>Temporary</option>
+            <option>Informal / Makeshift</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="field-label">Ownership Status</div>
+          <div class="toggle-group">
+            <button class="toggle-btn active" id="own-owned" onclick="setToggle('own','owned')">Owned</button>
+            <button class="toggle-btn" id="own-rented" onclick="setToggle('own','rented')">Rented</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Employment Data -->
+    <div class="card">
+      <div class="card-header" onclick="toggleCard('emp')">
+        <div class="card-title">
+          <!-- <div class="card-icon">💼</div> -->
+           <div class="card-icon">1.3</div>
+          <span class="card-title-text"> Job Card Holders</span>
+        </div>
+        <div class="card-chevron open" id="chevron-emp">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </div>
+      </div>
+      <div class="card-body open" id="body-emp">
+        <div class="field">
+          <div class="field-label">Total Registered</div>
+          <input class="input-field" type="number" placeholder="0" id="totalReg">
+        </div>
+        <div class="field">
+          <div class="field-label">Active Workers</div>
+          <input class="input-field" type="number" placeholder="0" id="activeWorkers">
+        </div>
+        <div class="field">
+          <div class="field-label">Average Employment Days (Yearly)</div>
+          <div class="slider-wrap">
+            <div class="slider-header">
+              <span style="font-size:12px;color:var(--text-muted)">Days / Year</span>
+              <span class="slider-val" id="sliderVal">45</span>
+            </div>
+            <input type="range" min="0" max="365" value="45" id="empSlider"
+              oninput="document.getElementById('sliderVal').textContent=this.value">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <button class="cta-btn" onclick="nextSection()">
+      Next Section
+      <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M5 12h14M13 6l6 6-6 6"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <svg width="22" height="22" fill="none" stroke="#2563EB" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/>
+      </svg>
+      <span class="nav-label" style="color:#2563EB">Survey</span>
+    </div>
+    <div class="nav-item">
+      <svg width="22" height="22" fill="none" stroke="#94A3B8" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+      </svg>
+      <span class="nav-label">Map</span>
+    </div>
+    <div class="nav-item">
+      <svg width="22" height="22" fill="none" stroke="#94A3B8" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      <span class="nav-label">Sync</span>
+    </div>
+    <div class="nav-item">
+      <svg width="22" height="22" fill="none" stroke="#94A3B8" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.582-7 8-7s8 3 8 7"/>
+      </svg>
+      <span class="nav-label">Profile</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const counts = { age1: 0, age2: 0, age3: 0 };
+
+  function changeCount(id, delta) {
+    counts[id] = Math.max(0, counts[id] + delta);
+    document.getElementById(id).textContent = counts[id];
+    updateProgress();
+  }
+
+  function toggleCard(id) {
+    const body = document.getElementById('body-' + id);
+    const chevron = document.getElementById('chevron-' + id);
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chevron.classList.toggle('open', !isOpen);
+  }
+
+  const toggleState = {};
+  function setToggle(group, val) {
+    toggleState[group] = val;
+    document.querySelectorAll(`[id^="${group}-"]`).forEach(btn => {
+      btn.classList.toggle('active', btn.id === `${group}-${val}`);
+    });
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const fields = ['totalPop','male','female','totalHH','housingType','totalReg','activeWorkers'];
+    let filled = fields.filter(id => document.getElementById(id)?.value).length;
+    if (toggleState['own']) filled++;
+    const pct = Math.round((filled / (fields.length + 1)) * 55 + 45);
+    const capped = Math.min(pct, 100);
+    document.getElementById('progressFill').style.width = capped + '%';
+    document.getElementById('pctLabel').textContent = capped + '% Complete';
+  }
+
+  document.querySelectorAll('.input-field, .select-field').forEach(el => {
+    el.addEventListener('input', updateProgress);
+  });
+
+  function nextSection() {
+    const btn = document.querySelector('.cta-btn');
+    btn.textContent = '✓ Saved! Moving to Section 4...';
+    btn.style.background = 'linear-gradient(135deg, #10B981, #059669)';
+    setTimeout(() => {
+      btn.innerHTML = 'Next Section <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+      btn.style.background = '';
+    }, 2000);
+  }
+</script>
+</body>
+</html>

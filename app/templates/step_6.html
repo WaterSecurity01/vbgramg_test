@@ -1,0 +1,934 @@
+{% extends 'base.html' %}
+{% block title %}Works Explorer – GeoServer Map{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- FULL SCREEN LOADER -->
+<div id="map-loader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text" id="loader-msg">Loading Map Data...</div>
+</div>
+
+<div class="layout-container">
+    <!-- LEFT: MAP -->
+    <div class="left-section">
+        <div id="map"></div>
+        <div class="map-status-pill" id="map-status">Initializing Web Feature Service...</div>
+        <button class="reset-btn" id="reset-map-btn" onclick="resetToIndia()"><i class="fa-solid fa-arrow-left"></i>
+            Back to India</button>
+    </div>
+
+    <!-- RIGHT: TABLE -->
+    <div class="right-section">
+        <div class="table-toolbar">
+            <div class="tb-header-row">
+                <div class="tb-title"><i class="fa-solid fa-table-list"></i> Works Catalogue</div>
+                <div class="tb-count" id="table-count">0 works</div>
+            </div>
+
+            <!-- Moved Legend Panel -->
+            <div class="legend-panel">
+                <span class="legend-label">Filter by Domain</span>
+                <div class="legend-items" id="domain-legend">
+                    <!-- Rendered via JS -->
+                </div>
+            </div>
+
+            <div class="tb-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="table-search" placeholder="Search works or groups..." autocomplete="off">
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="works-table">
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Thematic Domain</th>
+                        <th>Group Name</th>
+                        <th>Work Name</th>
+                        <th>Classification</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Rows via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="/static/leaflet.js"></script>
+<script src='/static/omnivore.js'></script>
+<script>
+    function syncNavHeight() {
+        const nav = document.querySelector('.navbar');
+        if (nav) {
+            document.documentElement.style.setProperty('--nav-height', nav.offsetHeight + 'px');
+        }
+    }
+    syncNavHeight();
+    window.addEventListener('resize', syncNavHeight);
+
+    // Data Sources
+    const WORKS_JSON_URL = "{{ url_for('static', filename='works_list.json') }}";
+    const STATES_GEOJSON = "{{ url_for('static', filename='states.geojson') }}";
+    const HR_VILLAGES_GEOJSON = "{{ url_for('static', filename='hr_villages.geojson') }}";
+
+    // Config
+    const IMPORT_ROW_COUNT = 100; // Change this to import any specific row count.
+    const MARKERS_INDIA = 100;
+    const MARKERS_HARYANA = 20;
+
+    // State globals
+    let map, stateLayer, villageLayer;
+    let markerGroup; // Will be initialized later with L.layerGroup().addTo(map);
+    let allCsvRows = [];
+    let rowMarkerMap = new Map(); // maps row index (in csv) to Leaflet marker
+    let activeDomainFilter = null;
+    let activeStateFilter = null;
+    let searchTerm = '';
+    let currentState = 'INDIA'; // 'INDIA' or 'HARYANA'
+
+    const DOMAINS = ["water", "rural", "livelihood", "climate"];
+    const OVERLAY_BUCKETS = ["pm_gati_shakti", "yuktdhara", "india_wris"];
+    const FILTER_BUCKETS = [...DOMAINS, ...OVERLAY_BUCKETS];
+    const OVERLAY_CONFIG = {
+        pm_gati_shakti: { name: "PM Gati Shakti", total: 2, overlap: 1, thematicDomain: "PM Gati Shakti", groupName: "National Tracked Infrastructure" },
+        yuktdhara: { name: "Yuktdhara", total: 3, overlap: 2, thematicDomain: "Yuktdhara", groupName: "Spatial Planning Layer" },
+        india_wris: { name: "India WRIS", total: 1, overlap: 1, thematicDomain: "India WRIS", groupName: "Water Resource Intelligence" }
+    };
+    const DOMAIN_COLORS = {
+        water: { name: 'Water', c: '#0ea5e9', bg: '#e0f2fe', bd: '#bae6fd' },
+        rural: { name: 'Rural', c: '#10b981', bg: '#d1fae5', bd: '#a7f3d0' },
+        livelihood: { name: 'Livelihood', c: '#f59e0b', bg: '#fef3c7', bd: '#fde68a' },
+        climate: { name: 'Climate', c: '#8b5cf6', bg: '#ede9fe', bd: '#ddd6fe' },
+        pm_gati_shakti: { name: 'PM Gati Shakti', c: '#ef4444', bg: '#fee2e2', bd: '#fecaca' },
+        yuktdhara: { name: 'Yuktdhara', c: '#0f766e', bg: '#ccfbf1', bd: '#99f6e4' },
+        india_wris: { name: 'India WRIS', c: '#7c3aed', bg: '#ede9fe', bd: '#ddd6fe' }
+    };
+
+    function getDomainBucket(domainText) {
+        const text = String(domainText || '').toLowerCase();
+        if (text.includes("pm gati shakti")) return "pm_gati_shakti";
+        if (text.includes("yuktdhara")) return "yuktdhara";
+        if (text.includes("india wris")) return "india_wris";
+        if (text.includes("climate")) return "climate";
+        if (text.includes("livelihood")) return "livelihood";
+        if (text.includes("rural")) return "rural";
+        if (text.includes("water")) return "water";
+        return "water";
+    }
+
+    function normalizeWorksJsonRows(jsonRows) {
+        if (!Array.isArray(jsonRows)) return [];
+        return jsonRows.map((row, idx) => ({
+            'S.No.': String(row['S.No.'] || row.serial || idx + 1),
+            'Thematic Domain': row['Thematic Domain'] || row.theme || '',
+            'Group Name': row['Group Name'] || row['Group Name (AI)'] || row.group || '',
+            'Work Name': row['Work Name'] || row.name || '',
+            'Classification': row['Classification'] || row.type || '',
+            'State': row['State'] || ''
+        })).filter(r => r['Thematic Domain'] && r['Work Name']);
+    }
+
+    function allocateByRatio(domainRowsMap, targetCount) {
+        const baseCounts = {};
+        let totalBase = 0;
+        DOMAINS.forEach(d => {
+            const count = (domainRowsMap[d] || []).length;
+            baseCounts[d] = count;
+            totalBase += count;
+        });
+        if (totalBase === 0 || targetCount <= 0) {
+            return DOMAINS.reduce((acc, d) => { acc[d] = 0; return acc; }, {});
+        }
+
+        const exact = {};
+        const floorAlloc = {};
+        const remainders = [];
+        let used = 0;
+        DOMAINS.forEach(d => {
+            exact[d] = (baseCounts[d] / totalBase) * targetCount;
+            floorAlloc[d] = Math.floor(exact[d]);
+            used += floorAlloc[d];
+            remainders.push({ domain: d, rem: exact[d] - floorAlloc[d] });
+        });
+
+        let remaining = targetCount - used;
+        remainders.sort((a, b) => b.rem - a.rem);
+        let i = 0;
+        while (remaining > 0) {
+            floorAlloc[remainders[i % remainders.length].domain] += 1;
+            i += 1;
+            remaining -= 1;
+        }
+        return floorAlloc;
+    }
+
+    function sampleRowsByDomainRatio(rows, targetCount) {
+        const byDomain = DOMAINS.reduce((acc, d) => { acc[d] = []; return acc; }, {});
+        rows.forEach(r => {
+            const bucket = getDomainBucket(r['Thematic Domain']);
+            if (byDomain[bucket]) byDomain[bucket].push(r);
+        });
+
+        const allocations = allocateByRatio(byDomain, targetCount);
+        const sampled = [];
+
+        DOMAINS.forEach(domain => {
+            const source = byDomain[domain];
+            const need = allocations[domain] || 0;
+            if (!source.length || need <= 0) return;
+            for (let i = 0; i < need; i++) {
+                sampled.push({ ...source[i % source.length] });
+            }
+        });
+
+        sampled.forEach((r, idx) => { r['S.No.'] = String(idx + 1); });
+        return sampled;
+    }
+
+    function appendOverlayRows(targetRows, options = {}) {
+        const existingPts = options.existingPts || [];
+        const markAsDummy = Boolean(options.markAsDummy);
+        const stateName = options.stateName || '';
+
+        let overlapSourceIndex = 0;
+        OVERLAY_BUCKETS.forEach((bucket) => {
+            const cfg = OVERLAY_CONFIG[bucket];
+            for (let i = 0; i < cfg.total; i++) {
+                const shouldOverlap = i < cfg.overlap && existingPts.length > 0;
+                const row = {
+                    'S.No.': String(targetRows.length + 1),
+                    'Thematic Domain': cfg.thematicDomain,
+                    'Group Name': cfg.groupName,
+                    'Work Name': `${cfg.name} Layer ${i + 1}`,
+                    'Classification': 'New',
+                    '_overlay': true,
+                    '_overlayBucket': bucket,
+                    '_overlayOverlap': shouldOverlap,
+                    '_state': stateName || ''
+                };
+                if (markAsDummy) {
+                    row._is_dummy = true;
+                }
+                if (shouldOverlap) {
+                    const sourcePt = existingPts[overlapSourceIndex % existingPts.length];
+                    overlapSourceIndex += 1;
+                    row._pt = [sourcePt[0] + 0.00015, sourcePt[1] - 0.00015];
+                } else if (existingPts.length > 0) {
+                    const sourcePt = existingPts[overlapSourceIndex % existingPts.length];
+                    overlapSourceIndex += 1;
+                    row._pt = [sourcePt[0] + 0.0012, sourcePt[1] - 0.0012];
+                }
+                targetRows.push(row);
+            }
+        });
+    }
+
+    /* --- GEOMETRY HELPERS FOR RANDOM POINT GENERATION --- */
+    // Extracts rings from GeoJSON (Multi)Polygon
+    function extractRings(geometry) {
+        let rings = [];
+        if (geometry.type === 'Polygon') {
+            rings.push(geometry.coordinates);
+        } else if (geometry.type === 'MultiPolygon') {
+            geometry.coordinates.forEach(poly => rings.push(poly));
+        }
+        return rings;
+    }
+
+    // Ray-casting algorithm
+    function pointInRing(pt, ring) {
+        let isInside = false;
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+            let xi = ring[i][0], yi = ring[i][1];
+            let xj = ring[j][0], yj = ring[j][1];
+            let intersect = ((yi > pt[1]) !== (yj > pt[1])) && (pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi);
+            if (intersect) isInside = !isInside;
+        }
+        return isInside;
+    }
+
+    function pointInPolygonCoords(pt, rings) {
+        // pt is [lng, lat]
+        // First ring is exterior, rest are holes
+        if (!rings || rings.length === 0 || !pointInRing(pt, rings[0])) return false;
+        for (let i = 1; i < rings.length; i++) {
+            if (pointInRing(pt, rings[i])) return false;
+        }
+        return true;
+    }
+
+    // Ensures point is not just inside, but strictly inside with a margin (pad in decimal degrees)
+    function isPointDeepInPolygon(lng, lat, rings, pad) {
+        if (!pointInPolygonCoords([lng, lat], rings)) return false;
+        if (pad > 0) {
+            if (!pointInPolygonCoords([lng + pad, lat], rings)) return false;
+            if (!pointInPolygonCoords([lng - pad, lat], rings)) return false;
+            if (!pointInPolygonCoords([lng, lat + pad], rings)) return false;
+            if (!pointInPolygonCoords([lng, lat - pad], rings)) return false;
+        }
+        return true;
+    }
+
+    function pointInLayer(ptLngLat, geoJsonFeatures) {
+        for (let f of geoJsonFeatures) {
+            const ringsList = extractRings(f.geometry);
+            for (let rings of ringsList) {
+                if (pointInPolygonCoords(ptLngLat, rings)) return true;
+            }
+        }
+        return false;
+    }
+
+    // Generate N random points within GeoJSON features
+    function generateRandomPointsInLayer(n, layer, bounds) {
+        const pts = [];
+        const features = layer.toGeoJSON().features;
+        let attempts = 0;
+        const maxAttempts = n * 100;
+
+        while (pts.length < n && attempts < maxAttempts) {
+            attempts++;
+            const lat = bounds.getSouth() + Math.random() * (bounds.getNorth() - bounds.getSouth());
+            const lng = bounds.getWest() + Math.random() * (bounds.getEast() - bounds.getWest());
+
+            if (pointInLayer([lng, lat], features)) {
+                pts.push([lat, lng]);
+            }
+        }
+        return pts;
+    }
+
+    /* --- DATA SAMPLING & MARKER GENERATION --- */
+    // Process all 278 rows and assign them to states strictly.
+    function assignMarkersToStates(stateGeoJsonLayer) {
+        document.getElementById('map-status').textContent = `Calculating geometric distribution for all ${allCsvRows.length} works...`;
+
+        // Clear existing map
+        markerGroup.clearLayers();
+        rowMarkerMap.clear();
+
+        const features = stateGeoJsonLayer.toGeoJSON().features;
+        const bounds = stateGeoJsonLayer.getBounds();
+
+        let processedCount = 0;
+
+        // Process in chunks so we don't block the UI thread completely
+        setTimeout(function processChunk() {
+            const chunkEnd = Math.min(processedCount + 50, allCsvRows.length);
+            for (let i = processedCount; i < chunkEnd; i++) {
+                const row = allCsvRows[i];
+                if (row._is_dummy) continue; // Skip dummy clones
+
+                const bucket = getDomainBucket(row['Thematic Domain']);
+
+                // Find a random point inside *any* state feature
+                let pt = row['_pt'];
+                let foundFeatureName = row['_state'];
+
+                if (!pt) {
+                    if (row._overlayOverlap) {
+                        const validOthers = allCsvRows
+                            .slice(0, i)
+                            .filter(r => r._pt && !r._overlay);
+                        if (validOthers.length > 0) {
+                            const base = validOthers[Math.floor(Math.random() * validOthers.length)];
+                            pt = [base._pt[0] + 0.00015, base._pt[1] - 0.00015];
+                            row['_pt'] = pt;
+                            row['_state'] = base['_state'];
+                        }
+                    }
+
+                    let attempts = 0;
+                    let foundFeature = null;
+
+                    while (!pt && attempts < 200) {
+                        attempts++;
+                        const lat = bounds.getSouth() + Math.random() * (bounds.getNorth() - bounds.getSouth());
+                        const lng = bounds.getWest() + Math.random() * (bounds.getEast() - bounds.getWest());
+
+                        // Check which feature it fell into
+                        for (let f of features) {
+                            const ringsList = extractRings(f.geometry);
+                            let inside = false;
+
+                            // We use a ~5km padding unless we're struggling.
+                            let pad = attempts < 100 ? 0.05 : 0;
+
+                            for (let rings of ringsList) {
+                                if (isPointDeepInPolygon(lng, lat, rings, pad)) {
+                                    inside = true;
+                                    break;
+                                }
+                            }
+                            if (inside) {
+                                pt = [lat, lng];
+                                foundFeature = f;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (pt && foundFeature) {
+                        row['_pt'] = pt;
+                        foundFeatureName = foundFeature.properties.State_Name || foundFeature.properties.LGD_ST_Nam || 'Unknown State';
+                        row['_state'] = foundFeatureName;
+                    }
+                }
+
+                if (pt) {
+                    // Assign the state boundary name permanently to the memory model
+                    const markerFlags = { icon: createMarkerIcon(bucket, false) };
+                    if (row._overlay) markerFlags.zIndexOffset = 1000;
+
+                    const marker = L.marker(pt, markerFlags);
+                    const isNew = (row['Classification'] || '').toLowerCase() === 'new';
+                    const clsBadge = `<span class="class-badge ${isNew ? 'class-new' : 'class-repair'}">${row['Classification'] || '—'}</span>`;
+
+                    const popupHtml = `
+                    <div class="popup-header" style="background: ${DOMAIN_COLORS[bucket].bg}; border: 1px solid ${DOMAIN_COLORS[bucket].bd}; border-radius: 8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                        <h3 class="popup-title">${row['Work Name'] || 'Unnamed Work'}</h3>
+                        ${clsBadge}
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            <p class="popup-subtitle" style="margin:0; font-weight:700;">${DOMAIN_COLORS[bucket].name}</p>
+                            <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${row['Group Name'] || '—'}</p>
+                        </div>
+                    </div>
+                    `;
+
+                    marker.bindPopup(popupHtml);
+                    marker.on('click', () => flyToRow(i));
+
+                    markerGroup.addLayer(marker);
+                    rowMarkerMap.set(i, marker);
+                } else {
+                    row['_state'] = 'Offline Buffer'; // Fallback if PIP fails wildly
+                }
+            }
+
+            processedCount = chunkEnd;
+            if (processedCount < allCsvRows.length) {
+                document.getElementById('map-status').textContent = `Calculating geometric distribution... (${processedCount}/${allCsvRows.length})`;
+                setTimeout(processChunk, 10);
+            } else {
+                document.getElementById('map-status').textContent = `Plotted ${allCsvRows.length} works strictly mapped to states.`;
+                renderTable();
+                applyFilters();
+                hideLoader();
+            }
+        }, 10);
+    }
+
+    // Generate N randomized, unanchored subset markers specifically for the Haryana drilldown
+    // respecting overall domain ratio. We pass filterStateName to perfectly isolate dummy groups.
+    function generateRatioBoundedMarkers(targetCount, geoJsonLayer, filterStateName) {
+        showLoader('Updating Map Data...');
+
+        // Let UI breathe to show loader
+        setTimeout(() => {
+            markerGroup.clearLayers();
+            rowMarkerMap.clear();
+
+            // Clear any existing dummy rows entirely and gracefully reset the array map
+            allCsvRows = allCsvRows.filter(r => !r._is_dummy);
+
+            // 1. Budget target count per requested domain ratio
+            const byDomain = DOMAINS.reduce((acc, d) => { acc[d] = []; return acc; }, {});
+            allCsvRows.forEach(r => {
+                const b = getDomainBucket(r['Thematic Domain']);
+                if (byDomain[b]) byDomain[b].push(r);
+            });
+            const targets = allocateByRatio(byDomain, targetCount);
+
+            // 2. Sample original rows
+            let sampledData = [];
+            DOMAINS.forEach(d => {
+                const rowsInDomain = allCsvRows.filter(r => getDomainBucket(r['Thematic Domain']) === d);
+                if (!rowsInDomain.length) return;
+                for (let i = 0; i < targets[d]; i++) {
+                    sampledData.push({ ...rowsInDomain[i % rowsInDomain.length] }); // Push cloned real row
+                }
+            });
+
+            const bounds = geoJsonLayer.getBounds();
+            const features = geoJsonLayer.toGeoJSON().features;
+
+            // We map these dummy points logically to the end of the real array temporarily, 
+            // to not disrupt real records during India. But wait, Haryana state filter already hides standard points.
+            // It's cleaner to just overwrite the dummy states.
+
+            let generatedPoints = [];
+            sampledData.forEach((row, i) => {
+                let pt = null;
+                let attempts = 0;
+                while (!pt && attempts < 200) {
+                    attempts++;
+                    const lat = bounds.getSouth() + Math.random() * (bounds.getNorth() - bounds.getSouth());
+                    const lng = bounds.getWest() + Math.random() * (bounds.getEast() - bounds.getWest());
+
+                    for (let f of features) {
+                        const ringsList = extractRings(f.geometry);
+                        let inside = false;
+                        // For villages, they are sometimes too small to even handle 0.005 padding
+                        // We will allow 0 padding immediately or very small padding. Let's use 0 to guarantee hits.
+                        let pad = attempts < 50 ? 0.001 : 0;
+
+                        for (let rings of ringsList) {
+                            if (isPointDeepInPolygon(lng, lat, rings, pad)) { inside = true; break; }
+                        }
+                        if (inside) { pt = [lat, lng]; break; }
+                    }
+                }
+
+                if (pt) {
+                    generatedPoints.push(pt);
+                    // Append isolated state identity
+                    row['_state'] = filterStateName;
+                    row['_is_dummy'] = true;
+
+                    allCsvRows.push(row);
+
+                    const bucket = getDomainBucket(row['Thematic Domain']);
+
+                    const markerFlags = { icon: createMarkerIcon(bucket, false) };
+
+                    const marker = L.marker(pt, markerFlags);
+                    const isNew = (row['Classification'] || '').toLowerCase() === 'new';
+                    const clsBadge = `<span class="class-badge ${isNew ? 'class-new' : 'class-repair'}">${row['Classification'] || '—'}</span>`;
+
+                    const popupHtml = `
+                    <div class="popup-header" style="background: ${DOMAIN_COLORS[bucket].bg}; border: 1px solid ${DOMAIN_COLORS[bucket].bd}; border-radius: 8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                        <h3 class="popup-title">${row['Work Name'] || 'Unnamed Work'}</h3>
+                        ${clsBadge}
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            <p class="popup-subtitle" style="margin:0; font-weight:700;">${DOMAIN_COLORS[bucket].name}</p>
+                            <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${row['Group Name'] || '—'}</p>
+                        </div>
+                    </div>
+                `;
+                    marker.bindPopup(popupHtml);
+                    marker.on('click', () => {
+                        // Find actual row idx in array
+                        const idx = allCsvRows.indexOf(row);
+                        if (idx !== -1) flyToRow(idx);
+                    });
+
+                    markerGroup.addLayer(marker);
+                    rowMarkerMap.set(allCsvRows.indexOf(row), marker);
+                }
+            });
+
+            // Add requested overlay layers for drilldown as dummy rows with overlap quotas.
+            appendOverlayRows(allCsvRows, {
+                existingPts: generatedPoints,
+                markAsDummy: true,
+                stateName: filterStateName
+            });
+
+            // Plot any newly appended overlay dummy rows.
+            allCsvRows.forEach((row) => {
+                if (!row._is_dummy || !row._overlay) return;
+                if (rowMarkerMap.has(allCsvRows.indexOf(row))) return;
+                const pt = row._pt;
+                if (!pt) return;
+                const bucket = getDomainBucket(row['Thematic Domain']);
+                const marker = L.marker(pt, {
+                    icon: createMarkerIcon(bucket, false),
+                    zIndexOffset: 1000
+                });
+                const popupHtml = `
+                    <div class="popup-header" style="background: ${DOMAIN_COLORS[bucket].bg}; border: 1px solid ${DOMAIN_COLORS[bucket].bd}; border-radius: 8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                        <h3 class="popup-title">${row['Work Name'] || 'Unnamed Work'}</h3>
+                        <span class="class-badge class-new">New</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                            <p class="popup-subtitle" style="margin:0; font-weight:700;">${DOMAIN_COLORS[bucket].name}</p>
+                            <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${row['Group Name'] || '—'}</p>
+                        </div>
+                    </div>
+                `;
+                marker.bindPopup(popupHtml);
+                marker.on('click', () => {
+                    const idx = allCsvRows.indexOf(row);
+                    if (idx !== -1) flyToRow(idx);
+                });
+                markerGroup.addLayer(marker);
+                rowMarkerMap.set(allCsvRows.indexOf(row), marker);
+            });
+
+            document.getElementById('map-status').textContent = 'Map data updated.';
+            renderTable(); // Completely reconstruct the Table DOM since we mutated allCsvRows items
+            applyFilters();
+            hideLoader();
+        }, 50); // small delay for loader paint
+    }
+
+    function createMarkerIcon(bucket, focused) {
+        const color = DOMAIN_COLORS[bucket].c;
+        const size = focused ? 36 : 24;
+        const shadow = focused ? '0 4px 12px rgba(0,0,0,0.5)' : '0 2px 6px rgba(0,0,0,0.3)';
+        return L.divIcon({
+            html: `<i class="fa-solid fa-location-pin" style="color: ${color}; font-size: ${size}px; text-shadow: ${shadow}; transition: all 0.2s; display: block; transform: translateY(-${size / 2}px)"></i>`,
+            className: 'custom-pin',
+            iconSize: [size, size],
+            iconAnchor: [size / 2, size],
+            popupAnchor: [0, -size + 4]
+        });
+    }
+
+    /* --- Removed plotData since assignment merges everything --- */
+
+    /* --- GEOSERVER LAYER LOGIC --- */
+
+    function showLoader(msg) {
+        document.getElementById('loader-msg').textContent = msg;
+        document.getElementById('map-loader').classList.add('is-active');
+    }
+
+    function hideLoader() {
+        document.getElementById('map-loader').classList.remove('is-active');
+    }
+
+    async function loadIndiaLayer() {
+        showLoader('Fetching India State Boundaries...');
+        try {
+            const res = await fetch(STATES_GEOJSON);
+            const geojson = await res.json();
+
+            if (stateLayer) map.removeLayer(stateLayer);
+
+            stateLayer = L.geoJSON(geojson, {
+                style: function (feature) {
+                    const stateName = feature.properties.State_Name || feature.properties.LGD_ST_Nam || '';
+                    // Highlight Haryana
+                    if (stateName.toUpperCase() === 'HARYANA') {
+                        return { color: '#0369a1', weight: 3, fillOpacity: 0.1, fillColor: '#0369a1' };
+                    }
+                    return { color: '#475569', weight: 2, fillOpacity: 0, fillColor: 'transparent' };
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.on('click', function (e) {
+                        const stName = feature.properties.State_Name || feature.properties.LGD_ST_Nam || '';
+
+                        if (stName.toUpperCase() === 'HARYANA') {
+                            activeStateFilter = 'Haryana_State_Drill';
+                            map.flyToBounds(layer.getBounds(), { padding: [50, 50], duration: 0.8 });
+                            loadHaryanaVillages();
+                        } else {
+                            // Set active state filter for India natural hits
+                            if (activeStateFilter === stName) {
+                                activeStateFilter = null; // Toggle off if clicked again
+                                map.flyToBounds(stateLayer.getBounds(), { padding: [50, 50], duration: 0.8 });
+                                if (villageLayer) map.removeLayer(villageLayer);
+                            } else {
+                                activeStateFilter = stName;
+                                map.flyToBounds(layer.getBounds(), { padding: [50, 50], duration: 0.8 });
+                                if (villageLayer) map.removeLayer(villageLayer);
+                            }
+                        }
+
+                        applyFilters();
+                    });
+
+                    layer.on('mouseover', function () {
+                        const stName = feature.properties.State_Name || feature.properties.LGD_ST_Nam || '';
+                        if (stName.toUpperCase() === 'HARYANA') {
+                            layer.setStyle({ fillOpacity: 0.3 });
+                        } else {
+                            layer.setStyle({ fillOpacity: 0.1 });
+                        }
+                    });
+                    layer.on('mouseout', function () {
+                        const stName = feature.properties.State_Name || feature.properties.LGD_ST_Nam || '';
+                        if (stName.toUpperCase() === 'HARYANA') {
+                            layer.setStyle({ fillOpacity: 0.1 });
+                        } else {
+                            layer.setStyle({ fillOpacity: 0 });
+                        }
+                    });
+                }
+            }).addTo(map);
+
+            map.fitBounds(stateLayer.getBounds());
+            currentState = 'INDIA';
+            document.getElementById('reset-map-btn').classList.remove('visible');
+
+            // Boot entire dataset geometry distribution
+            assignMarkersToStates(stateLayer);
+
+        } catch (e) {
+            console.error("GeoJSON Error:", e);
+        }
+    }
+
+    async function loadHaryanaVillages() {
+        showLoader('Loading Haryana Village Boundaries...');
+        // Disable state layer visually
+        if (stateLayer) map.removeLayer(stateLayer);
+
+        if (villageLayer) map.removeLayer(villageLayer);
+
+        try {
+            const resp = await fetch(HR_VILLAGES_GEOJSON);
+            const data = await resp.json();
+
+            villageLayer = L.geoJSON(data, {
+                style: function () {
+                    return { color: '#0f172a', weight: 1, fillOpacity: 0.05, fillColor: '#0f172a' };
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.on('click', function (e) {
+                        // user clicked a specific village
+                        map.flyToBounds(layer.getBounds(), { padding: [50, 50], duration: 0.8 });
+
+                        activeStateFilter = 'Haryana_Village_Drill';
+                        // Spawn 10 markers explicitly in this village polygon
+                        generateRatioBoundedMarkers(10, L.geoJSON(feature), 'Haryana_Village_Drill');
+
+                        villageLayer.setStyle({ fillOpacity: 0.05, fillColor: '#0f172a' }); // reset all
+                        layer.setStyle({ fillOpacity: 0.2, fillColor: '#0ea5e9' }); // highlight clicked
+                    });
+
+                    layer.on('mouseover', function () {
+                        // don't overwrite if it's the actively clicked one
+                        if (layer.options.fillOpacity === 0.2) return;
+                        layer.setStyle({ fillOpacity: 0.1 });
+                    });
+
+                    layer.on('mouseout', function () {
+                        if (layer.options.fillOpacity === 0.2) return;
+                        layer.setStyle({ fillOpacity: 0.05 });
+                    });
+                }
+            }).addTo(map);
+
+            map.fitBounds(villageLayer.getBounds(), { padding: [50, 50] });
+
+            currentState = 'HARYANA';
+            document.getElementById('reset-map-btn').classList.add('visible');
+
+            // Generate exactly 20 dummy markers
+            generateRatioBoundedMarkers(20, villageLayer, 'Haryana_State_Drill');
+
+            hideLoader();
+        } catch (e) {
+            console.error("GeoJSON Error:", e);
+            if (stateLayer) stateLayer.addTo(map);
+            hideLoader();
+        }
+    }
+
+    window.resetToIndia = function () {
+        showLoader('Returning to India map...');
+        setTimeout(() => {
+            if (villageLayer) map.removeLayer(villageLayer);
+            if (stateLayer) stateLayer.addTo(map);
+            map.fitBounds(stateLayer.getBounds());
+
+            currentState = 'INDIA';
+            activeStateFilter = null;
+
+            // Strip generated clones from array completely
+            allCsvRows = allCsvRows.filter(r => !r._is_dummy);
+
+            renderTable(); // Re-render original TR roots
+
+            // Re-render the saved 278 point state mapping (instantly using row['_pt'] cache)
+            assignMarkersToStates(stateLayer);
+
+            document.getElementById('reset-map-btn').classList.remove('visible');
+        }, 100);
+    };
+
+    /* --- UI & INTERACTIVITY --- */
+
+    function renderLegend() {
+        const legendCounts = FILTER_BUCKETS.reduce((acc, d) => { acc[d] = 0; return acc; }, {});
+        allCsvRows.forEach(r => {
+            // Respect State filtering for legend counts
+            if (!activeStateFilter || r['_state'] === activeStateFilter) {
+                const bucket = getDomainBucket(r['Thematic Domain']);
+                if (legendCounts[bucket] !== undefined) {
+                    legendCounts[bucket]++;
+                }
+            }
+        });
+
+        const container = document.getElementById('domain-legend');
+        container.innerHTML = FILTER_BUCKETS.map(bucket => {
+            const cfg = DOMAIN_COLORS[bucket];
+            const isActive = activeDomainFilter === bucket;
+            const isDimmed = activeDomainFilter !== null && activeDomainFilter !== bucket;
+
+            return `
+                <div class="legend-item ${isActive ? 'is-active' : ''} ${isDimmed ? 'is-dimmed' : ''}"
+                     style="--item-color: ${cfg.c}; --item-bg: ${cfg.bg}"
+                     onclick="toggleDomainFilter('${bucket}')">
+                    <div class="li-dot"></div>
+                    <span class="li-text">${cfg.name} (${legendCounts[bucket]})</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.toggleDomainFilter = function (bucket) {
+        activeDomainFilter = (activeDomainFilter === bucket) ? null : bucket;
+        applyFilters();
+    };
+
+    function applyFilters() {
+        renderLegend();
+
+        const q = searchTerm.toLowerCase();
+        let visibleCount = 0;
+
+        // Filter Table 
+        const rows = document.querySelectorAll('#table-body tr');
+        rows.forEach(tr => {
+            const idx = parseInt(tr.dataset.idx);
+            const data = allCsvRows[idx];
+            if (!data) return;
+
+            const bucket = getDomainBucket(data['Thematic Domain']);
+            const textMatch = q === '' ||
+                (data['Work Name'] || '').toLowerCase().includes(q) ||
+                (data['Group Name'] || '').toLowerCase().includes(q);
+
+            const domainMatch = !activeDomainFilter || bucket === activeDomainFilter;
+            const stateMatch = !activeStateFilter || data['_state'] === activeStateFilter;
+
+            if (textMatch && domainMatch && stateMatch) {
+                visibleCount++;
+                tr.querySelector('td b').textContent = visibleCount; // Increment continuous S.No correctly
+                tr.style.display = '';
+            } else {
+                tr.style.display = 'none';
+            }
+        });
+
+        // Resolve Table Filter Title
+        let naturalFilterText = activeStateFilter || '';
+        if (naturalFilterText === 'Haryana_State_Drill') naturalFilterText = 'Haryana';
+        if (naturalFilterText === 'Haryana_Village_Drill') naturalFilterText = 'Village Details';
+
+        const filterSummary = naturalFilterText ? ` in ${naturalFilterText}` : '';
+        document.getElementById('table-count').innerHTML = `<b>${visibleCount}</b> of ${allCsvRows.length} records${filterSummary}`;
+
+        // Filter Map
+        rowMarkerMap.forEach((marker, idx) => {
+            const data = allCsvRows[idx];
+            if (!data) return;
+            const bucket = getDomainBucket(data['Thematic Domain']);
+
+            const textMatch = q === '' ||
+                (data['Work Name'] || '').toLowerCase().includes(q) ||
+                (data['Group Name'] || '').toLowerCase().includes(q);
+            const domainMatch = !activeDomainFilter || bucket === activeDomainFilter;
+            const stateMatch = !activeStateFilter || data['_state'] === activeStateFilter;
+
+            if (textMatch && domainMatch && stateMatch) {
+                if (!markerGroup.hasLayer(marker)) markerGroup.addLayer(marker);
+            } else {
+                if (markerGroup.hasLayer(marker)) markerGroup.removeLayer(marker);
+            }
+        });
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('table-body');
+        // Render all rows initially, CSS filtering hides them
+        tbody.innerHTML = allCsvRows.map((row, idx) => {
+            return `
+            <tr data-idx="${idx}" onclick="flyToRow(${idx})">
+              <td><b>${row['S.No.']}</b></td>
+              <td>${row['Thematic Domain'] || '—'}</td>
+              <td>${row['Group Name'] || '—'}</td>
+              <td>${row['Work Name'] || '—'}</td>
+              <td>${row['Classification'] || '—'}</td>
+            </tr>
+          `;
+        }).join('');
+    }
+
+    let focusedIdx = null;
+    window.flyToRow = function (idx) {
+        if (focusedIdx !== null && rowMarkerMap.has(focusedIdx)) {
+            const m = rowMarkerMap.get(focusedIdx);
+            const d = allCsvRows[focusedIdx];
+            m.setIcon(createMarkerIcon(getDomainBucket(d['Thematic Domain']), false));
+            m.setZIndexOffset(0);
+        }
+
+        focusedIdx = idx;
+        const marker = rowMarkerMap.get(idx);
+        if (marker) {
+            const d = allCsvRows[idx];
+            marker.setIcon(createMarkerIcon(getDomainBucket(d['Thematic Domain']), true));
+            marker.setZIndexOffset(1000);
+
+            map.flyTo(marker.getLatLng(), map.getZoom() > 8 ? map.getZoom() : 8, { duration: 0.6 });
+            marker.openPopup();
+        }
+
+        document.querySelectorAll('#table-body tr').forEach(tr => {
+            tr.classList.toggle('focused', parseInt(tr.dataset.idx) === idx);
+        });
+        const el = document.querySelector(`#table-body tr[data-idx="${idx}"]`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    /* --- INIT --- */
+    async function init() {
+        // Setup Map
+        map = L.map('map', {
+            zoomControl: true, minZoom: 4,
+        });
+
+        // Add CartoDB Positron basemap
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap contributors © CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        map.fitBounds([[6, 68], [37.5, 97.5]]); // Default India bounds
+
+        markerGroup = L.featureGroup().addTo(map);
+
+        // Load works_list.json Data
+        try {
+            const res = await fetch(WORKS_JSON_URL);
+            const json = await res.json();
+            const normalizedRows = normalizeWorksJsonRows(json);
+            allCsvRows = sampleRowsByDomainRatio(normalizedRows, IMPORT_ROW_COUNT);
+            appendOverlayRows(allCsvRows);
+
+            document.getElementById('table-search').addEventListener('input', (e) => {
+                searchTerm = e.target.value;
+                applyFilters();
+            });
+
+            // Now fetch India WFS
+            await loadIndiaLayer();
+
+        } catch (e) {
+            console.error("Init Error:", e);
+            document.getElementById('map-status').textContent = 'Failed to load initial data.';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+
+</script>
+{% endblock %}

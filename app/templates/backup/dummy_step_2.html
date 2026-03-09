@@ -1,0 +1,757 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viksit Gram Panchayat — Work Assignment</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600&display=swap');
+
+/* ================================================================
+   DESIGN TOKENS — identical to Page 1
+   ================================================================ */
+:root {
+  --bg:#f0f2f5;--surface:#fff;--surface2:#f7f9fc;--border:#dde2ec;
+  --text:#1a2340;--text-muted:#5a6a8a;--accent:#1d4ed8;--accent-light:#dbeafe;
+  --water:#f97316;--water-dark:#c2580a;--water-bg:#fff7ed;
+  --rural:#7c3aed;--rural-dark:#5b21b6;--rural-bg:#f5f3ff;
+  --livelihood:#059669;--livelihood-dark:#047857;--livelihood-bg:#ecfdf5;
+  --climate:#0ea5e9;--climate-dark:#0369a1;--climate-bg:#e0f2fe;
+  --danger:#dc2626;
+  --shadow:0 2px 12px rgba(0,0,0,.07);--shadow-lg:0 4px 24px rgba(0,0,0,.12);
+  --radius:10px;--radius-sm:6px;
+}
+
+/* ================================================================
+   BASE
+   ================================================================ */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;}
+
+/* ================================================================
+   HEADER — identical to Page 1
+   ================================================================ */
+.header{background:linear-gradient(135deg,#0f2167,#1d4ed8 60%,#2563eb);color:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:58px;box-shadow:0 3px 12px rgba(15,33,103,.3);position:sticky;top:0;z-index:100;}
+.header-left{display:flex;align-items:center;gap:14px;}
+.header-emblem{width:38px;height:38px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid rgba(255,255,255,.3);}
+.header-title .main{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:.5px;}
+.header-title .sub{font-size:11px;opacity:.75;letter-spacing:1px;text-transform:uppercase;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.header-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px;}
+.btn-back{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:20px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+.btn-back:hover{background:rgba(255,255,255,.2);}
+
+/* ================================================================
+   BREADCRUMB
+   ================================================================ */
+.breadcrumb{padding:10px 24px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);}
+.breadcrumb .crumb-link{color:var(--accent);cursor:pointer;font-weight:500;}
+.breadcrumb .crumb-link:hover{text-decoration:underline;}
+.breadcrumb .sep{opacity:.4;}
+.breadcrumb .crumb-current{color:var(--text);font-weight:600;}
+
+/* ================================================================
+   PAGE BODY — two equal panels
+   ================================================================ */
+.app-body{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px;min-height:calc(100vh - 96px);}
+
+/* ================================================================
+   PANEL (shared with Page 1)
+   ================================================================ */
+.panel{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;}
+.panel-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);background:var(--surface2);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:.5px;color:var(--text);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.panel-header .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
+.panel-header .dot-green{background:var(--livelihood);}
+.panel-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+
+/* ================================================================
+   COUNT BADGES
+   ================================================================ */
+.row-count{background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;font-family:'Noto Sans',sans-serif;}
+.row-count-green{background:var(--livelihood-bg);color:var(--livelihood-dark);}
+
+/* ================================================================
+   TABLE WRAPPER
+   ================================================================ */
+.table-wrapper{flex:1;overflow:auto;min-height:0;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead{position:sticky;top:0;z-index:10;background:#1a2340;color:#fff;}
+thead th{padding:10px 12px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;text-align:left;}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
+tbody tr:hover{background:#f8faff;}
+tbody td{padding:8px 12px;vertical-align:middle;}
+
+/* ================================================================
+   DOMAIN BADGES — same as Page 1
+   ================================================================ */
+.domain-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;}
+.domain-water{background:var(--water-bg);color:var(--water-dark);}
+.domain-rural{background:var(--rural-bg);color:var(--rural-dark);}
+.domain-livelihood{background:var(--livelihood-bg);color:var(--livelihood-dark);}
+.domain-climate{background:var(--climate-bg);color:var(--climate-dark);}
+.type-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+.type-new{background:#dcfce7;color:#166534;}
+.type-repair{background:#fff7ed;color:#9a3412;}
+
+/* ================================================================
+   ICON CLASSES (eye & delete from previous session)
+   ================================================================ */
+.icon-eye {
+  display:inline-block;width:1em;height:1em;background-color:currentColor;
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.30147 15.5771C4.77832 14.2684 3.6904 12.7726 3.18002 12C3.6904 11.2274 4.77832 9.73158 6.30147 8.42294C7.87402 7.07185 9.81574 6 12 6C14.1843 6 16.1261 7.07185 17.6986 8.42294C19.2218 9.73158 20.3097 11.2274 20.8201 12C20.3097 12.7726 19.2218 14.2684 17.6986 15.5771C16.1261 16.9282 14.1843 18 12 18C9.81574 18 7.87402 16.9282 6.30147 15.5771ZM12 4C9.14754 4 6.75717 5.39462 4.99812 6.90595C3.23268 8.42276 2.00757 10.1376 1.46387 10.9698C1.05306 11.5985 1.05306 12.4015 1.46387 13.0302C2.00757 13.8624 3.23268 15.5772 4.99812 17.0941C6.75717 18.6054 9.14754 20 12 20C14.8525 20 17.2429 18.6054 19.002 17.0941C20.7674 15.5772 21.9925 13.8624 22.5362 13.0302C22.947 12.4015 22.947 11.5985 22.5362 10.9698C21.9925 10.1376 20.7674 8.42276 19.002 6.90595C17.2429 5.39462 14.8525 4 12 4ZM10 12C10 10.8954 10.8955 10 12 10C13.1046 10 14 10.8954 14 12C14 13.1046 13.1046 14 12 14C10.8955 14 10 13.1046 10 12ZM12 8C9.7909 8 8.00004 9.79086 8.00004 12C8.00004 14.2091 9.7909 16 12 16C14.2092 16 16 14.2091 16 12C16 9.79086 14.2092 8 12 8Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;
+  mask-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.30147 15.5771C4.77832 14.2684 3.6904 12.7726 3.18002 12C3.6904 11.2274 4.77832 9.73158 6.30147 8.42294C7.87402 7.07185 9.81574 6 12 6C14.1843 6 16.1261 7.07185 17.6986 8.42294C19.2218 9.73158 20.3097 11.2274 20.8201 12C20.3097 12.7726 19.2218 14.2684 17.6986 15.5771C16.1261 16.9282 14.1843 18 12 18C9.81574 18 7.87402 16.9282 6.30147 15.5771ZM12 4C9.14754 4 6.75717 5.39462 4.99812 6.90595C3.23268 8.42276 2.00757 10.1376 1.46387 10.9698C1.05306 11.5985 1.05306 12.4015 1.46387 13.0302C2.00757 13.8624 3.23268 15.5772 4.99812 17.0941C6.75717 18.6054 9.14754 20 12 20C14.8525 20 17.2429 18.6054 19.002 17.0941C20.7674 15.5772 21.9925 13.8624 22.5362 13.0302C22.947 12.4015 22.947 11.5985 22.5362 10.9698C21.9925 10.1376 20.7674 8.42276 19.002 6.90595C17.2429 5.39462 14.8525 4 12 4ZM10 12C10 10.8954 10.8955 10 12 10C13.1046 10 14 10.8954 14 12C14 13.1046 13.1046 14 12 14C10.8955 14 10 13.1046 10 12ZM12 8C9.7909 8 8.00004 9.79086 8.00004 12C8.00004 14.2091 9.7909 16 12 16C14.2092 16 16 14.2091 16 12C16 9.79086 14.2092 8 12 8Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-size:contain;mask-repeat:no-repeat;mask-position:center;
+  vertical-align:middle;flex-shrink:0;
+}
+
+/* ================================================================
+   ACTION BUTTONS
+   ================================================================ */
+.action-btns{display:flex;gap:5px;align-items:center;}
+
+/* Shared base for all icon buttons */
+.btn-icon{width:28px;height:28px;border:none;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+
+/* View */
+.btn-view{background:var(--accent-light);color:var(--accent);}
+.btn-view:hover{background:var(--accent);color:#fff;}
+
+/* Move-right (→) */
+.btn-move-right{background:#dcfce7;color:#166534;}
+.btn-move-right:hover{background:#166534;color:#fff;}
+
+/* Move-left (←) */
+.btn-move-left{background:#fef9c3;color:#854d0e;}
+.btn-move-left:hover{background:#854d0e;color:#fff;}
+
+/* Arrow icon SVG masks */
+.icon-arrow-right,.icon-arrow-left{
+  display:inline-block;width:14px;height:14px;background-color:currentColor;
+  -webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;
+  mask-size:contain;mask-repeat:no-repeat;mask-position:center;
+  vertical-align:middle;flex-shrink:0;pointer-events:none;
+}
+.icon-arrow-right{
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 12H19M19 12L13 6M19 12L13 18' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 12H19M19 12L13 6M19 12L13 18' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.icon-arrow-left{
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M19 12H5M5 12L11 6M5 12L11 18' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M19 12H5M5 12L11 6M5 12L11 18' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ================================================================
+   EMPTY STATES
+   ================================================================ */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;color:var(--text-muted);gap:10px;text-align:center;}
+.empty-state .icon{font-size:40px;opacity:.25;}
+.empty-state .title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;}
+.empty-state .desc{font-size:11px;max-width:260px;line-height:1.6;}
+
+/* ================================================================
+   ROW ANIMATION
+   ================================================================ */
+@keyframes rowIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+@keyframes rowInRight{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+.row-animate-left{animation:rowIn .25s ease;}
+.row-animate-right{animation:rowInRight .25s ease;}
+
+/* ================================================================
+   RIGHT PANEL LAYOUT: table + certificate below
+   ================================================================ */
+.right-panel{display:flex;flex-direction:column;}
+.right-panel .table-section{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+.right-panel .table-section .table-wrapper{flex:1;overflow:auto;}
+
+/* ================================================================
+   CERTIFICATE
+   ================================================================ */
+.certificate-section{flex-shrink:0;border-top:2px solid var(--border);padding:20px 22px 22px;}
+.cert-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cert-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
+.cert-label::before{content:'';display:inline-block;width:3px;height:14px;background:var(--accent);border-radius:2px;}
+.cert-print-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;background:var(--accent-light);color:var(--accent);border:1px solid #bfdbfe;border-radius:var(--radius-sm);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.3px;transition:all .2s;}
+.cert-print-btn:hover{background:var(--accent);color:#fff;}
+
+.certificate{background:linear-gradient(135deg,#fdfcf7 0%,#faf8f0 100%);border:1px solid #d4c89a;border-radius:var(--radius);padding:22px 26px;position:relative;overflow:hidden;}
+.certificate::before{content:'';position:absolute;inset:5px;border:1px dashed #d4c89a;border-radius:6px;pointer-events:none;opacity:.6;}
+
+.cert-seal-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.cert-govt-text{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;color:#7a6a30;letter-spacing:1.2px;text-transform:uppercase;line-height:1.5;}
+.cert-govt-text .bold{font-size:13px;font-weight:700;color:#4a3c10;display:block;}
+.cert-ref{font-size:10px;color:#9a8a50;font-family:monospace;text-align:right;}
+
+.cert-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#2c1e00;text-align:center;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.cert-subtitle{font-size:11px;color:#7a6a30;text-align:center;margin-bottom:16px;letter-spacing:.5px;}
+.cert-divider{border:none;border-top:1px solid #c8b870;margin:0 20px 16px;}
+
+.cert-body{font-size:12px;line-height:1.85;color:#3a2c00;text-align:justify;}
+.cert-body .cert-blank{display:inline-block;min-width:90px;border-bottom:1px solid #7a6a30;color:#1a4ed8;font-weight:600;text-align:center;padding:0 4px;}
+.cert-count{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#1d4ed8;}
+
+.cert-footer{margin-top:20px;display:flex;align-items:flex-end;justify-content:space-between;}
+.cert-place-date{font-size:10px;color:#7a6a30;line-height:1.8;}
+.cert-place-date strong{display:block;font-size:11px;color:#3a2c00;}
+.cert-signature{text-align:center;}
+.cert-sig-line{width:140px;border-top:1px solid #7a6a30;margin-bottom:4px;}
+.cert-sig-name{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:#2c1e00;letter-spacing:.3px;}
+.cert-sig-title{font-size:10px;color:#7a6a30;}
+.cert-stamp{position:absolute;right:26px;bottom:56px;width:60px;height:60px;border:2.5px solid rgba(29,78,216,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:8px;font-weight:700;color:rgba(29,78,216,.3);text-align:center;letter-spacing:.5px;line-height:1.3;transform:rotate(-15deg);}
+
+/* ================================================================
+   SUMMARY STATS BAR
+   ================================================================ */
+.stats-bar{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;}
+.stat-chip{flex:1;padding:8px 12px;text-align:center;border-right:1px solid var(--border);}
+.stat-chip:last-child{border-right:none;}
+.stat-chip .val{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
+.stat-chip .lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;}
+.stat-chip.water .val{color:var(--water-dark);}
+.stat-chip.rural .val{color:var(--rural-dark);}
+.stat-chip.livelihood .val{color:var(--livelihood-dark);}
+.stat-chip.climate .val{color:var(--climate-dark);}
+
+/* ================================================================
+   SCROLLBARS
+   ================================================================ */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:#94a3b8;}
+
+/* ================================================================
+   WORK NAME CELL
+   ================================================================ */
+.work-name-cell{max-width:220px;font-weight:500;line-height:1.4;}
+.sno-cell{color:var(--text-muted);font-weight:600;width:32px;}
+.uuid-cell{font-family:monospace;font-size:10px;color:var(--text-muted);white-space:nowrap;letter-spacing:.3px;}
+.uuid-pill{display:inline-block;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:10px;color:#475569;letter-spacing:.5px;}
+
+/* ================================================================
+   TOOLTIP on truncated names
+   ================================================================ */
+[title]{cursor:default;}
+
+/* ================================================================
+   PRINT
+   ================================================================ */
+@media print{
+  .header,.breadcrumb,.app-body .panel:first-child,.btn-back,.cert-print-btn{display:none!important;}
+  .app-body{display:block;padding:0;}
+  .right-panel{box-shadow:none;border:none;}
+  .right-panel .table-section{max-height:none;overflow:visible;}
+  .certificate-section{border-top:2px solid #ccc;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-emblem">🏛️</div>
+    <div class="header-title">
+      <div class="main">Viksit Gram Panchayat Stack</div>
+      <div class="sub">Saturated Mode — Work Assignment</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-badge">📋 MGNREGS Work Registry</div>
+    <button class="btn-back" onclick="window.history.back()">
+      <span style="font-size:14px;">←</span> Back to Stack
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     BREADCRUMB
+     ============================================================ -->
+<div class="breadcrumb">
+  <span class="crumb-link" onclick="window.history.back()">🏠 Work Planning Dashboard</span>
+  <span class="sep">›</span>
+  <span class="crumb-current">Work Assignment</span>
+</div>
+
+<!-- ============================================================
+     MAIN BODY
+     ============================================================ -->
+<div class="app-body">
+
+  <!-- ======================== LEFT PANEL ======================== -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="dot"></div>
+      Generated Work Stack
+      <div class="panel-header-right">
+        <span class="row-count" id="leftCount">0 Works</span>
+      </div>
+    </div>
+
+    <!-- Domain stats bar -->
+    <div class="stats-bar">
+      <div class="stat-chip water"><div class="val" id="lsWater">0</div><div class="lbl">Water</div></div>
+      <div class="stat-chip rural"><div class="val" id="lsRural">0</div><div class="lbl">Rural</div></div>
+      <div class="stat-chip livelihood"><div class="val" id="lsLivelihood">0</div><div class="lbl">Livelihood</div></div>
+      <div class="stat-chip climate"><div class="val" id="lsClimate">0</div><div class="lbl">Climate</div></div>
+    </div>
+
+    <div class="table-wrapper">
+      <div id="leftEmpty" class="empty-state">
+        <div class="icon">📋</div>
+        <div class="title">No Works in Stack</div>
+        <div class="desc">Go back to the dashboard and generate 100 random works to populate this list.</div>
+      </div>
+      <table id="leftTable" style="display:none;">
+        <thead>
+          <tr>
+            <th style="width:32px;">#</th>
+            <th style="width:90px;">UUID</th>
+            <th>Work Name</th>
+            <th>Theme</th>
+            <th>Type</th>
+            <th style="width:40px;text-align:center;">→</th>
+          </tr>
+        </thead>
+        <tbody id="leftBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================== RIGHT PANEL ======================== -->
+  <div class="panel right-panel">
+
+    <!-- Top: Action Table Section -->
+    <div class="table-section">
+      <div class="panel-header">
+        <div class="dot dot-green"></div>
+        Action Plan
+        <div class="panel-header-right">
+          <span class="row-count row-count-green" id="rightCount">0 Assigned</span>
+        </div>
+      </div>
+
+      <!-- Domain stats bar for right panel -->
+      <div class="stats-bar">
+        <div class="stat-chip water"><div class="val" id="rsWater">0</div><div class="lbl">Water</div></div>
+        <div class="stat-chip rural"><div class="val" id="rsRural">0</div><div class="lbl">Rural</div></div>
+        <div class="stat-chip livelihood"><div class="val" id="rsLivelihood">0</div><div class="lbl">Livelihood</div></div>
+        <div class="stat-chip climate"><div class="val" id="rsClimate">0</div><div class="lbl">Climate</div></div>
+      </div>
+
+      <div class="table-wrapper">
+        <div id="rightEmpty" class="empty-state">
+          <div class="icon">📥</div>
+          <div class="title">No Works Assigned Yet</div>
+          <div class="desc">Click the <strong>→</strong> button on any work in the left panel to move it into the Action Plan.</div>
+        </div>
+        <table id="rightTable" style="display:none;" class="action-table">
+          <thead>
+            <tr>
+              <th style="width:40px;text-align:center;">←</th>
+              <th style="width:32px;">#</th>
+              <th style="width:90px;">UUID</th>
+              <th>Work Name</th>
+              <th>Theme</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody id="rightBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Bottom: Certificate -->
+    <div class="certificate-section">
+      <div class="cert-header-row">
+        <div class="cert-label">Certificate of Work Sanction</div>
+        <button class="cert-print-btn" onclick="window.print()">
+          <span style="font-size:13px;">🖨</span> Print Certificate
+        </button>
+      </div>
+
+      <div class="certificate">
+        <div class="cert-stamp">GRAM<br>PANCHAYAT<br>SEAL</div>
+
+        <div class="cert-seal-row">
+          <div class="cert-govt-text">
+            Government of India
+            <span class="bold">Ministry of Rural Development</span>
+            MGNREGS — Saturated Mode
+          </div>
+          <div class="cert-ref">
+            Ref. No.: <strong id="certRef">GP/MGNREGS/2025-26/——</strong><br>
+            Date: <strong id="certDate"></strong>
+          </div>
+        </div>
+
+        <div class="cert-title">Certificate of Work Sanction</div>
+        <div class="cert-subtitle">Mahatma Gandhi National Rural Employment Guarantee Scheme</div>
+        <hr class="cert-divider">
+
+        <div class="cert-body">
+          This is to certify that the Gram Panchayat of <span class="cert-blank">__________________</span>,
+          Block <span class="cert-blank">__________________</span>, District <span class="cert-blank">__________________</span>,
+          has under the Viksit Gram Panchayat Saturated Mode initiative, duly deliberated upon and resolved in its Gram Sabha
+          meeting to undertake a total of <span class="cert-count" id="certCount">0</span> works
+          under the Mahatma Gandhi National Rural Employment Guarantee Scheme for the financial year
+          <span class="cert-blank">2025–26</span>. The said works span across
+          water security, rural infrastructure, livelihood assets, and climate resilience domains and have been
+          selected with due consideration of local needs, available resources, and community priorities as
+          mandated under the MGNREGS operational guidelines. The Gram Panchayat hereby affirms that the
+          foregoing action plan has been prepared in a transparent and participatory manner.
+        </div>
+
+        <div class="cert-footer">
+          <div class="cert-place-date">
+            <strong>Place &amp; Date</strong>
+            <span id="certPlaceDate">__________________, <span id="certDateFull"></span></span>
+          </div>
+          <div class="cert-signature">
+            <div class="cert-sig-line"></div>
+            <div class="cert-sig-name">Gram Pradhan / Sarpanch</div>
+            <div class="cert-sig-title">Gram Panchayat, with seal</div>
+          </div>
+          <div class="cert-signature">
+            <div class="cert-sig-line"></div>
+            <div class="cert-sig-name">Panchayat Secretary</div>
+            <div class="cert-sig-title">Authorized Signatory</div>
+          </div>
+          <div class="cert-signature">
+            <div class="cert-sig-line"></div>
+            <div class="cert-sig-name">Block Development Officer</div>
+            <div class="cert-sig-title">Countersignature &amp; Seal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /right-panel -->
+</div><!-- /app-body -->
+
+<script>
+// ================================================================
+// DOMAIN HELPERS (identical to Page 1)
+// ================================================================
+function domainKey(theme){
+  if(!theme) return 'water';
+  if(theme==='Domain I'||theme.includes('Domain I')) return 'water';
+  if(theme==='Domain II'||theme.includes('Domain II')) return 'rural';
+  if(theme==='Domain III'||theme.includes('Domain III')) return 'livelihood';
+  if(theme==='Domain IV'||theme.includes('Domain IV')) return 'climate';
+  return 'water';
+}
+function domainLabel(k){return{water:'Water Security',rural:'Rural Infrastructure',livelihood:'Livelihood Assets',climate:'Climate Resilience'}[k]||k;}
+function domainBadge(k){return{water:'domain-water',rural:'domain-rural',livelihood:'domain-livelihood',climate:'domain-climate'}[k]||'domain-water';}
+
+// ================================================================
+// STATE
+// ================================================================
+var leftRows  = [];   // works available to assign
+var rightRows = [];   // works in action plan
+
+// ================================================================
+// SEED DATA — in production this would come from sessionStorage
+// or be passed from Page 1. Here we generate 100 sample works
+// matching Page 1 distribution so the page is self-contained.
+// ================================================================
+var SAMPLE_WORKS = [
+  // Domain I – Water Security (45 works)
+  {name:"Construction of Boulder Check Dam",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Repair & Maintenance of Earthen Check Dam",theme:"Domain I",group:"Surface Structures",type:"Repair"},
+  {name:"Construction of Gabion Check Dam",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Construction of Masonry Check Dam",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Construction of Farm Pond",theme:"Domain I",group:"Recharge Structures",type:"New"},
+  {name:"Rejuvenation of Pond",theme:"Domain I",group:"Recharge Structures",type:"Repair"},
+  {name:"Construction of Percolation Tank",theme:"Domain I",group:"Recharge Structures",type:"New"},
+  {name:"Construction of Recharge Pit",theme:"Domain I",group:"Recharge Structures",type:"New"},
+  {name:"Construction of Recharge Shaft",theme:"Domain I",group:"Recharge Structures",type:"New"},
+  {name:"Construction of Water Harvesting Pond",theme:"Domain I",group:"Recharge Structures",type:"New"},
+  {name:"Repair & Maintenance of Percolation Tank",theme:"Domain I",group:"Recharge Structures",type:"Repair"},
+  {name:"Construction of Tanka",theme:"Domain I",group:"Recharge Structures",type:"New"},
+  {name:"Construction of Drip Irrigation Channels",theme:"Domain I",group:"Irrigation Systems",type:"New"},
+  {name:"Installation of Sprinkler Irrigation System",theme:"Domain I",group:"Irrigation Systems",type:"New"},
+  {name:"Construction of Irrigation Well",theme:"Domain I",group:"Irrigation Systems",type:"New"},
+  {name:"Construction of Main Canal",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Repair & Maintenance of Main Canal",theme:"Domain I",group:"Surface Structures",type:"Repair"},
+  {name:"Lining of Canal",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Construction of Field Channels",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Construction of Diversion Channel",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Construction of Underground Dyke",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Construction of Brushwood Gully Plug",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Construction of Stone Boulder Gully Plug",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Construction of Continuous Contour Trench",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Construction of Staggered Contour Trench",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Raising of Mango Horticulture Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Raising of Coconut Horticulture Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Raising of Neem Medicinal Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Avenue Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Canal Line Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Raising of Bamboo Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Raising of Amla Medicinal Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Bio-drainage Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Construction of Rooftop Rainwater Harvesting",theme:"Domain I",group:"Rainwater Harvesting",type:"New"},
+  {name:"Repair of Rooftop Rainwater Harvesting",theme:"Domain I",group:"Rainwater Harvesting",type:"Repair"},
+  {name:"Development of Waterlogged Land",theme:"Domain I",group:"Land Reclamation",type:"New"},
+  {name:"Construction of Drainage Works in Waterlogged Land",theme:"Domain I",group:"Land Reclamation",type:"New"},
+  {name:"Repair of Sand-Filled Groundwater Recharge in Borewell",theme:"Domain I",group:"Recharge Structures",type:"Repair"},
+  {name:"Construction of Injection Well in Channels",theme:"Domain I",group:"Recharge Structures",type:"New"},
+  {name:"Repair of Minor Distributary Canal",theme:"Domain I",group:"Surface Structures",type:"Repair"},
+  {name:"Construction of Branch Canal",theme:"Domain I",group:"Surface Structures",type:"New"},
+  {name:"Raising of Sericulture Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Construction of Artificial Wetland",theme:"Domain I",group:"Recharge Structures",type:"New"},
+  {name:"Raising of Jatropha Oil Seed Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  {name:"Raising of Mangrove Plantation",theme:"Domain I",group:"Soil Conservation",type:"New"},
+  // Domain II – Rural Infrastructure (23 works)
+  {name:"Construction of Cement Concrete Road",theme:"Domain II",group:"Rural Connectivity",type:"New"},
+  {name:"Repair & Maintenance of Bitumen Road",theme:"Domain II",group:"Rural Connectivity",type:"Repair"},
+  {name:"Construction of Culvert",theme:"Domain II",group:"Rural Connectivity",type:"New"},
+  {name:"Construction of Rural Foot Over Bridge",theme:"Domain II",group:"Rural Connectivity",type:"New"},
+  {name:"Construction of Kharanja Road",theme:"Domain II",group:"Rural Connectivity",type:"New"},
+  {name:"Construction of Anganwadi Centre Building",theme:"Domain II",group:"Civic Buildings",type:"New"},
+  {name:"Repair of Anganwadi Centre Building",theme:"Domain II",group:"Civic Buildings",type:"Repair"},
+  {name:"Construction of Gram Panchayat Building",theme:"Domain II",group:"Civic Buildings",type:"New"},
+  {name:"Construction of Rural Health Centre",theme:"Domain II",group:"Civic Buildings",type:"New"},
+  {name:"Construction of Additional Classroom",theme:"Domain II",group:"Education Infrastructure",type:"New"},
+  {name:"Construction of School Toilet",theme:"Domain II",group:"Education Infrastructure",type:"New"},
+  {name:"Construction of Kitchen Shed for School",theme:"Domain II",group:"Education Infrastructure",type:"New"},
+  {name:"Construction of Community Sanitary Complex",theme:"Domain II",group:"Waste Management",type:"New"},
+  {name:"Construction of IHHL",theme:"Domain II",group:"Waste Management",type:"New"},
+  {name:"Construction of Soak Pit",theme:"Domain II",group:"Waste Management",type:"New"},
+  {name:"Installation of Solar Street Light",theme:"Domain II",group:"Renewable Energy",type:"New"},
+  {name:"Construction of Biogas Plant",theme:"Domain II",group:"Renewable Energy",type:"New"},
+  {name:"Construction of PMAY-G House",theme:"Domain II",group:"Rural Housing",type:"New"},
+  {name:"Construction of Sitting Chaupal",theme:"Domain II",group:"Common Facilities",type:"New"},
+  {name:"Construction of Rural Bus Stand",theme:"Domain II",group:"Common Facilities",type:"New"},
+  {name:"Repair of JJM Storage Structure",theme:"Domain II",group:"Water Supply",type:"Repair"},
+  {name:"Construction of Boundary Wall for School",theme:"Domain II",group:"Education Infrastructure",type:"New"},
+  {name:"Construction of Marriage/Community Hall",theme:"Domain II",group:"Civic Buildings",type:"New"},
+  // Domain III – Livelihood Assets (18 works)
+  {name:"Construction of Training & Skill Development Centre",theme:"Domain III",group:"Skill Infrastructure",type:"New"},
+  {name:"Construction of Workshed for SHG",theme:"Domain III",group:"Skill Infrastructure",type:"New"},
+  {name:"Construction of Rural Haat Building",theme:"Domain III",group:"Market Infrastructure",type:"New"},
+  {name:"Construction of Market Yard",theme:"Domain III",group:"Market Infrastructure",type:"New"},
+  {name:"Construction of Cold Storage Unit",theme:"Domain III",group:"Agri Storage",type:"New"},
+  {name:"Construction of Food Grain Storage Building",theme:"Domain III",group:"Agri Storage",type:"New"},
+  {name:"Construction of Fishery Pond",theme:"Domain III",group:"Fisheries Assets",type:"New"},
+  {name:"Construction of Fish Drying Yard",theme:"Domain III",group:"Fisheries Assets",type:"New"},
+  {name:"Construction of Cattle Shelter",theme:"Domain III",group:"Livestock Assets",type:"New"},
+  {name:"Construction of Milk Production Centre",theme:"Domain III",group:"Livestock Assets",type:"New"},
+  {name:"Construction of Vermi Compost Structure",theme:"Domain III",group:"Organic Inputs",type:"New"},
+  {name:"Construction of NADEP Compost Pit",theme:"Domain III",group:"Organic Inputs",type:"New"},
+  {name:"Raising of Nursery",theme:"Domain III",group:"Production Units",type:"New"},
+  {name:"Construction of SHG Building",theme:"Domain III",group:"SHG Infrastructure",type:"New"},
+  {name:"Construction of Oil Seed Processing Unit",theme:"Domain III",group:"Circular Economy",type:"New"},
+  {name:"Construction of Mini Flour Mill Processing Unit",theme:"Domain III",group:"Circular Economy",type:"New"},
+  {name:"Construction of Poultry Shelter",theme:"Domain III",group:"Livestock Assets",type:"New"},
+  {name:"Construction of Aquaculture Structure for Fish Farming",theme:"Domain III",group:"Fisheries Assets",type:"New"},
+  // Domain IV – Climate Resilience (14 works)
+  {name:"Construction of Cyclone Shelter",theme:"Domain IV",group:"Disaster Shelters",type:"New"},
+  {name:"Repair & Maintenance of Cyclone Shelter",theme:"Domain IV",group:"Disaster Shelters",type:"Repair"},
+  {name:"Construction of Flood Retention Shelter",theme:"Domain IV",group:"Disaster Shelters",type:"New"},
+  {name:"Construction of Embankment",theme:"Domain IV",group:"Protective Works",type:"New"},
+  {name:"Strengthening of Embankment",theme:"Domain IV",group:"Protective Works",type:"New"},
+  {name:"Construction of Gabion Spur",theme:"Domain IV",group:"Protective Works",type:"New"},
+  {name:"Construction of Flood Protection Wall",theme:"Domain IV",group:"Protective Works",type:"New"},
+  {name:"Construction of Storm Water Drain",theme:"Domain IV",group:"Protective Works",type:"New"},
+  {name:"Construction of Masonry Retaining Wall",theme:"Domain IV",group:"Protective Works",type:"New"},
+  {name:"Construction of RCC Retaining Wall",theme:"Domain IV",group:"Protective Works",type:"New"},
+  {name:"Raising of Shelterbelt Plantation",theme:"Domain IV",group:"Protective Plantations",type:"New"},
+  {name:"Construction of Forest Fire Line",theme:"Domain IV",group:"Fire Management",type:"New"},
+  {name:"Post-Disaster Restoration of Rural Roads",theme:"Domain IV",group:"Asset Restoration",type:"New"},
+  {name:"Construction of Stabilisation Pond",theme:"Domain IV",group:"Flood Control",type:"New"}
+];
+
+// ================================================================
+// UUID GENERATOR — identical to Page 1 (8-char hex)
+// ================================================================
+function genUUID(){return 'xxxxxxxx'.replace(/x/g,function(){return Math.floor(Math.random()*16).toString(16).toUpperCase();});}
+
+// ================================================================
+// INIT — load works (from sessionStorage if available, else sample)
+// ================================================================
+function init(){
+  // Try to read from sessionStorage (set by Page 1)
+  var stored = null;
+  try { stored = sessionStorage.getItem('vgp_stack'); } catch(e){}
+  if(stored){
+    try{
+      var parsed = JSON.parse(stored);
+      if(parsed && parsed.length > 0){
+        leftRows = parsed.map(function(r,i){
+          return {
+            uuid: r.uuid || genUUID(),
+            sno: i+1,
+            name: r.workName || r.name || 'Unknown Work',
+            theme: r.theme || 'Domain I',
+            dk: r.dk || r.domainKey || domainKey(r.theme||'Domain I'),
+            group: r.group || '',
+            type: r.type || 'New'
+          };
+        });
+      }
+    }catch(e){}
+  }
+  // Fallback to sample data
+  if(!leftRows.length){
+    leftRows = SAMPLE_WORKS.map(function(w,i){
+      return {
+        uuid: genUUID(),
+        sno: i+1,
+        name: w.name,
+        theme: w.theme,
+        dk: domainKey(w.theme),
+        group: w.group,
+        type: w.type
+      };
+    });
+  }
+
+  // Set certificate date
+  var now = new Date();
+  var opts = {day:'2-digit',month:'long',year:'numeric'};
+  var dateStr = now.toLocaleDateString('en-IN', opts);
+  document.getElementById('certDate').textContent = dateStr;
+  document.getElementById('certDateFull').textContent = dateStr;
+  var refNum = 'GP/MGNREGS/'+ now.getFullYear() +'-'+(now.getFullYear()+1).toString().slice(-2)+'/'+
+    Math.floor(1000+Math.random()*9000);
+  document.getElementById('certRef').textContent = refNum;
+
+  render();
+}
+
+// ================================================================
+// MOVE RIGHT
+// ================================================================
+function moveRight(uuid){
+  var idx = leftRows.findIndex(function(r){return r.uuid===uuid;});
+  if(idx===-1) return;
+  var row = leftRows.splice(idx,1)[0];
+  rightRows.push(row);
+  render();
+}
+
+// ================================================================
+// MOVE LEFT
+// ================================================================
+function moveLeft(uuid){
+  var idx = rightRows.findIndex(function(r){return r.uuid===uuid;});
+  if(idx===-1) return;
+  var row = rightRows.splice(idx,1)[0];
+  leftRows.push(row);
+  render();
+}
+
+// ================================================================
+// RENDER BOTH TABLES
+// ================================================================
+function render(){
+  renderLeft();
+  renderRight();
+  updateStats();
+}
+
+function renderLeft(){
+  var tbody = document.getElementById('leftBody');
+  var empty = document.getElementById('leftEmpty');
+  var table = document.getElementById('leftTable');
+  var countEl = document.getElementById('leftCount');
+
+  countEl.textContent = leftRows.length + ' Work' + (leftRows.length!==1?'s':'');
+
+  if(!leftRows.length){
+    empty.style.display=''; table.style.display='none'; return;
+  }
+  empty.style.display='none'; table.style.display='';
+  tbody.innerHTML='';
+
+  leftRows.forEach(function(row, idx){
+    var tr = document.createElement('tr');
+    tr.className = 'row-animate-left';
+    tr.setAttribute('data-uuid', row.uuid);
+    var shortName = row.name.length > 42 ? row.name.substring(0,42)+'…' : row.name;
+    tr.innerHTML =
+      '<td class="sno-cell">'+(idx+1)+'</td>'+
+      '<td class="uuid-cell"><span class="uuid-pill">'+esc(row.uuid)+'</span></td>'+
+      '<td class="work-name-cell" title="'+esc(row.name)+'">'+esc(shortName)+'</td>'+
+      '<td><span class="domain-badge '+domainBadge(row.dk)+'">'+domainLabel(row.dk)+'</span></td>'+
+      '<td><span class="type-badge '+(row.type==='New'?'type-new':'type-repair')+'">'+esc(row.type)+'</span></td>'+
+      '<td style="text-align:center;">'+
+        '<button class="btn-icon btn-move-right" onclick="moveRight(\''+esc(row.uuid)+'\')" title="Move to Action Plan">'+
+          '<span class="icon-arrow-right"></span>'+
+        '</button>'+
+      '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function renderRight(){
+  var tbody = document.getElementById('rightBody');
+  var empty = document.getElementById('rightEmpty');
+  var table = document.getElementById('rightTable');
+  var countEl = document.getElementById('rightCount');
+
+  countEl.textContent = rightRows.length + ' Assigned';
+  document.getElementById('certCount').textContent = rightRows.length;
+
+  if(!rightRows.length){
+    empty.style.display=''; table.style.display='none'; return;
+  }
+  empty.style.display='none'; table.style.display='';
+  tbody.innerHTML='';
+
+  rightRows.forEach(function(row, idx){
+    var tr = document.createElement('tr');
+    tr.className = 'row-animate-right';
+    tr.setAttribute('data-uuid', row.uuid);
+    var shortName = row.name.length > 42 ? row.name.substring(0,42)+'…' : row.name;
+    tr.innerHTML =
+      '<td style="text-align:center;">'+
+        '<button class="btn-icon btn-move-left" onclick="moveLeft(\''+esc(row.uuid)+'\')" title="Move back to Stack">'+
+          '<span class="icon-arrow-left"></span>'+
+        '</button>'+
+      '</td>'+
+      '<td class="sno-cell">'+(idx+1)+'</td>'+
+      '<td class="uuid-cell"><span class="uuid-pill">'+esc(row.uuid)+'</span></td>'+
+      '<td class="work-name-cell" title="'+esc(row.name)+'">'+esc(shortName)+'</td>'+
+      '<td><span class="domain-badge '+domainBadge(row.dk)+'">'+domainLabel(row.dk)+'</span></td>'+
+      '<td><span class="type-badge '+(row.type==='New'?'type-new':'type-repair')+'">'+esc(row.type)+'</span></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+// ================================================================
+// UPDATE STATS BARS
+// ================================================================
+function updateStats(){
+  var lc={water:0,rural:0,livelihood:0,climate:0};
+  var rc={water:0,rural:0,livelihood:0,climate:0};
+  leftRows.forEach(function(r){ lc[r.dk]++; });
+  rightRows.forEach(function(r){ rc[r.dk]++; });
+
+  document.getElementById('lsWater').textContent=lc.water;
+  document.getElementById('lsRural').textContent=lc.rural;
+  document.getElementById('lsLivelihood').textContent=lc.livelihood;
+  document.getElementById('lsClimate').textContent=lc.climate;
+
+  document.getElementById('rsWater').textContent=rc.water;
+  document.getElementById('rsRural').textContent=rc.rural;
+  document.getElementById('rsLivelihood').textContent=rc.livelihood;
+  document.getElementById('rsClimate').textContent=rc.climate;
+}
+
+// ================================================================
+// HTML ESCAPE HELPER
+// ================================================================
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ================================================================
+// BOOT
+// ================================================================
+init();
+</script>
+</body>
+</html>
