@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% block title %} Step 3 {% endblock %}
+
+{% block content %}
+
+<section id="step3-ui">
+    <div class="step3-layout">
+
+        <!--Viksit Gram Panchayat Stack -->
+        <div class="panel left-panel">
+            <div class="panel-heading">Viksit Gram Panchayat Stack</div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Theme</th>
+                            <th>Group</th>
+                            <th>Work</th>
+                            <th>Classification</th>
+                            <th class="qty-col">Qty</th>
+                            <th class="icon-col"><i class="fa-solid fa-arrow-right"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="schemeTableBody">
+                        <tr><td colspan="6" class="empty-row">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="status-msg" id="statusMsg">Loading data...</p>
+
+            <!-- Domain Cards -->
+            <div class="domain-grid" id="domainCardsContainer"></div>
+        </div>
+
+        <!-- Annual Action Plan -->
+        <div class="panel right-panel">
+            <div class="panel-heading">Annual Action Plan</div>
+
+            <div class="table-wrap">
+                <table style="table-layout: fixed;">
+                    <colgroup>
+                        <col style="width: auto;">
+                        <col style="width: auto;">
+                        <col style="width: 42px;">
+                        <col style="width: 36px;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Work</th>
+                            <th>Theme</th>
+                            <th style="text-align:center;">Qty</th>
+                            <th style="text-align:center;"><i class="fa-solid fa-trash"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="aapTableBody">
+                        <tr><td colspan="4" class="empty-row">No work added yet.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- About Work -->
+            <div class="about-work">
+                <h4>About the Work</h4>
+                <div id="aboutWorkContent" class="about-content muted">
+                    Select a row using the eye icon to view details.
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="step3-footer">
+                <button class="btn-back" onclick="window.location.href='{{ url_for('routes.step_2') }}'">Back</button>
+                <button class="btn-approve" onclick="window.location.href='{{ url_for('routes.step_4') }}'">Approve</button>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+(function () {
+
+    const PREFILLED_JSON_PATH = "/static/prefilled_works.json";
+
+    const schemeTableBody  = document.getElementById("schemeTableBody");
+    const aapTableBody     = document.getElementById("aapTableBody");
+    const aboutWorkContent = document.getElementById("aboutWorkContent");
+    const statusMsg        = document.getElementById("statusMsg");
+    const domainCardsContainer = document.getElementById("domainCardsContainer");
+    const domainColorPalette = ["var(--water)", "var(--infra)", "var(--live)", "var(--disaster)"];
+
+    let allRows    = [];   // full JSON rows with qty
+    let aapRows    = [];   // { rowRef, qty } objects in AAP
+    let activeFilterTheme = null;
+    let domainThemes = [];
+
+    function jsonToObjects(jsonArr) {
+        if (!Array.isArray(jsonArr)) return [];
+        return jsonArr.map(function (item) {
+            const work           = (item["Work Name"] || "").trim();
+            const classification = (item["Classification"] || "").trim();
+            const rawCount = Number(item.count || item.Count || 1);
+            const qty = Number.isFinite(rawCount) && rawCount > 0 ? Math.floor(rawCount) : 1;
+            return {
+                theme:          (item["Thematic Domain"] || "").trim(),
+                group:          (item["Group Name"] || item["Group Name (AI)"] || "").trim(),
+                work:           work,
+                classification: classification,
+                totalQty:       qty,   // original max
+                availQty:       qty    // remaining available
+            };
+        }).filter(function (r) { return r.theme && r.group && r.work; });
+    }
+
+    // Render left table
+    function renderSchemeTable() {
+        schemeTableBody.innerHTML = "";
+        const rowsToShow = activeFilterTheme
+            ? allRows.filter(function (r) { return r.theme === activeFilterTheme; })
+            : allRows;
+
+        if (!rowsToShow.length) {
+            schemeTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">No data available.</td></tr>';
+            return;
+        }
+
+        rowsToShow.forEach(function (row) {
+            const idx      = allRows.indexOf(row);
+            const depleted = row.availQty <= 0;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML =
+                '<td>' + row.theme          + '</td>' +
+                '<td>' + row.group          + '</td>' +
+                '<td>' + row.work           + '</td>' +
+                '<td>' + row.classification + '</td>' +
+                '<td class="qty-col"><span class="qty-value" id="qty-val-' + idx + '">' + row.availQty + '</span></td>' +
+                '<td class="icon-col">' +
+                    '<button class="icon-btn arrow-btn" data-action="add-to-aap" data-index="' + idx + '"' +
+                    (depleted ? ' disabled style="color:#c0c0c0;opacity:0.4;cursor:not-allowed;" title="No quantity left"' : '') +
+                    '><i class="fa-solid fa-arrow-right"></i></button>' +
+                '</td>';
+            schemeTableBody.appendChild(tr);
+        });
+    }
+
+    function renderAapTable() {
+        aapTableBody.innerHTML = "";
+        if (!aapRows.length) {
+            aapTableBody.innerHTML = '<tr><td colspan="4" class="empty-row">No work added yet.</td></tr>';
+            return;
+        }
+        aapRows.forEach(function (entry, idx) {
+            const tr = document.createElement("tr");
+            tr.innerHTML =
+                '<td>' + entry.rowRef.work  + '</td>' +
+                '<td>' + entry.rowRef.theme + '</td>' +
+                '<td style="text-align:center;"><span class="aap-qty-badge">' + entry.qty + '</span></td>' +
+                '<td style="text-align:center;"><button class="icon-btn delete-btn" data-action="delete-aap" data-index="' + idx + '"><i class="fa-solid fa-trash"></i></button></td>';
+            aapTableBody.appendChild(tr);
+        });
+    }
+
+    function getCardHeading(theme) {
+        const match = theme.match(/\(([^)]+)\)/);
+        return match ? match[1].trim() : theme;
+    }
+
+    function renderDomainCards() {
+        domainCardsContainer.innerHTML = "";
+        domainThemes.forEach(function (theme, idx) {
+            const item = document.createElement("div");
+            item.className = "domain-item";
+            item.innerHTML =
+                '<div class="label">' + getCardHeading(theme) + '</div>' +
+                '<div class="count-card" data-theme="' + theme.replace(/"/g, "&quot;") + '" style="background:' + domainColorPalette[idx % domainColorPalette.length] + '">0</div>';
+            domainCardsContainer.appendChild(item);
+        });
+    }
+
+    // Domain card counts
+    function renderDomainCounts() {
+        domainThemes.forEach(function (theme) {
+            const sum = allRows
+                .filter(function (r) { return r.theme === theme; })
+                .reduce(function (acc, r) { return acc + r.availQty; }, 0);
+            const card = Array.from(domainCardsContainer.querySelectorAll('.count-card[data-theme]'))
+                .find(function (el) { return el.dataset.theme === theme; });
+            if (card) card.textContent = String(sum);
+        });
+    }
+
+    // Domain card filter on click
+    domainCardsContainer.addEventListener("click", function (event) {
+        const card = event.target.closest('.count-card[data-theme]');
+        if (!card) return;
+        const theme = card.getAttribute("data-theme");
+        if (activeFilterTheme === theme) {
+                activeFilterTheme = null;
+                domainCardsContainer.querySelectorAll('.count-card[data-theme]').forEach(function (c) { c.classList.remove("active-filter"); });
+                statusMsg.textContent = "Showing all " + allRows.length + " works.";
+        } else {
+            activeFilterTheme = theme;
+            domainCardsContainer.querySelectorAll('.count-card[data-theme]').forEach(function (c) { c.classList.remove("active-filter"); });
+            card.classList.add("active-filter");
+            const count = allRows.filter(function (r) { return r.theme === theme; }).length;
+            statusMsg.textContent = "Showing " + count + " works for selected domain.";
+        }
+        renderSchemeTable();
+    });
+
+    // Show about
+    function showAbout(row) {
+        aboutWorkContent.classList.remove("muted");
+        aboutWorkContent.textContent =
+            "Theme: "          + row.theme          + "\n" +
+            "Group: "          + row.group          + "\n" +
+            "Work: "           + row.work           + "\n" +
+            "Classification: " + row.classification + "\n" +
+            "Available Qty: "  + row.availQty       + " / " + row.totalQty;
+    }
+
+    // Main click handler
+    document.getElementById("step3-ui").addEventListener("click", function (e) {
+        const btn = e.target.closest("button[data-action]");
+        if (!btn) return;
+
+        const action = btn.getAttribute("data-action");
+        const index  = Number(btn.getAttribute("data-index"));
+
+        // Add to AAP(arrow).... 1 qty at a time
+        if (action === "add-to-aap") {
+            const row = allRows[index];
+            if (row.availQty <= 0) {
+                statusMsg.textContent = "No quantity available for: " + row.work;
+                return;
+            }
+            // Send 1 unit to AAP
+            row.availQty--;
+            const existing = aapRows.find(function (a) { return a.rowRef === row; });
+            if (existing) {
+                existing.qty++;
+            } else {
+                aapRows.push({ rowRef: row, qty: 1 });
+            }
+            renderAapTable();
+            renderSchemeTable();
+            renderDomainCounts();
+            statusMsg.textContent = "Added 1 to AAP: " + row.work + " (Remaining: " + row.availQty + ")";
+
+        //  Delete from AAP.... 1 qty at a time 
+        } else if (action === "delete-aap") {
+            const entry = aapRows[index];
+            entry.rowRef.availQty++;
+            if (entry.rowRef.availQty > entry.rowRef.totalQty) {
+                entry.rowRef.availQty = entry.rowRef.totalQty;
+            }
+            entry.qty--;
+            if (entry.qty <= 0) {
+                aapRows.splice(index, 1);
+            }
+            renderAapTable();
+            renderSchemeTable();
+            renderDomainCounts();
+            aboutWorkContent.classList.add("muted");
+            aboutWorkContent.textContent = "Select a row using the eye icon to view details.";
+            statusMsg.textContent = "Removed 1 from AAP: " + entry.rowRef.work + " (AAP remaining: " + (entry.qty || 0) + ")";
+        }
+    });
+
+    // Load JSON 
+    async function init() {
+        try {
+            const res = await fetch(PREFILLED_JSON_PATH, { cache: "no-store" });
+            if (!res.ok) throw new Error("JSON not found");
+            const data = await res.json();
+            allRows = jsonToObjects(data);
+            domainThemes = Array.from(new Set(allRows.map(function (r) { return r.theme; })));
+            renderDomainCards();
+            renderSchemeTable();
+            renderDomainCounts();
+            statusMsg.textContent = "Loaded " + allRows.length + " works from prefilled_works.json.";
+        } catch (err) {
+            schemeTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Could not load prefilled data.</td></tr>';
+            statusMsg.textContent = "Error loading prefilled_works.json.";
+        }
+    }
+
+    // Fit to viewport
+    function fitToViewport() {
+        const navbar = document.querySelector(".navbar");
+        const navHeight = navbar ? navbar.offsetHeight : 96;
+        document.getElementById("step3-ui").style.setProperty("--nav-h", navHeight + "px");
+    }
+    window.addEventListener("resize", fitToViewport);
+    fitToViewport();
+
+    init();
+}());
+</script>
+
+{% endblock %}

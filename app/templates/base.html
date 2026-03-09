@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}">
     <title>VB GRAM G - {% block title %}{% endblock %}</title>
 </head>
 <body>
@@ -18,10 +19,10 @@
 
     <nav class="navbar">
         <div class="progress-container">
-            {% set labels = ['VBGRAMG Works','VGP Stack','VGP AAP','Yuktdhara'] %}
-            {% for step in range(1, 5) %}
+            {% set labels = ['Gap Analysis','VBGRAMG Works','VGP Stack','VGP AAP','Yuktdhara'] %}
+            {% for step in range(1, 6) %}
             <div class="step-wrapper">
-                <a href="{{url_for('routes.step_' + step|string)}}" class="step {% if current_step >= step %}active{% endif %}">{{step}}</a>
+                <a href="{{url_for('routes.step_' + step|string)}}" class="step {% if current_step >= step %}active{% endif %}">{{step-1}}</a>
                 <span class="step-label {% if current_step >= step %}active{% endif %}">{{labels[loop.index-1]}}</span>
             </div>
             {% endfor %}

@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viksit Gram Panchayat Stack</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600&display=swap');
+:root{--bg:#f0f2f5;--surface:#fff;--surface2:#f7f9fc;--border:#dde2ec;--text:#1a2340;--text-muted:#5a6a8a;--accent:#1d4ed8;--accent-light:#dbeafe;--water:#f97316;--water-dark:#c2580a;--water-bg:#fff7ed;--rural:#7c3aed;--rural-dark:#5b21b6;--rural-bg:#f5f3ff;--livelihood:#059669;--livelihood-dark:#047857;--livelihood-bg:#ecfdf5;--climate:#0ea5e9;--climate-dark:#0369a1;--climate-bg:#e0f2fe;--danger:#dc2626;--shadow:0 2px 12px rgba(0,0,0,.07);--shadow-lg:0 4px 24px rgba(0,0,0,.12);--radius:10px;--radius-sm:6px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;}
+.header{background:linear-gradient(135deg,#0f2167,#1d4ed8 60%,#2563eb);color:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:58px;box-shadow:0 3px 12px rgba(15,33,103,.3);position:sticky;top:0;z-index:100;}
+.header-left{display:flex;align-items:center;gap:14px;}
+.header-emblem{width:38px;height:38px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid rgba(255,255,255,.3);}
+.header-title .main{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:.5px;}
+.header-title .sub{font-size:11px;opacity:.75;letter-spacing:1px;text-transform:uppercase;}
+.header-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px;}
+.app-body{display:grid;grid-template-columns:260px 1fr 280px;gap:14px;padding:14px;min-height:calc(100vh - 58px);}
+.panel{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;}
+.panel-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);background:var(--surface2);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:.5px;color:var(--text);display:flex;align-items:center;gap:8px;}
+.panel-header .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
+.left-panel .panel-body{padding:16px;display:flex;flex-direction:column;gap:14px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;}
+select{width:100%;padding:8px 28px 8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);font-family:'Noto Sans',sans-serif;font-size:13px;transition:border-color .2s,box-shadow .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6a8a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer;}
+select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light);}
+select:disabled{opacity:.5;cursor:not-allowed;}
+.radio-group{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.radio-option{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;user-select:none;background:var(--surface2);font-size:12px;font-weight:500;}
+.radio-option.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+.radio-dot{width:14px;height:14px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.radio-option.selected .radio-dot{border-color:var(--accent);background:var(--accent);}
+.radio-option.selected .radio-dot::after{content:'';width:4px;height:4px;border-radius:50%;background:#fff;}
+.divider{border:none;border-top:1px solid var(--border);margin:2px 0;}
+.btn-add{width:100%;padding:10px;background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(29,78,216,.4);}
+.btn-add:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(29,78,216,.5);}
+.btn-random{width:100%;padding:9px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(124,58,237,.35);display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-random:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(124,58,237,.45);}
+.btn-clear{width:100%;padding:8px;background:transparent;color:var(--danger);border:1.5px solid var(--danger);border-radius:var(--radius-sm);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s;}
+.btn-clear:hover{background:#fef2f2;}
+.status-msg{font-size:11px;padding:6px 10px;border-radius:var(--radius-sm);text-align:center;font-weight:500;min-height:28px;display:flex;align-items:center;justify-content:center;}
+.status-msg.success{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;}
+.status-msg.error{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;}
+.status-msg.info{background:var(--accent-light);color:var(--accent);border:1px solid #bfdbfe;}
+.status-msg.empty{background:transparent;border:none;}
+.center-panel{display:flex;flex-direction:column;}
+.center-panel .panel-header{justify-content:space-between;}
+.row-count{background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.filter-active-badge{background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;display:none;}
+.filter-active-badge.visible{display:inline-flex;align-items:center;gap:4px;}
+.table-wrapper{flex:1;overflow:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead{position:sticky;top:0;z-index:10;background:#1a2340;color:#fff;}
+thead th{padding:10px 12px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;text-align:left;}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s;animation:rowIn .3s ease;}
+@keyframes rowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+tbody tr:hover{background:#f8faff;}
+tbody tr.highlighted{background:#fffbeb;}
+tbody td{padding:8px 12px;vertical-align:middle;}
+.uuid-cell{font-family:monospace;font-size:10px;color:var(--text-muted);white-space:nowrap;}
+.work-name-cell{max-width:300px;font-weight:500;line-height:1.4;}
+.domain-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;}
+.domain-water{background:var(--water-bg);color:var(--water-dark);}
+.domain-rural{background:var(--rural-bg);color:var(--rural-dark);}
+.domain-livelihood{background:var(--livelihood-bg);color:var(--livelihood-dark);}
+.domain-climate{background:var(--climate-bg);color:var(--climate-dark);}
+.type-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+.type-new{background:#dcfce7;color:#166534;}
+.type-repair{background:#fff7ed;color:#9a3412;}
+.bene-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;}
+.bene-individual{background:#e0e7ff;color:#3730a3;}
+.bene-community{background:#fce7f3;color:#9d174d;}
+.action-btns{display:flex;gap:5px;align-items:center;}
+.btn-view,.btn-del{width:28px;height:28px;border:none;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:14px;}
+.btn-view{background:var(--accent-light);color:var(--accent);}
+.btn-view:hover{background:var(--accent);color:#fff;}
+.btn-del{background:#fee2e2;color:var(--danger);}
+.btn-del:hover{background:var(--danger);color:#fff;}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--text-muted);gap:12px;}
+.empty-state .icon{font-size:48px;opacity:.3;}
+.empty-state .title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;}
+.empty-state .desc{font-size:12px;text-align:center;max-width:300px;line-height:1.6;}
+.right-panel .panel-body{padding:14px;display:flex;flex-direction:column;gap:12px;}
+.domain-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--radius);cursor:pointer;transition:all .2s;border:2px solid transparent;user-select:none;}
+.domain-btn.active{transform:scale(1.02);box-shadow:var(--shadow-lg);}
+.domain-btn.water{background:var(--water-bg);}
+.domain-btn.water.active{border-color:var(--water);}
+.domain-btn.water:hover{background:#ffedd5;}
+.domain-btn.rural{background:var(--rural-bg);}
+.domain-btn.rural.active{border-color:var(--rural);}
+.domain-btn.rural:hover{background:#ede9fe;}
+.domain-btn.livelihood{background:var(--livelihood-bg);}
+.domain-btn.livelihood.active{border-color:var(--livelihood);}
+.domain-btn.livelihood:hover{background:#d1fae5;}
+.domain-btn.climate{background:var(--climate-bg);}
+.domain-btn.climate.active{border-color:var(--climate);}
+.domain-btn.climate:hover{background:#bae6fd;}
+.domain-btn-count{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;min-width:44px;text-align:center;}
+.water .domain-btn-count{color:var(--water);}
+.rural .domain-btn-count{color:var(--rural);}
+.livelihood .domain-btn-count{color:var(--livelihood);}
+.climate .domain-btn-count{color:var(--climate-dark);}
+.domain-btn-info{flex:1;}
+.domain-btn-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:.3px;margin-bottom:2px;}
+.water .domain-btn-name{color:var(--water-dark);}
+.rural .domain-btn-name{color:var(--rural-dark);}
+.livelihood .domain-btn-name{color:var(--livelihood-dark);}
+.climate .domain-btn-name{color:var(--climate-dark);}
+.domain-btn-sub{font-size:10px;color:var(--text-muted);font-weight:500;}
+.filter-icon{font-size:12px;opacity:.4;}
+.domain-btn.active .filter-icon{opacity:1;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;text-align:center;}
+.stat-box .val{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--text);}
+.stat-box .lbl{font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.detail-section{margin-top:4px;}
+.detail-header{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.detail-header::after{content:'';flex:1;height:1px;background:var(--border);}
+.detail-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:none;flex-direction:column;gap:10px;animation:fadeIn .25s ease;}
+.detail-card.visible{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.detail-work-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--text);line-height:1.3;}
+.detail-meta{display:flex;flex-wrap:wrap;gap:5px;}
+.detail-content{font-size:12px;line-height:1.7;color:var(--text-muted);background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;max-height:160px;overflow-y:auto;}
+.detail-uuid{font-family:monospace;font-size:10px;color:var(--text-muted);background:#f1f5f9;padding:4px 8px;border-radius:4px;word-break:break-all;}
+.detail-empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px;color:var(--text-muted);text-align:center;font-size:12px;background:var(--surface2);border:1px dashed var(--border);border-radius:var(--radius);}
+.detail-empty .icon{font-size:28px;opacity:.3;}
+.loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:999;backdrop-filter:blur(4px);}
+.loading-overlay.active{display:flex;}
+.loading-box{background:#fff;border-radius:var(--radius);padding:28px 36px;text-align:center;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;align-items:center;gap:14px;}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--text);}
+.loading-sub{font-size:12px;color:var(--text-muted);}
+@keyframes countPulse{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(1)}}
+.count-pulse{animation:countPulse .35s ease;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;}
+.icon-eye {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.30147 15.5771C4.77832 14.2684 3.6904 12.7726 3.18002 12C3.6904 11.2274 4.77832 9.73158 6.30147 8.42294C7.87402 7.07185 9.81574 6 12 6C14.1843 6 16.1261 7.07185 17.6986 8.42294C19.2218 9.73158 20.3097 11.2274 20.8201 12C20.3097 12.7726 19.2218 14.2684 17.6986 15.5771C16.1261 16.9282 14.1843 18 12 18C9.81574 18 7.87402 16.9282 6.30147 15.5771ZM12 4C9.14754 4 6.75717 5.39462 4.99812 6.90595C3.23268 8.42276 2.00757 10.1376 1.46387 10.9698C1.05306 11.5985 1.05306 12.4015 1.46387 13.0302C2.00757 13.8624 3.23268 15.5772 4.99812 17.0941C6.75717 18.6054 9.14754 20 12 20C14.8525 20 17.2429 18.6054 19.002 17.0941C20.7674 15.5772 21.9925 13.8624 22.5362 13.0302C22.947 12.4015 22.947 11.5985 22.5362 10.9698C21.9925 10.1376 20.7674 8.42276 19.002 6.90595C17.2429 5.39462 14.8525 4 12 4ZM10 12C10 10.8954 10.8955 10 12 10C13.1046 10 14 10.8954 14 12C14 13.1046 13.1046 14 12 14C10.8955 14 10 13.1046 10 12ZM12 8C9.7909 8 8.00004 9.79086 8.00004 12C8.00004 14.2091 9.7909 16 12 16C14.2092 16 16 14.2091 16 12C16 9.79086 14.2092 8 12 8Z' fill='%23000000'/%3E%3C/svg%3E");
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.30147 15.5771C4.77832 14.2684 3.6904 12.7726 3.18002 12C3.6904 11.2274 4.77832 9.73158 6.30147 8.42294C7.87402 7.07185 9.81574 6 12 6C14.1843 6 16.1261 7.07185 17.6986 8.42294C19.2218 9.73158 20.3097 11.2274 20.8201 12C20.3097 12.7726 19.2218 14.2684 17.6986 15.5771C16.1261 16.9282 14.1843 18 12 18C9.81574 18 7.87402 16.9282 6.30147 15.5771ZM12 4C9.14754 4 6.75717 5.39462 4.99812 6.90595C3.23268 8.42276 2.00757 10.1376 1.46387 10.9698C1.05306 11.5985 1.05306 12.4015 1.46387 13.0302C2.00757 13.8624 3.23268 15.5772 4.99812 17.0941C6.75717 18.6054 9.14754 20 12 20C14.8525 20 17.2429 18.6054 19.002 17.0941C20.7674 15.5772 21.9925 13.8624 22.5362 13.0302C22.947 12.4015 22.947 11.5985 22.5362 10.9698C21.9925 10.1376 20.7674 8.42276 19.002 6.90595C17.2429 5.39462 14.8525 4 12 4ZM10 12C10 10.8954 10.8955 10 12 10C13.1046 10 14 10.8954 14 12C14 13.1046 13.1046 14 12 14C10.8955 14 10 13.1046 10 12ZM12 8C9.7909 8 8.00004 9.79086 8.00004 12C8.00004 14.2091 9.7909 16 12 16C14.2092 16 16 14.2091 16 12C16 9.79086 14.2092 8 12 8Z' fill='%23000000'/%3E%3C/svg%3E");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.icon-delete {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M667.8 362.1H304V830c0 28.2 23 51 51.3 51h312.4c28.4 0 51.4-22.8 51.4-51V362.2h-51.3z'/%3E%3Cpath d='M750.3 295.2c0-8.9-7.6-16.1-17-16.1H289.9c-9.4 0-17 7.2-17 16.1v50.9c0 8.9 7.6 16.1 17 16.1h443.4c9.4 0 17-7.2 17-16.1v-50.9z'/%3E%3Cpath d='M733.3 258.3H626.6V196c0-11.5-9.3-20.8-20.8-20.8H419.1c-11.5 0-20.8 9.3-20.8 20.8v62.3H289.9c-20.8 0-37.7 16.5-37.7 36.8V346c0 18.1 13.5 33.1 31.1 36.2V830c0 39.6 32.3 71.8 72.1 71.8h312.4c39.8 0 72.1-32.2 72.1-71.8V382.2c17.7-3.1 31.1-18.1 31.1-36.2v-50.9c0.1-20.2-16.9-36.8-37.7-36.8z m-293.5-41.5h145.3v41.5H439.8v-41.5z m-146.2 83.1H729.5v41.5H293.6v-41.5z m404.8 530.2c0 16.7-13.7 30.3-30.6 30.3H355.4c-16.9 0-30.6-13.6-30.6-30.3V382.9h373.6v447.2z'/%3E%3Cpath d='M511.6 798.9c11.5 0 20.8-9.3 20.8-20.8V466.8c0-11.5-9.3-20.8-20.8-20.8s-20.8 9.3-20.8 20.8v311.4c0 11.4 9.3 20.7 20.8 20.7zM407.8 798.9c11.5 0 20.8-9.3 20.8-20.8V466.8c0-11.5-9.3-20.8-20.8-20.8s-20.8 9.3-20.8 20.8v311.4c0.1 11.4 9.4 20.7 20.8 20.7zM615.4 799.6c11.5 0 20.8-9.3 20.8-20.8V467.4c0-11.5-9.3-20.8-20.8-20.8s-20.8 9.3-20.8 20.8v311.4c0 11.5 9.3 20.8 20.8 20.8z'/%3E%3C/svg%3E");
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M667.8 362.1H304V830c0 28.2 23 51 51.3 51h312.4c28.4 0 51.4-22.8 51.4-51V362.2h-51.3z'/%3E%3Cpath d='M750.3 295.2c0-8.9-7.6-16.1-17-16.1H289.9c-9.4 0-17 7.2-17 16.1v50.9c0 8.9 7.6 16.1 17 16.1h443.4c9.4 0 17-7.2 17-16.1v-50.9z'/%3E%3Cpath d='M733.3 258.3H626.6V196c0-11.5-9.3-20.8-20.8-20.8H419.1c-11.5 0-20.8 9.3-20.8 20.8v62.3H289.9c-20.8 0-37.7 16.5-37.7 36.8V346c0 18.1 13.5 33.1 31.1 36.2V830c0 39.6 32.3 71.8 72.1 71.8h312.4c39.8 0 72.1-32.2 72.1-71.8V382.2c17.7-3.1 31.1-18.1 31.1-36.2v-50.9c0.1-20.2-16.9-36.8-37.7-36.8z m-293.5-41.5h145.3v41.5H439.8v-41.5z m-146.2 83.1H729.5v41.5H293.6v-41.5z m404.8 530.2c0 16.7-13.7 30.3-30.6 30.3H355.4c-16.9 0-30.6-13.6-30.6-30.3V382.9h373.6v447.2z'/%3E%3Cpath d='M511.6 798.9c11.5 0 20.8-9.3 20.8-20.8V466.8c0-11.5-9.3-20.8-20.8-20.8s-20.8 9.3-20.8 20.8v311.4c0 11.4 9.3 20.7 20.8 20.7zM407.8 798.9c11.5 0 20.8-9.3 20.8-20.8V466.8c0-11.5-9.3-20.8-20.8-20.8s-20.8 9.3-20.8 20.8v311.4c0.1 11.4 9.4 20.7 20.8 20.7zM615.4 799.6c11.5 0 20.8-9.3 20.8-20.8V467.4c0-11.5-9.3-20.8-20.8-20.8s-20.8 9.3-20.8 20.8v311.4c0 11.5 9.3 20.8 20.8 20.8z'/%3E%3C/svg%3E");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <div class="loading-text">Generating 100 Works</div>
+    <div class="loading-sub">Populating stack with random works...</div>
+  </div>
+</div>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-emblem">🏛️</div>
+    <div class="header-title">
+      <div class="main">Viksit Gram Panchayat Stack</div>
+      <div class="sub">Saturated Mode — Work Planning Dashboard</div>
+    </div>
+  </div>
+  <div class="header-badge">📋 MGNREGS Work Registry</div>
+</div>
+
+<div class="app-body">
+  <!-- LEFT PANEL -->
+  <div class="panel left-panel">
+    <div class="panel-header"><div class="dot"></div>Add Work to Stack</div>
+    <div class="panel-body">
+      <div class="form-group">
+        <label class="form-label">Thematic Domain</label>
+        <select id="selTheme" onchange="onThemeChange()"><option value="">— Select Theme —</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Work Group</label>
+        <select id="selGroup" onchange="onGroupChange()" disabled><option value="">— Select Group —</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Work Name</label>
+        <select id="selWork" disabled><option value="">— Select Work —</option></select>
+      </div>
+      <hr class="divider">
+      <div class="form-group">
+        <label class="form-label">Work Type</label>
+        <div class="radio-group">
+          <label class="radio-option" id="rNew" onclick="selectRadio('workType','New','rNew','workTypeGroup')">
+            <input type="radio" style="display:none;" name="workType" value="New"><div class="radio-dot"></div>New
+          </label>
+          <label class="radio-option" id="rRepair" onclick="selectRadio('workType','Repair','rRepair','workTypeGroup')">
+            <input type="radio" style="display:none;" name="workType" value="Repair"><div class="radio-dot"></div>Repair
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Beneficiary Type</label>
+        <div class="radio-group">
+          <label class="radio-option" id="rInd" onclick="selectRadio('beneType','Individual','rInd','beneTypeGroup')">
+            <input type="radio" style="display:none;" name="beneType" value="Individual"><div class="radio-dot"></div>Individual
+          </label>
+          <label class="radio-option" id="rComm" onclick="selectRadio('beneType','Community','rComm','beneTypeGroup')">
+            <input type="radio" style="display:none;" name="beneType" value="Community"><div class="radio-dot"></div>Community
+          </label>
+        </div>
+      </div>
+      <hr class="divider">
+      <button class="btn-add" onclick="addWork()">＋ ADD WORK TO STACK</button>
+      <div class="status-msg empty" id="statusMsg"></div>
+      <hr class="divider">
+      <button class="btn-random" onclick="generateRandom()">🎲 Generate 100 Random Works</button>
+      <button class="btn-clear" onclick="clearAll()">🗑 Clear All Works</button>
+    </div>
+    
+    <style>
+    .view-icon {
+        width: 50px;
+        height: 50px;
+        display: inline-block;
+        position: relative;
+    }
+
+    .view-icon::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: 
+            radial-gradient(circle at 50% 50%, transparent 30%, #000 30%, #000 35%, transparent 35%),
+            radial-gradient(circle at 50% 50%, transparent 0%, #000 0%);
+        -webkit-mask-image: url('data:image/svg+xml,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" clip-rule="evenodd" d="M6.30147 15.5771C4.77832 14.2684 3.6904 12.7726 3.18002 12C3.6904 11.2274 4.77832 9.73158 6.30147 8.42294C7.87402 7.07185 9.81574 6 12 6C14.1843 6 16.1261 7.07185 17.6986 8.42294C19.2218 9.73158 20.3097 11.2274 20.8201 12C20.3097 12.7726 19.2218 14.2684 17.6986 15.5771C16.1261 16.9282 14.1843 18 12 18C9.81574 18 7.87402 16.9282 6.30147 15.5771ZM12 4C9.14754 4 6.75717 5.39462 4.99812 6.90595C3.23268 8.42276 2.00757 10.1376 1.46387 10.9698C1.05306 11.5985 1.05306 12.4015 1.46387 13.0302C2.00757 13.8624 3.23268 15.5772 4.99812 17.0941C6.75717 18.6054 9.14754 20 12 20C14.8525 20 17.2429 18.6054 19.002 17.0941C20.7674 15.5772 21.9925 13.8624 22.5362 13.0302C22.947 12.4015 22.947 11.5985 22.5362 10.9698C21.9925 10.1376 20.7674 8.42276 19.002 6.90595C17.2429 5.39462 14.8525 4 12 4ZM10 12C10 10.8954 10.8955 10 12 10C13.1046 10 14 10.8954 14 12C14 13.1046 13.1046 14 12 14C10.8955 14 10 13.1046 10 12ZM12 8C9.7909 8 8.00004 9.79086 8.00004 12C8.00004 14.2091 9.7909 16 12 16C14.2092 16 16 14.2091 16 12C16 9.79086 14.2092 8 12 8Z" fill="#000000"/></svg>');
+        mask-image: url('data:image/svg+xml,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.30147 15.5771C4.77832 14.2684 3.6904 12.7726 3.18002 12C3.6904 11.2274 4.77832 9.73158 6.30147 8.42294C7.87402 7.07185 9.81574 6 12 6C14.1843 6 16.1261 7.07185 17.6986 8.42294C19.2218 9.73158 20.3097 11.2274 20.8201 12C20.3097 12.7726 19.2218 14.2684 17.6986 15.5771C16.1261 16.9282 14.1843 18 12 18C9.81574 18 7.87402 16.9282 6.30147 15.5771ZM12 4C9.14754 4 6.75717 5.39462 4.99812 6.90595C3.23268 8.42276 2.00757 10.1376 1.46387 10.9698C1.05306 11.5985 1.05306 12.4015 1.46387 13.0302C2.00757 13.8624 3.23268 15.5772 4.99812 17.0941C6.75717 18.6054 9.14754 20 12 20C14.8525 20 17.2429 18.6054 19.002 17.0941C20.7674 15.5772 21.9925 13.8624 22.5362 13.0302C22.947 12.4015 22.947 11.5985 22.5362 10.9698C21.9925 10.1376 20.7674 8.42276 19.002 6.90595C17.2429 5.39462 14.8525 4 12 4ZM10 12C10 10.8954 10.8955 10 12 10C13.1046 10 14 10.8954 14 12C14 13.1046 13.1046 14 12 14C10.8955 14 10 13.1046 10 12ZM12 8C9.7909 8 8.00004 9.79086 8.00004 12C8.00004 14.2091 9.7909 16 12 16C14.2092 16 16 14.2091 16 12C16 9.79086 14.2092 8 12 8Z" fill="#000000"/></svg>');
+    }
+    </style>
+
+    <div class="view-icon"></div>
+  </div>
+
+  <!-- CENTER PANEL -->
+  <div class="panel center-panel">
+    <div class="panel-header">
+      <div style="display:flex;align-items:center;gap:8px;flex:1;">
+        <div class="dot"></div>Work Stack Registry
+        <span class="row-count" id="rowCount">0 Works</span>
+        <span class="filter-active-badge" id="filterBadge">🔍 Filtered</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);">Click <strong>👁</strong> to view &nbsp;·&nbsp; <strong>🗑</strong> to remove</div>
+    </div>
+    <div class="table-wrapper">
+      <div id="emptyState" class="empty-state">
+        <div class="icon">📋</div>
+        <div class="title">Stack is Empty</div>
+        <div class="desc">Add works using the left panel, or click "Generate 100 Random Works" to auto-populate.</div>
+      </div>
+      <table id="worksTable" style="display:none;">
+        <thead><tr><th>#</th><th>UUID</th><th>Work Name</th><th>Theme</th><th>Group</th><th>Type</th><th>Beneficiary</th><th>Actions</th></tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="panel right-panel">
+    <div class="panel-header"><div class="dot"></div>Domain Overview</div>
+    <div class="panel-body">
+      <div class="stats-row">
+        <div class="stat-box"><div class="val" id="totalWorks">0</div><div class="lbl">Total Works</div></div>
+        <div class="stat-box"><div class="val" id="totalNew">0</div><div class="lbl">New Works</div></div>
+      </div>
+      <div class="domain-btn water" id="btnWater" onclick="toggleFilter('water')">
+        <div class="domain-btn-count" id="cntWater">0</div>
+        <div class="domain-btn-info"><div class="domain-btn-name">Water Security</div><div class="domain-btn-sub">Water Harvesting — Domain I</div></div>
+        <div class="filter-icon">⚙</div>
+      </div>
+      <div class="domain-btn rural" id="btnRural" onclick="toggleFilter('rural')">
+        <div class="domain-btn-count" id="cntRural">0</div>
+        <div class="domain-btn-info"><div class="domain-btn-name">Rural Infrastructure</div><div class="domain-btn-sub">Core Rural Amenities — Domain II</div></div>
+        <div class="filter-icon">⚙</div>
+      </div>
+      <div class="domain-btn livelihood" id="btnLivelihood" onclick="toggleFilter('livelihood')">
+        <div class="domain-btn-count" id="cntLivelihood">0</div>
+        <div class="domain-btn-info"><div class="domain-btn-name">Livelihood Assets</div><div class="domain-btn-sub">Livelihood Infrastructure — Domain III</div></div>
+        <div class="filter-icon">⚙</div>
+      </div>
+      <div class="domain-btn climate" id="btnClimate" onclick="toggleFilter('climate')">
+        <div class="domain-btn-count" id="cntClimate">0</div>
+        <div class="domain-btn-info"><div class="domain-btn-name">Climate Resilience</div><div class="domain-btn-sub">Climate Resilience — Domain IV</div></div>
+        <div class="filter-icon">⚙</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-header">About the Work</div>
+        <div id="detailCard" class="detail-card">
+          <div class="detail-work-name" id="detailName"></div>
+          <div class="detail-meta" id="detailMeta"></div>
+          <div class="detail-content" id="detailContent"></div>
+          <div class="detail-uuid" id="detailUuid"></div>
+        </div>
+        <div id="detailEmpty" class="detail-empty">
+          <div class="icon">👁</div>
+          <div>Click the view icon on any row to see work details here.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// COMPLETE WORKS DATASET — all entries have sno, theme, group, name, classification, content
+// ================================================================
+var WD = [
+  {sno:1,theme:"Domain I",group:"Surface Structures",name:"Construction of Boulder Check Dam",cls:"New",content:"A Boulder Check Dam is a small barrier made by placing big stones across a stream to slow rainwater flow, reduce soil erosion, and recharge groundwater. Low-cost and eco-friendly, it is very useful in hilly and drought-prone rural areas."},
+  {sno:2,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Boulder Check Dam",cls:"Repair",content:"Repair of Boulder Check Dam to restore displaced boulders and reinforce the barrier structure, maintaining its water-slowing and soil erosion-prevention function."},
+  {sno:3,theme:"Domain I",group:"Surface Structures",name:"Construction of Earthen Check Dam",cls:"New",content:"An Earthen Check Dam is a small barrier made using compacted soil across a stream or drainage channel to slow rainwater, reduce erosion, and allow groundwater recharge."},
+  {sno:4,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Earthen Check Dam",cls:"Repair",content:"Repair of Earthen Check Dam involves compacting and restoring the earthen structure to prevent further degradation and maintain water-harvesting function."},
+  {sno:5,theme:"Domain I",group:"Surface Structures",name:"Construction of Gabion Check Dam",cls:"New",content:"A Gabion Check Dam uses stones packed in wire mesh boxes placed across a stream to slow rainwater, prevent soil erosion, and allow groundwater recharge."},
+  {sno:6,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Gabion Check Dam",cls:"Repair",content:"Repair involves reinforcing wire mesh cages and replacing displaced stones to restore the dam's structural integrity and function."},
+  {sno:7,theme:"Domain I",group:"Surface Structures",name:"Construction of Masonry Check Dam",cls:"New",content:"A Masonry Check Dam uses stones or bricks joined with cement to slow rainwater, store it, reduce soil erosion, and increase groundwater recharge."},
+  {sno:8,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Masonry Check Dam",cls:"Repair",content:"Repair of Masonry Check Dam involves patching cracks, re-plastering joints, and restoring structural strength."},
+  {sno:9,theme:"Domain I",group:"Surface Structures",name:"Construction of Brushwood Gully Plug",cls:"New",content:"A Brushwood Gully Plug uses branches, bushes, and wooden sticks placed across a gully to slow rainwater and prevent soil loss."},
+  {sno:10,theme:"Domain I",group:"Surface Structures",name:"Construction of Earthen Gully Plug",cls:"New",content:"An Earthen Gully Plug is a compacted soil barrier across a gully to stop fast-flowing rainwater, reduce erosion, and improve soil moisture."},
+  {sno:11,theme:"Domain I",group:"Surface Structures",name:"Construction of Stone Boulder Gully Plug",cls:"New",content:"A Stone Boulder Gully Plug places large stones across a gully to control rainwater flow, reduce erosion, and prevent the gully from widening."},
+  {sno:12,theme:"Domain I",group:"Surface Structures",name:"Construction of Main Canal",cls:"New",content:"A Main Canal is a large water channel that carries water from a river, dam, or reservoir to villages and fields — the primary irrigation source in rural areas."},
+  {sno:13,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Main Canal",cls:"Repair",content:"Repair of Main Canal involves desiltation, bank strengthening, and lining restoration to ensure continuous water flow for irrigation."},
+  {sno:14,theme:"Domain I",group:"Surface Structures",name:"Construction of Branch Canal",cls:"New",content:"A Branch Canal takes water from the main canal and distributes it to different villages and farming areas for crop irrigation."},
+  {sno:15,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Branch Canal",cls:"Repair",content:"Repair of Branch Canal to restore even water distribution to farming areas."},
+  {sno:16,theme:"Domain I",group:"Surface Structures",name:"Construction of Major Distributary Canal",cls:"New",content:"A Major Distributary Canal takes water from a branch canal and supplies it to smaller distributaries and farm fields."},
+  {sno:17,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Major Distributary Canal",cls:"Repair",content:"Repair of Major Distributary Canal to restore water supply across rural areas."},
+  {sno:18,theme:"Domain I",group:"Surface Structures",name:"Construction of Minor Distributary Canal",cls:"New",content:"A Minor Distributary Canal delivers water from a major distributary directly to nearby farm fields."},
+  {sno:19,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Minor Distributary Canal",cls:"Repair",content:"Repair of Minor Distributary Canal to restore direct irrigation water delivery to fields."},
+  {sno:20,theme:"Domain I",group:"Surface Structures",name:"Lining of Canal",cls:"New",content:"Canal Lining covers the inner surface with cement, concrete, or stone to prevent water leakage and improve flow efficiency."},
+  {sno:21,theme:"Domain I",group:"Surface Structures",name:"Construction of Water Courses and Field Channels",cls:"New",content:"Water Courses and Field Channels carry irrigation water from distributary canals to individual farm fields for equal distribution."},
+  {sno:22,theme:"Domain I",group:"Surface Structures",name:"Construction of Diversion Channel",cls:"New",content:"A Diversion Channel redirects flowing water from a stream or drain to reduce flooding and allow controlled use for irrigation."},
+  {sno:23,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Diversion Channel",cls:"Repair",content:"Repair of Diversion Channel to restore flood management and irrigation redirection functions."},
+  {sno:24,theme:"Domain I",group:"Surface Structures",name:"Construction of Flood Diversion Drain",cls:"New",content:"A Flood Diversion Drain channels excess floodwater away from villages and agricultural fields to rivers or safe outlets."},
+  {sno:25,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Flood Diversion Drain",cls:"Repair",content:"Repair of Flood Diversion Drain to protect villages from flood damage."},
+  {sno:26,theme:"Domain I",group:"Surface Structures",name:"Construction of Underground Dyke",cls:"New",content:"An Underground Dyke is a subsurface barrier that stops underground water flow and increases groundwater levels to support nearby wells."},
+  {sno:27,theme:"Domain I",group:"Surface Structures",name:"Repair & Maintenance of Underground Dyke",cls:"Repair",content:"Repair of Underground Dyke to restore groundwater recharge capability."},
+  {sno:28,theme:"Domain I",group:"Recharge Structures",name:"Construction of Collection Chamber for Spring Shed",cls:"New",content:"A Collection Chamber for Spring Shed collects and protects naturally flowing spring water from contamination for drinking and irrigation."},
+  {sno:29,theme:"Domain I",group:"Recharge Structures",name:"Repair & Maintenance of Collection Chamber for Spring Shed",cls:"Repair",content:"Repair of Spring Collection Chamber to maintain clean spring water collection."},
+  {sno:30,theme:"Domain I",group:"Recharge Structures",name:"Construction of Farm Pond",cls:"New",content:"A Farm Pond is a small water storage structure near agricultural fields to collect rainwater and runoff for irrigation and groundwater recharge."},
+  {sno:31,theme:"Domain I",group:"Recharge Structures",name:"Construction of Filtration Chamber for Defunct Borewell",cls:"New",content:"A Filtration Chamber converts an unused borewell into a groundwater recharge point by filtering rainwater through sand, gravel, and stone."},
+  {sno:32,theme:"Domain I",group:"Recharge Structures",name:"Repair & Maintenance of Filtration Chamber in Defunct Borewell",cls:"Repair",content:"Repair of Filtration Chamber for Defunct Borewell to maintain groundwater recharge function."},
+  {sno:33,theme:"Domain I",group:"Recharge Structures",name:"Construction of Filtration Pond with Recharge Shaft along Escape Channel",cls:"New",content:"This structure filters excess rainwater through sand and gravel then injects it deep into the ground via a recharge shaft to improve groundwater."},
+  {sno:34,theme:"Domain I",group:"Recharge Structures",name:"Repair & Maintenance of Filtration Pond with Recharge Shaft",cls:"Repair",content:"Repair of Filtration Pond with Recharge Shaft to restore groundwater conservation."},
+  {sno:35,theme:"Domain I",group:"Recharge Structures",name:"Construction of Injection Well in Channels",cls:"New",content:"An Injection Well in Channels allows filtered surface water to be injected into deeper underground layers to increase groundwater levels."},
+  {sno:36,theme:"Domain I",group:"Recharge Structures",name:"Repair & Maintenance of Injection Well in Channels",cls:"Repair",content:"Repair of Injection Well in Channels to restore groundwater recharge from surface channels."},
+  {sno:37,theme:"Domain I",group:"Recharge Structures",name:"Construction of Injection Well in Water Bodies",cls:"New",content:"An Injection Well in Water Bodies filters and injects stored pond or lake water into deeper underground layers for recharge."},
+  {sno:38,theme:"Domain I",group:"Recharge Structures",name:"Repair & Maintenance of Injection Well in Water Bodies",cls:"Repair",content:"Repair of Injection Well in Water Bodies to restore groundwater recharge."},
+  {sno:39,theme:"Domain I",group:"Recharge Structures",name:"Construction of Percolation Tank",cls:"New",content:"A Percolation Tank is a small storage structure across a drainage line to collect rainwater and allow it to slowly seep into the ground."},
+  {sno:40,theme:"Domain I",group:"Recharge Structures",name:"Repair & Maintenance of Percolation Tank",cls:"Repair",content:"Repair of Percolation Tank to restore groundwater recharge and water storage."},
+  {sno:41,theme:"Domain I",group:"Recharge Structures",name:"Construction of Recharge Pit",cls:"New",content:"A Recharge Pit is a small pit filled with sand, gravel, and stones to collect and filter rainwater and allow it to recharge groundwater."},
+  {sno:42,theme:"Domain I",group:"Recharge Structures",name:"Construction of Recharge Shaft",cls:"New",content:"A Recharge Shaft is a deep vertical structure filled with filtering materials to carry rainwater directly into underground water layers."},
+  {sno:43,theme:"Domain I",group:"Recharge Structures",name:"Repair & Maintenance of Recharge Shaft",cls:"Repair",content:"Repair of Recharge Shaft to restore groundwater recharge in water-scarce areas."},
+  {sno:44,theme:"Domain I",group:"Recharge Structures",name:"Rejuvenation of Pond",cls:"Repair",content:"Rejuvenation of Pond means cleaning, deepening, and repairing an existing pond to restore water storage capacity and groundwater recharge."},
+  {sno:45,theme:"Domain I",group:"Recharge Structures",name:"Rejuvenation of Step Well",cls:"Repair",content:"Rejuvenation of Step Well means cleaning, repairing, and restoring an old step well to make it functional for drinking water and recharge."},
+  {sno:46,theme:"Domain I",group:"Recharge Structures",name:"Construction of Sand-Filled Groundwater Recharge in Borewell",cls:"New",content:"Sand-Filled Groundwater Recharge in Borewell fills a borewell with clean sand and filtering materials to allow rainwater to improve groundwater levels."},
+  {sno:47,theme:"Domain I",group:"Recharge Structures",name:"Repair & Maintenance of Sand-Filled Groundwater Recharge in Borewell",cls:"Repair",content:"Repair of Sand-Filled Borewell Recharge to restore water conservation effectiveness."},
+  {sno:48,theme:"Domain I",group:"Recharge Structures",name:"Construction of Sand-Filled Groundwater Recharge in Dug Well",cls:"New",content:"Sand-Filled Groundwater Recharge in Dug Well uses sand and gravel to filter rainwater seeping into the ground through a dug well."},
+  {sno:49,theme:"Domain I",group:"Recharge Structures",name:"Repair & Maintenance of Sand-Filled Groundwater Recharge in Dug Well",cls:"Repair",content:"Repair of Sand-Filled Dug Well Recharge to restore groundwater conservation."},
+  {sno:50,theme:"Domain I",group:"Recharge Structures",name:"Construction of Tanka (Water Storage Structure)",cls:"New",content:"A Tanka is a traditional underground rainwater storage structure protected from evaporation and contamination for drinking and household use."},
+  {sno:51,theme:"Domain I",group:"Recharge Structures",name:"Construction of Water Harvesting Pond",cls:"New",content:"A Water Harvesting Pond collects rainwater and runoff for irrigation, livestock, and groundwater recharge."},
+  {sno:52,theme:"Domain I",group:"Recharge Structures",name:"Repair & Maintenance of Water Harvesting Pond",cls:"Repair",content:"Repair of Water Harvesting Pond to restore rainwater storage and groundwater recharge."},
+  {sno:53,theme:"Domain I",group:"Recharge Structures",name:"Construction of Artificial Wetland for Waste Water Management",cls:"New",content:"An Artificial Wetland treats wastewater through plants, soil, and gravel for natural cleaning and reuse in irrigation."},
+  {sno:54,theme:"Domain I",group:"Irrigation Systems",name:"Construction of Drip Irrigation Channels",cls:"New",content:"Drip Irrigation Channels supply water directly to plant roots in a controlled manner to save water and improve crop yield."},
+  {sno:55,theme:"Domain I",group:"Irrigation Systems",name:"Construction of Irrigation Channels for Field Distribution",cls:"New",content:"Irrigation Channels for Field Distribution carry water from a source to different parts of the field for proper distribution."},
+  {sno:56,theme:"Domain I",group:"Irrigation Systems",name:"Construction of Irrigation Well",cls:"New",content:"An Irrigation Well draws groundwater for watering agricultural fields during dry periods using pumps or traditional methods."},
+  {sno:57,theme:"Domain I",group:"Irrigation Systems",name:"Repair & Maintenance of Irrigation Well",cls:"Repair",content:"Repair of Irrigation Well to restore groundwater access for agricultural fields."},
+  {sno:58,theme:"Domain I",group:"Irrigation Systems",name:"Installation of Sprinkler Irrigation System",cls:"New",content:"A Sprinkler Irrigation System sprays water over crops through pipes and rotating sprinklers, ensuring uniform distribution and saving water."},
+  {sno:59,theme:"Domain I",group:"Land Reclamation",name:"Development of Waterlogged Land",cls:"New",content:"Development of Waterlogged Land treats agricultural land where excess water remains standing to restore soil quality and crop productivity."},
+  {sno:60,theme:"Domain I",group:"Land Reclamation",name:"Construction of Drainage Works in Waterlogged Land",cls:"New",content:"Drainage Works remove excess water from waterlogged fields to improve soil aeration and restore crop productivity."},
+  {sno:61,theme:"Domain I",group:"Soil Conservation",name:"Construction of Continuous Contour Trench",cls:"New",content:"A Continuous Contour Trench is a series of trenches along slope contour lines to slow rainwater, prevent erosion, and improve soil moisture."},
+  {sno:62,theme:"Domain I",group:"Soil Conservation",name:"Construction of Staggered Contour Trench",cls:"New",content:"A Staggered Contour Trench has small trenches in a staggered pattern along sloping land to reduce erosion and improve groundwater recharge."},
+  {sno:63,theme:"Domain I",group:"Soil Conservation",name:"Plantation in Coastal Area",cls:"New",content:"Coastal Plantation involves planting trees along coastal regions to protect land from winds, storms, and sea erosion."},
+  {sno:64,theme:"Domain I",group:"Soil Conservation",name:"Bio-drainage Plantation",cls:"New",content:"Bio-drainage Plantation plants high water-uptake trees on waterlogged land to reduce groundwater levels and improve soil quality naturally."},
+  {sno:65,theme:"Domain I",group:"Soil Conservation",name:"Raising of Agro Forestry Plantation",cls:"New",content:"Agro Forestry Plantation combines trees with crops to earn additional income from timber and fruits while improving soil fertility."},
+  {sno:66,theme:"Domain I",group:"Soil Conservation",name:"Raising of Bamboo Plantation",cls:"New",content:"Bamboo Plantation grows bamboo for construction, furniture, and handicrafts while preventing soil erosion and improving land quality."},
+  {sno:67,theme:"Domain I",group:"Soil Conservation",name:"Raising of Cactus Plantation",cls:"New",content:"Cactus Plantation grows cactus on dry barren land where other crops cannot grow, used for fodder, fencing, or medicinal purposes."},
+  {sno:68,theme:"Domain I",group:"Soil Conservation",name:"Raising of Mango Horticulture Plantation",cls:"New",content:"Mango Plantation plants mango trees for long-term fruit production and income while improving soil cover and reducing erosion."},
+  {sno:69,theme:"Domain I",group:"Soil Conservation",name:"Raising of Cashew Horticulture Plantation",cls:"New",content:"Cashew Plantation grows cashew trees in coastal and dry regions to provide long-term income through sale of cashew nuts."},
+  {sno:70,theme:"Domain I",group:"Soil Conservation",name:"Raising of Apple Horticulture Plantation",cls:"New",content:"Apple Plantation plants apple trees in hilly cold climate areas to provide fruit for many years and generate steady income for farmers."},
+  {sno:71,theme:"Domain I",group:"Soil Conservation",name:"Raising of Custard Apple Horticulture Plantation",cls:"New",content:"Custard Apple Plantation grows trees in dry and semi-arid areas with less water and provides nutritious fruits and regular income."},
+  {sno:72,theme:"Domain I",group:"Soil Conservation",name:"Raising of Lemon Horticulture Plantation",cls:"New",content:"Lemon Plantation grows lemon trees in warm climates for regular income through fresh fruits and related products."},
+  {sno:73,theme:"Domain I",group:"Soil Conservation",name:"Raising of Coconut Horticulture Plantation",cls:"New",content:"Coconut Plantation plants high-quality coconut saplings to create a permanent source of income, food, and coconut oil for rural families."},
+  {sno:74,theme:"Domain I",group:"Soil Conservation",name:"Raising of Moringa Horticulture Plantation",cls:"New",content:"Moringa Plantation grows fast-growing trees that provide nutritious leaves and drumsticks for both home consumption and local markets."},
+  {sno:75,theme:"Domain I",group:"Soil Conservation",name:"Raising of Orange Horticulture Plantation",cls:"New",content:"Orange Plantation plants orange saplings to create orchards that generate seasonal income through vitamin-rich fruit for nearby markets."},
+  {sno:76,theme:"Domain I",group:"Soil Conservation",name:"Raising of Guava Horticulture Plantation",cls:"New",content:"Guava Plantation creates hardy orchards that provide a quick and steady fruit harvest throughout the year with easy maintenance."},
+  {sno:77,theme:"Domain I",group:"Soil Conservation",name:"Raising of Pear Horticulture Plantation",cls:"New",content:"Pear Plantation establishes long-term orchards in hilly or temperate areas to produce pears as a valuable cash crop."},
+  {sno:78,theme:"Domain I",group:"Soil Conservation",name:"Raising of Dragon Fruit Horticulture Plantation",cls:"New",content:"Dragon Fruit Plantation grows high-value cacti on concrete poles in dry rural landscapes to produce premium fruit for markets."},
+  {sno:79,theme:"Domain I",group:"Soil Conservation",name:"Raising of Apricot Horticulture Plantation",cls:"New",content:"Apricot Plantation plants saplings in hilly or dry-temperate areas to produce high-value fresh and dried fruit for markets."},
+  {sno:80,theme:"Domain I",group:"Soil Conservation",name:"Raising of Chickoo Horticulture Plantation",cls:"New",content:"Chickoo Plantation grows well-drained soil orchards that produce sweet, nutritious fruit for sale in local and regional markets."},
+  {sno:81,theme:"Domain I",group:"Soil Conservation",name:"Raising of Pomegranate Horticulture Plantation",cls:"New",content:"Pomegranate Plantation grows drought-resistant trees in dry areas to yield nutrient-rich fruit with high market demand and long shelf life."},
+  {sno:82,theme:"Domain I",group:"Soil Conservation",name:"Raising of Litchi Horticulture Plantation",cls:"New",content:"Litchi Plantation establishes orchards in fertile, well-watered areas to produce high-value summer fruit and create seasonal employment."},
+  {sno:83,theme:"Domain I",group:"Soil Conservation",name:"Raising of Sweet Lime Horticulture Plantation",cls:"New",content:"Sweet Lime Plantation grows juice-rich orchards in well-drained soil to yield a high-demand crop for local and regional markets."},
+  {sno:84,theme:"Domain I",group:"Soil Conservation",name:"Raising of Avocado Horticulture Plantation",cls:"New",content:"Avocado Plantation plants saplings in well-drained soil to establish high-value nutrient-dense orchards with premium market demand."},
+  {sno:85,theme:"Domain I",group:"Soil Conservation",name:"Raising of Grape Horticulture Plantation",cls:"New",content:"Grape Plantation grows grapevines on trellis systems to create high-yield fruit for fresh consumption or processing into wine and juice."},
+  {sno:86,theme:"Domain I",group:"Soil Conservation",name:"Raising of Jack Fruit Horticulture Plantation",cls:"New",content:"Jackfruit Plantation creates long-term orchards providing both nutritious food and valuable timber, with fruit used ripe or as a vegetable."},
+  {sno:87,theme:"Domain I",group:"Soil Conservation",name:"Raising of Other Horticulture Plantation",cls:"New",content:"Other Horticulture Plantation plants locally suitable fruit or nut saplings to diversify income sources and improve food security."},
+  {sno:88,theme:"Domain I",group:"Soil Conservation",name:"Raising of Mangrove Plantation",cls:"New",content:"Mangrove Plantation plants salt-tolerant saplings along coastal areas to create a natural shield against storms and soil erosion."},
+  {sno:89,theme:"Domain I",group:"Soil Conservation",name:"Raising of Amla medicinal Plantation",cls:"New",content:"Amla Plantation creates long-term orchards that provide vitamin-rich fruit used extensively in traditional medicines and food products."},
+  {sno:90,theme:"Domain I",group:"Soil Conservation",name:"Raising of Neem medicinal Plantation",cls:"New",content:"Neem Plantation plants saplings to create a permanent source of natural medicine, organic pesticide, and high-quality timber."},
+  {sno:91,theme:"Domain I",group:"Soil Conservation",name:"Raising of Aswagandha medicinal Plantation",cls:"New",content:"Ashwagandha Plantation grows high-value medicinal roots in dry conditions for the pharmaceutical and wellness industries."},
+  {sno:92,theme:"Domain I",group:"Soil Conservation",name:"Raising of Arjuna medicinal Plantation",cls:"New",content:"Arjuna Plantation grows trees along riverbanks to provide medicinal bark used in traditional heart treatments and timber."},
+  {sno:93,theme:"Domain I",group:"Soil Conservation",name:"Raising of Satavari medicinal Plantation",cls:"New",content:"Shatavari Plantation grows high-value medicinal roots for traditional health tonics that fetch premium prices in herbal markets."},
+  {sno:94,theme:"Domain I",group:"Soil Conservation",name:"Raising of Mulethi medicinal Plantation",cls:"New",content:"Mulethi Plantation cultivates high-value medicinal roots used in throat and digestive health treatments, sold in herbal markets."},
+  {sno:95,theme:"Domain I",group:"Soil Conservation",name:"Raising of Tulsi medicinal Plantation",cls:"New",content:"Tulsi Plantation grows a sacred and versatile medicinal herb that provides multiple annual harvests for teas, oils, and medicines."},
+  {sno:96,theme:"Domain I",group:"Soil Conservation",name:"Raising of Peepal medicinal Plantation",cls:"New",content:"Peepal Plantation establishes long-lived oxygen-rich groves providing medicinal bark, leaves, and seeds and ecological benefits."},
+  {sno:97,theme:"Domain I",group:"Soil Conservation",name:"Raising of Bael medicinal Plantation",cls:"New",content:"Bael Plantation grows drought-tolerant trees producing fruit renowned for digestive and medicinal properties with high commercial value."},
+  {sno:98,theme:"Domain I",group:"Soil Conservation",name:"Raising of Ashoka medicinal Plantation",cls:"New",content:"Ashoka Plantation grows evergreen trees for medicinal bark and leaves used extensively in traditional health remedies."},
+  {sno:99,theme:"Domain I",group:"Soil Conservation",name:"Raising of Golden Shower medicinal Plantation",cls:"New",content:"Golden Shower (Amaltas) Plantation grows drought-tolerant trees providing medicinal pods, bark, and flowers for traditional digestive medicines."},
+  {sno:100,theme:"Domain I",group:"Soil Conservation",name:"Raising of Kachnar medicinal Plantation",cls:"New",content:"Kachnar Plantation grows hardy flowering trees providing medicinal buds, bark, and flowers used in glandular and skin treatments."},
+  {sno:101,theme:"Domain I",group:"Soil Conservation",name:"Raising of Other Medicinal Plantation",cls:"New",content:"Other Medicinal Plantation grows various locally suitable medicinal herbs, shrubs, or trees to diversify natural remedies and income."},
+  {sno:102,theme:"Domain I",group:"Soil Conservation",name:"Plantation in Community Institutions",cls:"New",content:"Community Institution Plantation plants shade-giving and fruit-bearing trees within schools, health centers, and community halls for green environment."},
+  {sno:103,theme:"Domain I",group:"Soil Conservation",name:"Avenue Plantation",cls:"New",content:"Avenue Plantation plants aesthetic shade-giving trees along both sides of roads to create green corridors, reduce erosion, and cool temperatures."},
+  {sno:104,theme:"Domain I",group:"Soil Conservation",name:"Canal Line Plantation",cls:"New",content:"Canal Line Plantation plants soil-binding trees along canal embankments to stabilize banks, reduce evaporation, and provide fodder."},
+  {sno:105,theme:"Domain I",group:"Soil Conservation",name:"Raising of Tea Plantation in Community Wasteland",cls:"New",content:"Tea Plantation transforms community wastelands into productive tea gardens providing consistent green leaf harvest and long-term employment."},
+  {sno:106,theme:"Domain I",group:"Soil Conservation",name:"Raising of Coffee Plantation in Community Wasteland",cls:"New",content:"Coffee Plantation converts idle wastelands into coffee estates providing a sustainable harvest and long-term seasonal employment."},
+  {sno:107,theme:"Domain I",group:"Soil Conservation",name:"Raising of Other Plantation in Community Wasteland",cls:"New",content:"Other Wasteland Plantation transforms degraded communal lands into productive green zones with locally hardy fruit or timber trees."},
+  {sno:108,theme:"Domain I",group:"Soil Conservation",name:"Raising of Plantation in Forest Area",cls:"New",content:"Forest Area Plantation systematically plants indigenous tree species within degraded forest patches to restore canopy and biodiversity."},
+  {sno:109,theme:"Domain I",group:"Soil Conservation",name:"Raising of Sericulture Plantation",cls:"New",content:"Sericulture Plantation grows high-yielding Mulberry varieties to establish a dedicated fodder base for silkworm rearing and silk production."},
+  {sno:110,theme:"Domain I",group:"Soil Conservation",name:"Raising of Jatropha Tree Borne Oil Seed Plantation",cls:"New",content:"Jatropha Plantation grows drought-resistant shrubs in marginal lands to produce oil-rich seeds for biofuel production."},
+  {sno:111,theme:"Domain I",group:"Soil Conservation",name:"Raising of Karanj Tree Borne Oil Seed Plantation",cls:"New",content:"Karanj Plantation grows nitrogen-fixing trees in degraded lands to produce oilseeds for biofuel and medicinal use."},
+  {sno:112,theme:"Domain I",group:"Soil Conservation",name:"Raising of Wild Apricot Tree Borne Oil Seed Plantation",cls:"New",content:"Wild Apricot Plantation grows frost-tolerant trees in high-altitude lands to produce oil-rich kernels for culinary and cosmetic use."},
+  {sno:113,theme:"Domain I",group:"Soil Conservation",name:"Raising of Simarouba Tree Borne Oil Seed Plantation",cls:"New",content:"Simarouba Plantation grows drought-tolerant evergreen trees to produce high-quality non-edible oilseeds for biofuel and medicinal use."},
+  {sno:114,theme:"Domain I",group:"Soil Conservation",name:"Raising of Mohua Tree Borne Oil Seed Plantation",cls:"New",content:"Mahua Plantation grows long-lived multi-purpose trees to produce oil-rich seeds and succulent flowers for food and traditional beverages."},
+  {sno:115,theme:"Domain I",group:"Soil Conservation",name:"Raising of Kokum Tree Borne Oil Seed Plantation",cls:"New",content:"Kokum Plantation grows evergreen trees in high-rainfall lands to produce Kokum butter seeds and medicinal rind health tonics."},
+  {sno:116,theme:"Domain I",group:"Soil Conservation",name:"Raising of Jojoba Tree Borne Oil Seed Plantation",cls:"New",content:"Jojoba Plantation grows drought-resilient shrubs in arid lands to produce high-value liquid wax seeds for premium cosmetics."},
+  {sno:117,theme:"Domain I",group:"Soil Conservation",name:"Raising of Neem Tree Borne Oil Seed Plantation",cls:"New",content:"Neem Oil Seed Plantation grows drought-resistant trees to produce seeds for high-value organic pesticides and fertilizers."},
+  {sno:118,theme:"Domain I",group:"Soil Conservation",name:"Raising of Anjeer Tree Borne Oil Seed Plantation",cls:"New",content:"Anjeer Plantation grows hardy Fig saplings to produce nutrient-dense fruits and oil-rich seeds for high-value extraction."},
+  {sno:119,theme:"Domain I",group:"Soil Conservation",name:"Raising of Cheura Tree Borne Oil Seed Plantation",cls:"New",content:"Cheura Plantation grows frost-tolerant evergreen trees to produce high-value vegetable butter and oilseeds for culinary and cosmetic use."},
+  {sno:120,theme:"Domain I",group:"Soil Conservation",name:"Raising of Tung Tree Borne Oil Seed Plantation",cls:"New",content:"Tung Plantation grows high-yielding deciduous trees to produce premium quick-drying oil used for wood finishing and industrial varnishes."},
+  {sno:121,theme:"Domain I",group:"Soil Conservation",name:"Raising of Olive Tree Borne Oil Seed Plantation",cls:"New",content:"Olive Plantation grows high-quality saplings in lime-rich soils to produce premium culinary and medicinal olive oil."},
+  {sno:122,theme:"Domain I",group:"Soil Conservation",name:"Raising of Oil Palm Tree Borne Oil Seed Plantation",cls:"New",content:"Oil Palm Plantation grows high-yielding tropical palms in fertile irrigated lands to produce valuable palm oil and kernel oil."},
+  {sno:123,theme:"Domain I",group:"Soil Conservation",name:"Raising of Other Tree Borne Oil Seed Plantation",cls:"New",content:"Other Tree Borne Oil Seed Plantation grows diverse non-traditional oil-bearing species for non-edible oils and industrial raw materials."},
+  {sno:124,theme:"Domain I",group:"Rainwater Harvesting",name:"Construction of Roof Top Rain Water Harvesting Structure",cls:"New",content:"Rooftop Rainwater Harvesting installs PVC gutters, downpipes, and filtration units to capture clean rainwater into storage tanks or recharge pits."},
+  {sno:125,theme:"Domain I",group:"Rainwater Harvesting",name:"Repair & Maintenance of Roof Top Rain Water Harvesting Structure",cls:"Repair",content:"Repair of Rooftop Rainwater Harvesting Structure to restore rainwater collection functionality."},
+  {sno:126,theme:"Domain II",group:"Rural Connectivity",name:"Construction of Cross Drainage Structure",cls:"New",content:"Cross Drainage Structure constructs culverts or pipes to allow safe passage of natural drainage water across canals or roadways, preventing waterlogging."},
+  {sno:127,theme:"Domain II",group:"Rural Connectivity",name:"Repair & Maintenance of Cross Drainage Structure",cls:"Repair",content:"Repair of Cross Drainage Structure to restore safe water passage and prevent waterlogging."},
+  {sno:128,theme:"Domain II",group:"Rural Connectivity",name:"Construction of Culvert",cls:"New",content:"Culvert construction places reinforced concrete pipes beneath roads to allow controlled water passage and prevent road washouts during rain."},
+  {sno:129,theme:"Domain II",group:"Rural Connectivity",name:"Repair & Maintenance of Culvert",cls:"Repair",content:"Repair of Culvert to maintain drainage and prevent road damage during monsoons."},
+  {sno:130,theme:"Domain II",group:"Rural Connectivity",name:"Construction of Rural Foot Over Bridge",cls:"New",content:"Rural Foot Over Bridge constructs elevated pedestrian walkways to provide safe passage over rivers, canals, or ravines in remote areas."},
+  {sno:131,theme:"Domain II",group:"Rural Connectivity",name:"Repair & Maintenance of Rural Foot Over Bridge",cls:"Repair",content:"Repair of Rural Foot Over Bridge to ensure year-round safe pedestrian connectivity."},
+  {sno:132,theme:"Domain II",group:"Rural Connectivity",name:"Construction of Bitumen Road",cls:"New",content:"Bitumen Road construction lays compacted stone aggregates bonded with bituminous binder to create a durable all-weather transport surface."},
+  {sno:133,theme:"Domain II",group:"Rural Connectivity",name:"Repair & Maintenance of Bitumen Road",cls:"Repair",content:"Repair of Bitumen Road to restore all-weather connectivity for rural transport."},
+  {sno:134,theme:"Domain II",group:"Rural Connectivity",name:"Construction of Cement Concrete Road",cls:"New",content:"Cement Concrete Road construction lays a thick reinforced concrete slab over a compacted sub-base for rigid, high-durability transport."},
+  {sno:135,theme:"Domain II",group:"Rural Connectivity",name:"Repair & Maintenance of Cement Concrete Road",cls:"Repair",content:"Repair of Cement Concrete Road to restore durable all-weather rural connectivity."},
+  {sno:136,theme:"Domain II",group:"Rural Connectivity",name:"Construction of Interlocking Paver Block Road",cls:"New",content:"Interlocking Paver Block Road fits together high-strength precast concrete blocks over a compacted sand bedding for a flexible, heavy-duty surface."},
+  {sno:137,theme:"Domain II",group:"Rural Connectivity",name:"Repair & Maintenance of Interlocking Paver Block Road",cls:"Repair",content:"Repair of Interlocking Paver Block Road to restore surface integrity and drainage."},
+  {sno:138,theme:"Domain II",group:"Rural Connectivity",name:"Construction of Kharanja Road",cls:"New",content:"Kharanja Road lays high-quality bricks in a vertical zigzag pattern over a compacted earth and sand base for a traditional durable rural path."},
+  {sno:139,theme:"Domain II",group:"Rural Connectivity",name:"Repair & Maintenance of Kharanja Road",cls:"Repair",content:"Repair of Kharanja Road to restore mud-free rural connectivity."},
+  {sno:140,theme:"Domain II",group:"Rural Connectivity",name:"Construction of WBM Road",cls:"New",content:"WBM Road construction lays successive layers of crushed stone aggregates compacted with water to create a durable all-weather base."},
+  {sno:141,theme:"Domain II",group:"Rural Connectivity",name:"Repair & Maintenance of WBM Road",cls:"Repair",content:"Repair of WBM Road to restore its all-weather base for rural traffic."},
+  {sno:142,theme:"Domain II",group:"Civic Buildings",name:"Construction of Anganwadi Centre Building",cls:"New",content:"Anganwadi Centre Building constructs a child-friendly facility for early childhood education, maternal healthcare, and community immunization."},
+  {sno:143,theme:"Domain II",group:"Civic Buildings",name:"Repair & Maintenance of Anganwadi Centre Building",cls:"Repair",content:"Repair of Anganwadi Centre Building to maintain safe environment for early childhood education."},
+  {sno:144,theme:"Domain II",group:"Civic Buildings",name:"Construction of Anganwadi Toilet",cls:"New",content:"Anganwadi Toilet constructs child-friendly hygienic sanitation units with low-height fixtures to encourage healthy hygiene habits."},
+  {sno:145,theme:"Domain II",group:"Civic Buildings",name:"Repair & Maintenance of Anganwadi Toilet",cls:"Repair",content:"Repair of Anganwadi Toilet to maintain hygienic sanitation for children."},
+  {sno:146,theme:"Domain II",group:"Civic Buildings",name:"Construction of Gram Panchayat Building",cls:"New",content:"Gram Panchayat Building constructs a multipurpose administrative facility as the primary hub for local self-governance."},
+  {sno:147,theme:"Domain II",group:"Civic Buildings",name:"Repair & Maintenance of Gram Panchayat Building",cls:"Repair",content:"Repair of Gram Panchayat Building to maintain local governance infrastructure."},
+  {sno:148,theme:"Domain II",group:"Civic Buildings",name:"Construction of Boundary Wall for Government Institutions",cls:"New",content:"Boundary Wall constructs a secure reinforced masonry perimeter around public land to prevent encroachment and ensure institutional safety."},
+  {sno:149,theme:"Domain II",group:"Civic Buildings",name:"Construction of Marriage/Community Hall",cls:"New",content:"Community Hall constructs a large-scale multipurpose structure for social gatherings, cultural festivals, and government workshops."},
+  {sno:150,theme:"Domain II",group:"Civic Buildings",name:"Repair & Maintenance of Marriage/Community Hall",cls:"Repair",content:"Repair of Community Hall to restore its function as a venue for social gatherings."},
+  {sno:151,theme:"Domain II",group:"Civic Buildings",name:"Construction of Rural Health Centre",cls:"New",content:"Rural Health Centre constructs a primary medical facility with consulting room, labor room, and pharmacy for remote population healthcare."},
+  {sno:152,theme:"Domain II",group:"Civic Buildings",name:"Repair & Maintenance of Rural Health Centre",cls:"Repair",content:"Repair of Rural Health Centre to maintain frontline healthcare services."},
+  {sno:153,theme:"Domain II",group:"Civic Buildings",name:"Construction of Rural Library Building",cls:"New",content:"Rural Library Building constructs a quiet, well-ventilated structure with reading hall, book storage, and digital connectivity."},
+  {sno:154,theme:"Domain II",group:"Civic Buildings",name:"Repair & Maintenance of Rural Library Building",cls:"Repair",content:"Repair of Rural Library Building to maintain educational and learning infrastructure."},
+  {sno:155,theme:"Domain II",group:"Civic Buildings",name:"Construction of Veterinary Health Centre",cls:"New",content:"Veterinary Health Centre constructs a specialized facility for livestock examination, minor surgery, and vaccine cold-chain storage."},
+  {sno:156,theme:"Domain II",group:"Civic Buildings",name:"Repair & Maintenance of Veterinary Health Centre",cls:"Repair",content:"Repair of Veterinary Health Centre to maintain animal health monitoring infrastructure."},
+  {sno:157,theme:"Domain II",group:"Education Infrastructure",name:"Construction of Additional Classroom for Government School",cls:"New",content:"Additional Classroom construction provides a safe spacious learning environment with natural ventilation and modern teaching aid points."},
+  {sno:158,theme:"Domain II",group:"Education Infrastructure",name:"Repair & Maintenance of Additional Classroom for Government School",cls:"Repair",content:"Repair of Classroom to maintain a safe learning environment."},
+  {sno:159,theme:"Domain II",group:"Education Infrastructure",name:"Construction of Compound Wall for Government School",cls:"New",content:"School Compound Wall constructs a secure masonry perimeter with integrated gates to protect students from unauthorized entry and cattle."},
+  {sno:160,theme:"Domain II",group:"Education Infrastructure",name:"Repair & Maintenance of Compound Wall for Government School",cls:"Repair",content:"Repair of Compound Wall to maintain school security and boundary integrity."},
+  {sno:161,theme:"Domain II",group:"Education Infrastructure",name:"Construction of Kitchen Shed for Government School",cls:"New",content:"Kitchen Shed constructs a dedicated hygienic and well-ventilated space for safe preparation of mid-day meals."},
+  {sno:162,theme:"Domain II",group:"Education Infrastructure",name:"Repair & Maintenance of Kitchen Shed for Government School",cls:"Repair",content:"Repair of Kitchen Shed to maintain hygienic mid-day meal preparation."},
+  {sno:163,theme:"Domain II",group:"Education Infrastructure",name:"Construction of Laboratory for Government School",cls:"New",content:"School Laboratory constructs a specialized structure with acid-resistant flooring and workstations for practical scientific experiments."},
+  {sno:164,theme:"Domain II",group:"Education Infrastructure",name:"Repair & Maintenance of Laboratory for Government School",cls:"Repair",content:"Repair of Laboratory to maintain a safe environment for scientific experiments."},
+  {sno:165,theme:"Domain II",group:"Education Infrastructure",name:"Construction of Play Ground for Government School",cls:"New",content:"School Playground levels and clears designated land to create a safe multi-sport surface for physical education and recreation."},
+  {sno:166,theme:"Domain II",group:"Education Infrastructure",name:"Construction of Toilet for Government School",cls:"New",content:"School Toilet constructs a hygienic sanitation block with separate units for boys and girls to ensure privacy and dignity."},
+  {sno:167,theme:"Domain II",group:"Education Infrastructure",name:"Repair & Maintenance of Toilet for Government School",cls:"Repair",content:"Repair of School Toilet to maintain hygienic sanitation and reduce dropout rates."},
+  {sno:168,theme:"Domain II",group:"Community Assets",name:"Construction of Crematorium",cls:"New",content:"Crematorium constructs a dignified heat-resistant structure with smoke chimney for traditional last rites and sanitary public health."},
+  {sno:169,theme:"Domain II",group:"Community Assets",name:"Repair & Maintenance of Crematorium",cls:"Repair",content:"Repair of Crematorium to maintain a dignified and sanitary space for last rites."},
+  {sno:170,theme:"Domain II",group:"Community Assets",name:"Construction of Graveyard",cls:"New",content:"Graveyard constructs a secure dignified burial ground with boundary wall, organized pathways, and prayer platforms."},
+  {sno:171,theme:"Domain II",group:"Community Assets",name:"Repair & Maintenance of Graveyard",cls:"Repair",content:"Repair of Graveyard to maintain a peaceful and well-demarcated burial ground."},
+  {sno:172,theme:"Domain II",group:"Water Supply",name:"Repair and Maintenance of Storage Structure for Water Supply Project (JJM)",cls:"Repair",content:"Repair of JJM Water Storage Structure to ensure continuous pressurized potable water supply for the community."},
+  {sno:173,theme:"Domain II",group:"Water Supply",name:"Repair and Maintenance of Distribution Structure Water Supply Project (JJM)",cls:"Repair",content:"Repair of JJM Distribution Pipeline to ensure equitable potable water flow across the community."},
+  {sno:174,theme:"Domain II",group:"Waste Management",name:"Construction of Community Sanitary Complex",cls:"New",content:"Community Sanitary Complex constructs a high-capacity multi-user sanitation block with separate blocks for men and women."},
+  {sno:175,theme:"Domain II",group:"Waste Management",name:"Construction of IHHL",cls:"New",content:"IHHL constructs a compact household sanitation unit with twin-pit soakage system for safe and dignified waste disposal."},
+  {sno:176,theme:"Domain II",group:"Waste Management",name:"Construction of Compost Collection Pit",cls:"New",content:"Compost Collection Pit constructs an underground aerated chamber for aerobic decomposition of organic waste into nutrient-rich manure."},
+  {sno:177,theme:"Domain II",group:"Waste Management",name:"Construction of Segregation Shed",cls:"New",content:"Segregation Shed constructs a robust structure with dedicated bays for systematic sorting of dry and wet municipal waste."},
+  {sno:178,theme:"Domain II",group:"Waste Management",name:"Construction of Soak Pit",cls:"New",content:"Soak Pit constructs a deep filtration chamber with graded aggregate layers for sustainable safe disposal of household greywater."},
+  {sno:179,theme:"Domain II",group:"Waste Management",name:"Construction of Soakage Channel",cls:"New",content:"Soakage Channel constructs a shallow lined trench for systematic diversion and sub-surface filtration of domestic greywater."},
+  {sno:180,theme:"Domain II",group:"Waste Management",name:"Construction of Liquid Waste Chamber",cls:"New",content:"Liquid Waste Chamber constructs an underground junction box to collect and divert household greywater to the main soakage system."},
+  {sno:181,theme:"Domain II",group:"Renewable Energy",name:"Construction of Biogas Plant",cls:"New",content:"Biogas Plant constructs a digester tank with airtight dome for anaerobic decomposition of organic waste into clean cooking fuel."},
+  {sno:182,theme:"Domain II",group:"Renewable Energy",name:"Installation of Solar Street Light",cls:"New",content:"Solar Street Light installs a self-contained pole-mounted photovoltaic system for reliable eco-friendly outdoor illumination."},
+  {sno:183,theme:"Domain II",group:"Common Facilities",name:"Construction of Rural Bus Stand",cls:"New",content:"Rural Bus Stand constructs a reinforced concrete passenger shelter with seating and paved bay for safe bus docking."},
+  {sno:184,theme:"Domain II",group:"Common Facilities",name:"Repair & Maintenance of Rural Bus Stand",cls:"Repair",content:"Repair of Rural Bus Stand to maintain transport connectivity and passenger shelter."},
+  {sno:185,theme:"Domain II",group:"Common Facilities",name:"Construction of Parking Shed",cls:"New",content:"Parking Shed constructs a robust overhead shelter with masonry support to protect farm and transport vehicles from weather."},
+  {sno:186,theme:"Domain II",group:"Common Facilities",name:"Repair & Maintenance of Parking Shed",cls:"Repair",content:"Repair of Parking Shed to maintain vehicle protection infrastructure."},
+  {sno:187,theme:"Domain II",group:"Common Facilities",name:"Construction of Rural Park",cls:"New",content:"Rural Park systematically landscapes a community plot with boundary walls, paver walkways, and native planting for green recreation."},
+  {sno:188,theme:"Domain II",group:"Common Facilities",name:"Construction of Sitting Chaupal/Pandal",cls:"New",content:"Sitting Chaupal constructs a raised platform with overhead shed as a traditional community gathering space for village meetings."},
+  {sno:189,theme:"Domain II",group:"Common Facilities",name:"Construction of CC/Paver Block Flooring in Community Institutions",cls:"New",content:"CC/Paver Flooring lays concrete or interlocking paver blocks to create a clean mud-free surface at schools and public offices."},
+  {sno:190,theme:"Domain II",group:"Rural Housing",name:"Construction of PMAY-G House",cls:"New",content:"PMAY-G House constructs a reinforced masonry house with concrete roof, kitchen, toilet, and foundation for permanent rural dwelling."},
+  {sno:191,theme:"Domain III",group:"Skill Infrastructure",name:"Construction of Training and Skill Development Centre Building",cls:"New",content:"Skill Development Centre constructs spacious halls with electrical fittings for local vocational training and empowerment workshops."},
+  {sno:192,theme:"Domain III",group:"Skill Infrastructure",name:"Repair & Maintenance of Training and Skill Development Centre Building",cls:"Repair",content:"Repair of Skill Development Centre to maintain rural youth empowerment infrastructure."},
+  {sno:193,theme:"Domain III",group:"Skill Infrastructure",name:"Construction of Workshed for SHG",cls:"New",content:"SHG Workshed constructs dedicated production and storage space with durable flooring for Self-Help Groups to scale micro-enterprises."},
+  {sno:194,theme:"Domain III",group:"Skill Infrastructure",name:"Repair & Maintenance of Workshed for SHG",cls:"Repair",content:"Repair of SHG Workshed to maintain production and storage space for women's collectives."},
+  {sno:195,theme:"Domain III",group:"Market Infrastructure",name:"Construction of Rural Haat Building",cls:"New",content:"Rural Haat Building constructs a marketplace with raised platforms, high-clearance roof, and drainage for local farmers and artisans."},
+  {sno:196,theme:"Domain III",group:"Market Infrastructure",name:"Repair & Maintenance of Rural Haat Building",cls:"Repair",content:"Repair of Rural Haat Building to maintain direct trade opportunities for farmers."},
+  {sno:197,theme:"Domain III",group:"Market Infrastructure",name:"Construction of Market Yard",cls:"New",content:"Market Yard constructs a high-capacity platform with overhead shed for large-scale collection and auction of agricultural produce."},
+  {sno:198,theme:"Domain III",group:"Market Infrastructure",name:"Repair & Maintenance of Market Yard",cls:"Repair",content:"Repair of Market Yard to maintain agricultural trade infrastructure for farmers."},
+  {sno:199,theme:"Domain III",group:"Agri Storage",name:"Construction of Agricultural Produce Storage Building",cls:"New",content:"Agricultural Produce Storage Building constructs a secure ventilated building to store harvested crops and prevent post-harvest losses."},
+  {sno:200,theme:"Domain III",group:"Agri Storage",name:"Repair & Maintenance of Agricultural Produce Storage Building",cls:"Repair",content:"Repair of Agricultural Produce Storage Building to maintain food security and crop storage."},
+  {sno:201,theme:"Domain III",group:"Agri Storage",name:"Construction of Cold Storage Unit",cls:"New",content:"Cold Storage Unit constructs a highly insulated refrigerated building to preserve perishable crops and reduce wastage."},
+  {sno:202,theme:"Domain III",group:"Agri Storage",name:"Repair & Maintenance of Cold Storage Unit",cls:"Repair",content:"Repair of Cold Storage Unit to maintain preservation of perishable agricultural produce."},
+  {sno:203,theme:"Domain III",group:"Agri Storage",name:"Construction of Food Grain Storage Building",cls:"New",content:"Food Grain Storage Building constructs a secure pest-free ventilated building for storing harvested grains to ensure food security."},
+  {sno:204,theme:"Domain III",group:"Agri Storage",name:"Repair & Maintenance of Food Grain Storage Building",cls:"Repair",content:"Repair of Food Grain Storage Building to maintain grain storage and food security."},
+  {sno:205,theme:"Domain III",group:"Agri Storage",name:"Construction of Threshing Yard",cls:"New",content:"Threshing Yard constructs a large leveled concrete platform for efficient mechanical or manual threshing of harvested crops."},
+  {sno:206,theme:"Domain III",group:"SHG Infrastructure",name:"Construction of SHG Building",cls:"New",content:"SHG Building constructs a dedicated meeting and office space with secure storage for Self-Help Groups' financial records and planning."},
+  {sno:207,theme:"Domain III",group:"SHG Infrastructure",name:"Repair & Maintenance SHG Building",cls:"Repair",content:"Repair of SHG Building to maintain organizational space for women's collectives."},
+  {sno:208,theme:"Domain III",group:"SHG Infrastructure",name:"Construction of Federation Building",cls:"New",content:"Federation Building constructs a large structure with multiple halls and office cabins as headquarters for a cluster of Self-Help Groups."},
+  {sno:209,theme:"Domain III",group:"SHG Infrastructure",name:"Repair & Maintenance Federation Building",cls:"Repair",content:"Repair of Federation Building to maintain collective governance and administration."},
+  {sno:210,theme:"Domain III",group:"Circular Economy",name:"Construction of Bio-fertilizer and Organic Manure Units",cls:"New",content:"Bio-fertilizer Unit constructs brick-lined pits and processing area for natural decomposition of agricultural and animal waste into manure."},
+  {sno:211,theme:"Domain III",group:"Circular Economy",name:"Construction of Vertical Greywater Treatment Unit",cls:"New",content:"Vertical Greywater Treatment Unit constructs filter towers of gravel, sand, and charcoal to naturally purify household wastewater."},
+  {sno:212,theme:"Domain III",group:"Circular Economy",name:"Construction of Horizontal Greywater Treatment Unit",cls:"New",content:"Horizontal Greywater Treatment Unit constructs shallow interconnected chambers with graded stone aggregates to filter domestic wastewater."},
+  {sno:213,theme:"Domain III",group:"Circular Economy",name:"Construction of Mini Flour Mill Processing Unit",cls:"New",content:"Mini Flour Mill Processing Unit constructs a building to house high-speed mechanical grinding machinery for convenient local milling."},
+  {sno:214,theme:"Domain III",group:"Circular Economy",name:"Construction of Cashew Processing Unit",cls:"New",content:"Cashew Processing Unit constructs dedicated sections for steaming, deshelling, and drying raw cashew nuts for value addition."},
+  {sno:215,theme:"Domain III",group:"Circular Economy",name:"Construction of Oil Seed Processing Unit",cls:"New",content:"Oil Seed Processing Unit constructs a building to house mechanical oil expellers and filtration equipment for local oil production."},
+  {sno:216,theme:"Domain III",group:"Circular Economy",name:"Construction of Integrated Agro Processing Unit (Cleaning/Grading/Packaging)",cls:"New",content:"Integrated Agro Processing Unit constructs a large hall with mechanical cleaners, graders, and packing machines for value-added produce."},
+  {sno:217,theme:"Domain III",group:"Circular Economy",name:"Construction of Forest Produce Processing Unit",cls:"New",content:"Forest Produce Processing Unit constructs sections for cleaning, drying, and processing non-timber forest products like mahua and honey."},
+  {sno:218,theme:"Domain III",group:"Circular Economy",name:"Construction of Handloom Processing Unit",cls:"New",content:"Handloom Processing Unit constructs a well-lit hall with handlooms, dyeing, and drying spaces for traditional weaving."},
+  {sno:219,theme:"Domain III",group:"Circular Economy",name:"Construction of Hot Press Biodegradable Processing Unit (Plates/Bowls)",cls:"New",content:"Hot Press Biodegradable Unit constructs a heat-resistant floor with hot-press machines to make eco-friendly plates and bowls from leaves."},
+  {sno:220,theme:"Domain III",group:"Circular Economy",name:"Construction of Bamboo Craft Processing Unit",cls:"New",content:"Bamboo Craft Unit constructs a hall with specialized tools for cutting, splitting, and weaving bamboo into high-quality handicrafts."},
+  {sno:221,theme:"Domain III",group:"Circular Economy",name:"Construction of Other Processing Unit",cls:"New",content:"Other Processing Unit constructs a versatile building with open-plan halls and high-capacity electrical points for rural industries."},
+  {sno:222,theme:"Domain III",group:"Circular Economy",name:"Construction of Recycling Plant",cls:"New",content:"Recycling Plant constructs a heavy-duty floor building to house machinery for sorting, shredding, and processing village waste."},
+  {sno:223,theme:"Domain III",group:"Organic Inputs",name:"Construction of Berkeley Compost Pit",cls:"New",content:"Berkeley Compost Pit constructs three interconnected aerated pits to facilitate a high-speed 18-day aerobic composting process."},
+  {sno:224,theme:"Domain III",group:"Organic Inputs",name:"Construction of Compost Pit",cls:"New",content:"Compost Pit constructs a brick-lined pit with drainage for natural decomposition of organic waste into high-quality manure."},
+  {sno:225,theme:"Domain III",group:"Organic Inputs",name:"Construction of NADEP Compost Pit",cls:"New",content:"NADEP Compost Pit constructs a rectangular masonry tank with honeycomb brickwork for maximum aeration and bulk compost production."},
+  {sno:226,theme:"Domain III",group:"Organic Inputs",name:"Construction of Vermi Compost Structure",cls:"New",content:"Vermi Compost Structure constructs shallow shaded beds to provide a controlled environment for earthworms to produce premium manure."},
+  {sno:227,theme:"Domain III",group:"Livestock Assets",name:"Construction of Cattle Shelter",cls:"New",content:"Cattle Shelter constructs anti-skid floor structure with mangers and drainage to provide safe housing for livestock."},
+  {sno:228,theme:"Domain III",group:"Livestock Assets",name:"Construction of Cattle/Animal Trough",cls:"New",content:"Animal Trough constructs a smooth concrete water tank at accessible height to provide a clean constant drinking source for livestock."},
+  {sno:229,theme:"Domain III",group:"Livestock Assets",name:"Raising of Fodder Cultivation",cls:"New",content:"Fodder Cultivation prepares a dedicated irrigated plot to grow high-protein green fodder for village livestock year-round."},
+  {sno:230,theme:"Domain III",group:"Livestock Assets",name:"Construction of Goat Shelter",cls:"New",content:"Goat Shelter constructs a raised slatted floor structure with ventilation, feeding mangers, and secure fencing to house goats."},
+  {sno:231,theme:"Domain III",group:"Livestock Assets",name:"Construction of Milk Production Centre",cls:"New",content:"Milk Production Centre constructs a hygienic building with stainless steel cooling tanks and testing counters for dairy farmers."},
+  {sno:232,theme:"Domain III",group:"Livestock Assets",name:"Repair & Maintenance of Milk Production Centre",cls:"Repair",content:"Repair of Milk Production Centre to maintain dairy collection and storage infrastructure."},
+  {sno:233,theme:"Domain III",group:"Livestock Assets",name:"Construction of Piggery Shed",cls:"New",content:"Piggery Shed constructs a sloped concrete floor, ventilated, high-clearance structure with farrowing pens for hygienic pig housing."},
+  {sno:234,theme:"Domain III",group:"Livestock Assets",name:"Construction of Poultry Shelter",cls:"New",content:"Poultry Shelter constructs a ventilated structure with wire-mesh perimeter, elevated nesting boxes, and feeding stations for chickens."},
+  {sno:235,theme:"Domain III",group:"Fisheries Assets",name:"Construction of Aquaculture Structure for Shrimp Farming",cls:"New",content:"Shrimp Aquaculture Structure excavates specialized ponds with plastic lining and aeration systems for high-value shrimp cultivation."},
+  {sno:236,theme:"Domain III",group:"Fisheries Assets",name:"Construction of Aquaculture Structure for Fish Farming",cls:"New",content:"Fish Aquaculture Structure excavates deep ponds with reinforced earthen bunds and inlet-outlet channels for breeding and growing fish."},
+  {sno:237,theme:"Domain III",group:"Fisheries Assets",name:"Construction of Aquaculture Structure for Crab Farming",cls:"New",content:"Crab Aquaculture Structure excavates specialized mud-bottom ponds with escape-proof fencing and PVC pipe shelters for crab farming."},
+  {sno:238,theme:"Domain III",group:"Fisheries Assets",name:"Construction of Fish Drying Yard",cls:"New",content:"Fish Drying Yard constructs a large elevated concrete platform with drying racks to prevent fish spoilage and increase market value."},
+  {sno:239,theme:"Domain III",group:"Fisheries Assets",name:"Construction of Fishery Pond",cls:"New",content:"Fishery Pond excavates a large pond with reinforced earthen bunds, inlet-outlet channels, and protective fencing for fish breeding."},
+  {sno:240,theme:"Domain III",group:"Fisheries Assets",name:"Repair & Maintenance of Fishery Pond",cls:"Repair",content:"Repair of Fishery Pond to restore fish breeding and community food security."},
+  {sno:241,theme:"Domain III",group:"Production Units",name:"Production of Building Material",cls:"New",content:"Building Material Production sets up a local unit for manufacturing fly-ash bricks, interlocking blocks, and concrete rings."},
+  {sno:242,theme:"Domain III",group:"Production Units",name:"Raising of Nursery",cls:"New",content:"Nursery Raising prepares a dedicated shaded plot with raised beds to grow healthy saplings of fruit, timber, and medicinal plants."},
+  {sno:243,theme:"Domain IV",group:"Disaster Shelters",name:"Construction of Cyclone Shelter",cls:"New",content:"Cyclone Shelter constructs a high-strength reinforced concrete building on raised stilts with wind-resistant roof for storm refuge."},
+  {sno:244,theme:"Domain IV",group:"Disaster Shelters",name:"Repair & Maintenance of Cyclone Shelters",cls:"Repair",content:"Repair of Cyclone Shelter to maintain life-saving refuge capacity during extreme weather events."},
+  {sno:245,theme:"Domain IV",group:"Disaster Shelters",name:"Construction of Flood Retention Shelter",cls:"New",content:"Flood Retention Shelter constructs a reinforced concrete building on elevated stilts with wide ramps as safe refuge during floods."},
+  {sno:246,theme:"Domain IV",group:"Disaster Shelters",name:"Repair & Maintenance of Flood Retention Shelters",cls:"Repair",content:"Repair of Flood Retention Shelter to maintain safe refuge capacity during monsoon floods."},
+  {sno:247,theme:"Domain IV",group:"Protective Works",name:"Construction of Embankment",cls:"New",content:"Embankment construction compacts soil into high earthen walls along riverbanks to prevent floodwaters from entering fields and homes."},
+  {sno:248,theme:"Domain IV",group:"Protective Works",name:"Strengthening of Embankment",cls:"New",content:"Embankment Strengthening reinforces existing earthen walls with stone pitching and turfing to withstand heavy monsoon flows."},
+  {sno:249,theme:"Domain IV",group:"Protective Works",name:"Construction of Earthen Spur",cls:"New",content:"Earthen Spur constructs a heavy earthen and stone structure extending from the riverbank to deflect river current and prevent erosion."},
+  {sno:250,theme:"Domain IV",group:"Protective Works",name:"Construction of Gabion Spur",cls:"New",content:"Gabion Spur uses stones packed in wire mesh cages to create a permeable structure deflecting river currents and preventing soil erosion."},
+  {sno:251,theme:"Domain IV",group:"Protective Works",name:"Construction of Stone Spur",cls:"New",content:"Stone Spur constructs a wedge-shaped boulder structure jutting into the river to divert forceful flow and prevent bank erosion."},
+  {sno:252,theme:"Domain IV",group:"Protective Works",name:"Repair & Maintenance of Spur",cls:"Repair",content:"Repair of Spur to maintain river deflection and soil erosion prevention function."},
+  {sno:253,theme:"Domain IV",group:"Protective Works",name:"Construction of Storm Water Drain",cls:"New",content:"Storm Water Drain excavates and lines channels to safely carry away excess rainwater from village streets and prevent waterlogging."},
+  {sno:254,theme:"Domain IV",group:"Protective Works",name:"Repair & Maintenance of Storm Water Drain",cls:"Repair",content:"Repair of Storm Water Drain to maintain village sanitation and drainage during heavy rains."},
+  {sno:255,theme:"Domain IV",group:"Protective Works",name:"Construction of Flood Diversion Channel",cls:"New",content:"Flood Diversion Channel excavates a wide sloped canal to redirect excess floodwater away from residential areas and farmland."},
+  {sno:256,theme:"Domain IV",group:"Protective Works",name:"Repair & Maintenance of Flood Diversion Channel",cls:"Repair",content:"Repair of Flood Diversion Channel to maintain flood protection for village communities."},
+  {sno:257,theme:"Domain IV",group:"Protective Works",name:"Construction of Flood Protection Wall",cls:"New",content:"Flood Protection Wall builds a strong reinforced masonry wall along riverbanks to block rising floodwaters from entering the village."},
+  {sno:258,theme:"Domain IV",group:"Protective Works",name:"Repair & Maintenance of Flood Protection Wall",cls:"Repair",content:"Repair of Flood Protection Wall to maintain flood blocking effectiveness."},
+  {sno:259,theme:"Domain IV",group:"Protective Works",name:"Construction of Masonry Bund",cls:"New",content:"Masonry Bund builds a solid low-height wall using stones and cement across a sloped field to stop soil erosion and store rainwater."},
+  {sno:260,theme:"Domain IV",group:"Protective Works",name:"Construction of Earthen Retaining Wall",cls:"New",content:"Earthen Retaining Wall builds a thick stepped wall using compacted soil and stone to support steep slopes and prevent landslides."},
+  {sno:261,theme:"Domain IV",group:"Protective Works",name:"Repair & Maintenance of Earthen Retaining Wall",cls:"Repair",content:"Repair of Earthen Retaining Wall to maintain slope stability and prevent landslides."},
+  {sno:262,theme:"Domain IV",group:"Protective Works",name:"Construction of Stone/Gabion Retaining Wall",cls:"New",content:"Stone/Gabion Retaining Wall stacks stones in wire mesh cages to create a strong breathable wall supporting steep slopes."},
+  {sno:263,theme:"Domain IV",group:"Protective Works",name:"Repair & Maintenance of Stone/Gabion Retaining Wall",cls:"Repair",content:"Repair of Stone/Gabion Retaining Wall to maintain protection against landslides."},
+  {sno:264,theme:"Domain IV",group:"Protective Works",name:"Construction of Masonry Retaining Wall",cls:"New",content:"Masonry Retaining Wall uses stones or bricks and cement mortar with drainage holes to support steep soil slopes from collapse."},
+  {sno:265,theme:"Domain IV",group:"Protective Works",name:"Repair & Maintenance of Masonry Retaining Wall",cls:"Repair",content:"Repair of Masonry Retaining Wall to maintain slope stability in hilly terrain."},
+  {sno:266,theme:"Domain IV",group:"Protective Works",name:"Construction of RCC Retaining Wall",cls:"New",content:"RCC Retaining Wall uses reinforced cement concrete and steel bars to hold back large earth volumes on steep slopes."},
+  {sno:267,theme:"Domain IV",group:"Protective Works",name:"Repair & Maintenance of RCC Retaining Wall",cls:"Repair",content:"Repair of RCC Retaining Wall to maintain structural protection in hilly areas."},
+  {sno:268,theme:"Domain IV",group:"Flood Control",name:"Construction of 3/5 Pond for Grey Water Management",cls:"New",content:"3/5 Pond Grey Water System digs interconnected pits with plants and charcoal to naturally filter and treat household wastewater."},
+  {sno:269,theme:"Domain IV",group:"Flood Control",name:"Construction of Masonry Greywater Drain",cls:"New",content:"Masonry Greywater Drain builds a permanent sloped stone and cement channel to carry household water away from homes to a soak pit."},
+  {sno:270,theme:"Domain IV",group:"Flood Control",name:"Construction of Stabilisation Pond",cls:"New",content:"Stabilisation Pond digs a large shallow basin to treat village sewage and wastewater naturally using sunlight and bacteria."},
+  {sno:271,theme:"Domain IV",group:"Asset Restoration",name:"Post-Disaster Restoration of Rural Roads",cls:"New",content:"Post-Disaster Rural Road Restoration fills potholes, restores drainage slopes, and compacts surfaces to reconnect villages after disasters."},
+  {sno:272,theme:"Domain IV",group:"Asset Restoration",name:"Post-Disaster Restoration of Other Community Assets",cls:"New",content:"Post-Disaster Community Asset Restoration repairs shared structures like community halls and grain storage sheds after natural disasters."},
+  {sno:273,theme:"Domain IV",group:"Asset Restoration",name:"Post-Disaster Restoration of Community Building Assets",cls:"New",content:"Post-Disaster Building Restoration repairs school rooms, health centers, and community halls to make them safe and usable again."},
+  {sno:274,theme:"Domain IV",group:"Protective Plantations",name:"Raising of Shelterbelt Plantation",cls:"New",content:"Shelterbelt Plantation plants multiple rows of tall trees along field edges as a natural wall against strong winds reducing soil erosion."},
+  {sno:275,theme:"Domain IV",group:"Fire Management",name:"Construction of Animal Protection Trenches",cls:"New",content:"Animal Protection Trenches dig deep V-shaped ditches along forest boundaries to prevent wild animals and cattle from damaging crops."},
+  {sno:276,theme:"Domain IV",group:"Fire Management",name:"Raising of Fire Break Hedges",cls:"New",content:"Fire Break Hedges clear wide strips and plant fire-resistant trees to act as natural barriers against spreading forest and field fires."},
+  {sno:277,theme:"Domain IV",group:"Fire Management",name:"Construction of Forest Fire Line",cls:"New",content:"Forest Fire Line clears a wide continuous strip of dry grass and bushes within the forest to stop the spread of ground fires."},
+  {sno:278,theme:"Domain IV",group:"Fire Management",name:"Raising of Fuel Buffer Zone",cls:"New",content:"Fuel Buffer Zone plants fast-growing trees on village outskirts to provide firewood and reduce pressure on natural forests."}
+];
+
+// ================================================================
+// DOMAIN HELPERS
+// ================================================================
+function domainKey(theme){
+  if(theme==="Domain I") return "water";
+  if(theme==="Domain II") return "rural";
+  if(theme==="Domain III") return "livelihood";
+  if(theme==="Domain IV") return "climate";
+  return "water";
+}
+function domainLabel(k){return{water:"Water Security",rural:"Rural Infrastructure",livelihood:"Livelihood Assets",climate:"Climate Resilience"}[k]||k;}
+function domainBadge(k){return{water:"domain-water",rural:"domain-rural",livelihood:"domain-livelihood",climate:"domain-climate"}[k]||"domain-water";}
+function domainFullName(k){return{water:"Domain I: Water Security (Water Harvesting)",rural:"Domain II: Core Rural Infrastructure (Rural Amenities)",livelihood:"Domain III: Livelihood Infrastructure (Livelihood Assets)",climate:"Domain IV: Climate Resilience (Climate Resilience)"}[k]||k;}
+
+// ================================================================
+// STATE
+// ================================================================
+var stackRows=[], activeFilter=null, viewedUUID=null;
+var radioState={workType:null, beneType:null};
+
+// ================================================================
+// UUID
+// ================================================================
+function genUUID(){return 'xxxxxxxx'.replace(/x/g,()=>Math.floor(Math.random()*16).toString(16).toUpperCase());}
+
+// ================================================================
+// RADIO
+// ================================================================
+function selectRadio(group, value, elId, groupId){
+  radioState[group]=value;
+  var els=['rNew','rRepair','rInd','rComm'];
+  if(group==='workType'){['rNew','rRepair'].forEach(function(id){document.getElementById(id).classList.remove('selected');});}
+  else{['rInd','rComm'].forEach(function(id){document.getElementById(id).classList.remove('selected');});}
+  document.getElementById(elId).classList.add('selected');
+}
+
+// ================================================================
+// DROPDOWNS
+// ================================================================
+function initDropdowns(){
+  var themeMap={'Domain I':'Domain I: Water Security','Domain II':'Domain II: Rural Infrastructure','Domain III':'Domain III: Livelihood Assets','Domain IV':'Domain IV: Climate Resilience'};
+  var themes=[...new Set(WD.map(function(w){return w.theme;}))];
+  var sel=document.getElementById('selTheme');
+  themes.forEach(function(t){var o=document.createElement('option');o.value=t;o.textContent=themeMap[t]||t;sel.appendChild(o);});
+}
+
+function onThemeChange(){
+  var theme=document.getElementById('selTheme').value;
+  var sg=document.getElementById('selGroup'),sw=document.getElementById('selWork');
+  sg.innerHTML='<option value="">— Select Group —</option>';
+  sw.innerHTML='<option value="">— Select Work —</option>';
+  sg.disabled=!theme; sw.disabled=true;
+  if(!theme)return;
+  var groups=[...new Set(WD.filter(function(w){return w.theme===theme;}).map(function(w){return w.group;}))];
+  groups.forEach(function(g){var o=document.createElement('option');o.value=g;o.textContent=g;sg.appendChild(o);});
+}
+
+function onGroupChange(){
+  var theme=document.getElementById('selTheme').value;
+  var group=document.getElementById('selGroup').value;
+  var sw=document.getElementById('selWork');
+  sw.innerHTML='<option value="">— Select Work —</option>';
+  sw.disabled=!group;
+  if(!group)return;
+  WD.filter(function(w){return w.theme===theme&&w.group===group;}).forEach(function(w){var o=document.createElement('option');o.value=w.sno;o.textContent=w.name;sw.appendChild(o);});
+}
+
+// ================================================================
+// ADD WORK
+// ================================================================
+function addWork(){
+  var sno=parseInt(document.getElementById('selWork').value);
+  if(!sno)return showStatus('Please select a work.','error');
+  if(!radioState.workType)return showStatus('Please select Work Type.','error');
+  if(!radioState.beneType)return showStatus('Please select Beneficiary Type.','error');
+  var w=WD.find(function(x){return x.sno===sno;});
+  if(!w)return showStatus('Work not found.','error');
+  stackRows.push({uuid:genUUID(),sno:w.sno,workName:w.name,theme:w.theme,dk:domainKey(w.theme),group:w.group,type:radioState.workType,bene:radioState.beneType,content:w.content});
+  renderTable(); updateCounters();
+  showStatus('✓ Added: '+(w.name.length>45?w.name.substring(0,45)+'…':w.name),'success');
+}
+
+// ================================================================
+// GENERATE 100 RANDOM WORKS
+// ================================================================
+function generateRandom(){
+  var ww=WD.filter(function(w){return w.theme==='Domain I';}),
+      rw=WD.filter(function(w){return w.theme==='Domain II';}),
+      lw=WD.filter(function(w){return w.theme==='Domain III';}),
+      cw=WD.filter(function(w){return w.theme==='Domain IV';});
+  if(!ww.length||!rw.length||!lw.length||!cw.length){
+    showStatus('Dataset error — cannot generate works.','error'); return;
+  }
+  document.getElementById('loadingOverlay').classList.add('active');
+  setTimeout(function(){
+    var bene=['Individual','Community'];
+    function rnd(arr){return arr[Math.floor(Math.random()*arr.length)];}
+    function mkRow(w){return{uuid:genUUID(),sno:w.sno,workName:w.name,theme:w.theme,dk:domainKey(w.theme),group:w.group,type:w.cls,bene:rnd(bene),content:w.content};}
+    var rows=[];
+    for(var i=0;i<45;i++) rows.push(mkRow(rnd(ww)));
+    for(var i=0;i<23;i++) rows.push(mkRow(rnd(rw)));
+    for(var i=0;i<18;i++) rows.push(mkRow(rnd(lw)));
+    for(var i=0;i<14;i++) rows.push(mkRow(rnd(cw)));
+    // Fisher-Yates shuffle
+    for(var i=rows.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=rows[i];rows[i]=rows[j];rows[j]=t;}
+    stackRows=rows; activeFilter=null; viewedUUID=null;
+    document.querySelectorAll('.domain-btn').forEach(function(b){b.classList.remove('active');});
+    document.getElementById('filterBadge').classList.remove('visible');
+    document.getElementById('detailCard').classList.remove('visible');
+    document.getElementById('detailEmpty').style.display='';
+    renderTable(); updateCounters();
+    document.getElementById('loadingOverlay').classList.remove('active');
+    showStatus('✓ 100 random works generated successfully!','success');
+  },700);
+}
+
+// ================================================================
+// CLEAR ALL
+// ================================================================
+function clearAll(){
+  if(!stackRows.length)return showStatus('Stack is already empty.','info');
+  if(!confirm('Clear all '+stackRows.length+' works?'))return;
+  stackRows=[]; activeFilter=null; viewedUUID=null;
+  document.querySelectorAll('.domain-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('filterBadge').classList.remove('visible');
+  document.getElementById('detailCard').classList.remove('visible');
+  document.getElementById('detailEmpty').style.display='';
+  renderTable(); updateCounters(); showStatus('Stack cleared.','info');
+}
+
+// ================================================================
+// DELETE ROW
+// ================================================================
+function deleteRow(uuid){
+  var idx=stackRows.findIndex(function(r){return r.uuid===uuid;});
+  if(idx===-1)return;
+  stackRows.splice(idx,1);
+  if(viewedUUID===uuid){viewedUUID=null;document.getElementById('detailCard').classList.remove('visible');document.getElementById('detailEmpty').style.display='';}
+  renderTable(); updateCounters(); showStatus('Work removed.','info');
+}
+
+// ================================================================
+// VIEW ROW
+// ================================================================
+function viewRow(uuid){
+  var row=stackRows.find(function(r){return r.uuid===uuid;});
+  if(!row)return;
+  viewedUUID=uuid;
+  document.getElementById('detailName').textContent=row.workName;
+  document.getElementById('detailContent').textContent=row.content;
+  document.getElementById('detailUuid').textContent='UUID: '+row.uuid;
+  document.getElementById('detailMeta').innerHTML=
+    '<span class="domain-badge '+domainBadge(row.dk)+'">'+domainLabel(row.dk)+'</span>'+
+    '<span class="type-badge '+(row.type==='New'?'type-new':'type-repair')+'">'+row.type+'</span>'+
+    '<span class="bene-badge '+(row.bene==='Individual'?'bene-individual':'bene-community')+'">'+row.bene+'</span>';
+  document.getElementById('detailCard').classList.add('visible');
+  document.getElementById('detailEmpty').style.display='none';
+  document.querySelectorAll('#tableBody tr').forEach(function(tr){tr.classList.remove('highlighted');});
+  var mr=document.querySelector('tr[data-uuid="'+uuid+'"]');
+  if(mr){mr.classList.add('highlighted');mr.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+
+// ================================================================
+// FILTER
+// ================================================================
+function toggleFilter(k){
+  var cap=k.charAt(0).toUpperCase()+k.slice(1);
+  if(activeFilter===k){activeFilter=null;document.getElementById('btn'+cap).classList.remove('active');document.getElementById('filterBadge').classList.remove('visible');}
+  else{
+    if(activeFilter){var prev=activeFilter.charAt(0).toUpperCase()+activeFilter.slice(1);document.getElementById('btn'+prev).classList.remove('active');}
+    activeFilter=k;document.getElementById('btn'+cap).classList.add('active');document.getElementById('filterBadge').classList.add('visible');
+  }
+  renderTable();
+}
+
+// ================================================================
+// RENDER TABLE
+// ================================================================
+function renderTable(){
+  var tbody=document.getElementById('tableBody'),
+      empty=document.getElementById('emptyState'),
+      table=document.getElementById('worksTable'),
+      rcEl=document.getElementById('rowCount');
+  var rows=activeFilter?stackRows.filter(function(r){return r.dk===activeFilter;}):stackRows;
+  if(!stackRows.length){empty.style.display='';table.style.display='none';rcEl.textContent='0 Works';return;}
+  empty.style.display='none';table.style.display='';
+  rcEl.textContent=activeFilter?(rows.length+' filtered / '+stackRows.length+' total'):(stackRows.length+' Works');
+  tbody.innerHTML='';
+  rows.forEach(function(row,idx){
+    var tr=document.createElement('tr');
+    tr.setAttribute('data-uuid',row.uuid);
+    if(row.uuid===viewedUUID)tr.classList.add('highlighted');
+    tr.innerHTML='<td style="color:var(--text-muted);font-weight:600;">'+(idx+1)+'</td>'+
+      '<td class="uuid-cell">'+row.uuid+'</td>'+
+      '<td class="work-name-cell">'+row.workName+'</td>'+
+      '<td><span style="color:var(--text-muted);font-size:11px;">'+domainLabel(row.dk)+'</span></td>'+
+      '<td style="color:var(--text-muted);font-size:11px;">'+row.group+'</td>'+
+      '<td><span style="color:var(--text-muted);font-size:11px;">'+row.type+'</span></td>'+
+      '<td><span style="color:var(--text-muted);font-size:11px;">'+row.bene+'</span></td>'+
+      '<td><div class="action-btns">'+
+        '<button onclick="viewRow(\''+row.uuid+'\')" title="View Details"><span class="icon-eye" style="width:14px;height:14px;"></span></button>'+
+        '<button onclick="deleteRow(\''+row.uuid+'\')" title="Remove"><span class="icon-delete" style="width:14px;height:14px;"></span></button>'+
+      '</div></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+// ================================================================
+// COUNTERS
+// ================================================================
+function updateCounters(){
+  var c={water:0,rural:0,livelihood:0,climate:0},nw=0;
+  stackRows.forEach(function(r){c[r.dk]++;if(r.type==='New')nw++;});
+  pulse('cntWater',c.water);pulse('cntRural',c.rural);pulse('cntLivelihood',c.livelihood);pulse('cntClimate',c.climate);
+  pulse('totalWorks',stackRows.length);pulse('totalNew',nw);
+}
+function pulse(id,val){
+  var el=document.getElementById(id);if(!el)return;
+  var prev=parseInt(el.textContent)||0;
+  if(prev!==val){el.textContent=val;el.classList.remove('count-pulse');void el.offsetWidth;el.classList.add('count-pulse');}
+}
+
+// ================================================================
+// STATUS
+// ================================================================
+function showStatus(msg,type){
+  var el=document.getElementById('statusMsg');
+  el.className='status-msg '+type; el.textContent=msg;
+  clearTimeout(el._t);
+  el._t=setTimeout(function(){el.className='status-msg empty';el.textContent='';},3500);
+}
+
+// ================================================================
+// INIT
+// ================================================================
+initDropdowns(); renderTable(); updateCounters();
+</script>
+</body>
+</html>
