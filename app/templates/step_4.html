@@ -93,53 +93,65 @@
     let searchTerm = '';
     let currentState = 'INDIA'; // 'INDIA' or 'HARYANA'
 
+    const DOMAINS = ["water", "rural", "livelihood", "climate"];
+    const OVERLAY_BUCKETS = ["pm_gati_shakti", "yuktdhara", "india_wris"];
+    const FILTER_BUCKETS = [...DOMAINS, ...OVERLAY_BUCKETS];
+    const OVERLAY_CONFIG = {
+        pm_gati_shakti: { name: "PM Gati Shakti", total: 2, overlap: 1, thematicDomain: "PM Gati Shakti", groupName: "National Tracked Infrastructure" },
+        yuktdhara: { name: "Yuktdhara", total: 3, overlap: 2, thematicDomain: "Yuktdhara", groupName: "Spatial Planning Layer" },
+        india_wris: { name: "India WRIS", total: 1, overlap: 1, thematicDomain: "India WRIS", groupName: "Water Resource Intelligence" }
+    };
     const DOMAIN_COLORS = {
-        'Domain I': { name: 'Water Harvesting', c: '#0ea5e9', bg: '#e0f2fe', bd: '#bae6fd' },     // Blue
-        'Domain II': { name: 'Rural Amenities', c: '#10b981', bg: '#d1fae5', bd: '#a7f3d0' },    // Green
-        'Domain III': { name: 'Livelihood Assets', c: '#f59e0b', bg: '#fef3c7', bd: '#fde68a' }, // Orange/Yellow
-        'Domain IV': { name: 'Climate Resilience', c: '#8b5cf6', bg: '#ede9fe', bd: '#ddd6fe' }, // Purple
-        'PM Gati Shakti API': { name: 'PM Gati Shakti API', c: '#ef4444', bg: '#fee2e2', bd: '#fecaca' }  // Danger Red
+        water: { name: 'Water', c: '#0ea5e9', bg: '#e0f2fe', bd: '#bae6fd' },
+        rural: { name: 'Rural', c: '#10b981', bg: '#d1fae5', bd: '#a7f3d0' },
+        livelihood: { name: 'Livelihood', c: '#f59e0b', bg: '#fef3c7', bd: '#fde68a' },
+        climate: { name: 'Climate', c: '#8b5cf6', bg: '#ede9fe', bd: '#ddd6fe' },
+        pm_gati_shakti: { name: 'PM Gati Shakti', c: '#ef4444', bg: '#fee2e2', bd: '#fecaca' },
+        yuktdhara: { name: 'Yuktdhara', c: '#0f766e', bg: '#ccfbf1', bd: '#99f6e4' },
+        india_wris: { name: 'India WRIS', c: '#7c3aed', bg: '#ede9fe', bd: '#ddd6fe' }
     };
 
     function getDomainBucket(domainText) {
-        if (!domainText) return 'Domain I';
-        if (domainText.includes("PM Gati Shakti API")) return "PM Gati Shakti API";
-        if (domainText.includes("Domain IV")) return "Domain IV";
-        if (domainText.includes("Domain III")) return "Domain III";
-        if (domainText.includes("Domain II")) return "Domain II";
-        return "Domain I";
+        const text = String(domainText || '').toLowerCase();
+        if (text.includes("pm gati shakti")) return "pm_gati_shakti";
+        if (text.includes("yuktdhara")) return "yuktdhara";
+        if (text.includes("india wris")) return "india_wris";
+        if (text.includes("climate")) return "climate";
+        if (text.includes("livelihood")) return "livelihood";
+        if (text.includes("rural")) return "rural";
+        if (text.includes("water")) return "water";
+        return "water";
     }
 
     function normalizeWorksJsonRows(jsonRows) {
         if (!Array.isArray(jsonRows)) return [];
         return jsonRows.map((row, idx) => ({
-            'S.No.': String(row['S.No.'] || idx + 1),
-            'Thematic Domain': row['Thematic Domain'] || '',
-            'Group Name': row['Group Name'] || row['Group Name (AI)'] || '',
-            'Work Name': row['Work Name'] || '',
-            'Classification': row['Classification'] || '',
+            'S.No.': String(row['S.No.'] || row.serial || idx + 1),
+            'Thematic Domain': row['Thematic Domain'] || row.theme || '',
+            'Group Name': row['Group Name'] || row['Group Name (AI)'] || row.group || '',
+            'Work Name': row['Work Name'] || row.name || '',
+            'Classification': row['Classification'] || row.type || '',
             'State': row['State'] || ''
         })).filter(r => r['Thematic Domain'] && r['Work Name']);
     }
 
     function allocateByRatio(domainRowsMap, targetCount) {
-        const domains = ['Domain I', 'Domain II', 'Domain III', 'Domain IV'];
         const baseCounts = {};
         let totalBase = 0;
-        domains.forEach(d => {
+        DOMAINS.forEach(d => {
             const count = (domainRowsMap[d] || []).length;
             baseCounts[d] = count;
             totalBase += count;
         });
         if (totalBase === 0 || targetCount <= 0) {
-            return { 'Domain I': 0, 'Domain II': 0, 'Domain III': 0, 'Domain IV': 0 };
+            return DOMAINS.reduce((acc, d) => { acc[d] = 0; return acc; }, {});
         }
 
         const exact = {};
         const floorAlloc = {};
         const remainders = [];
         let used = 0;
-        domains.forEach(d => {
+        DOMAINS.forEach(d => {
             exact[d] = (baseCounts[d] / totalBase) * targetCount;
             floorAlloc[d] = Math.floor(exact[d]);
             used += floorAlloc[d];
@@ -158,8 +170,7 @@
     }
 
     function sampleRowsByDomainRatio(rows, targetCount) {
-        const domains = ['Domain I', 'Domain II', 'Domain III', 'Domain IV'];
-        const byDomain = { 'Domain I': [], 'Domain II': [], 'Domain III': [], 'Domain IV': [] };
+        const byDomain = DOMAINS.reduce((acc, d) => { acc[d] = []; return acc; }, {});
         rows.forEach(r => {
             const bucket = getDomainBucket(r['Thematic Domain']);
             if (byDomain[bucket]) byDomain[bucket].push(r);
@@ -168,7 +179,7 @@
         const allocations = allocateByRatio(byDomain, targetCount);
         const sampled = [];
 
-        domains.forEach(domain => {
+        DOMAINS.forEach(domain => {
             const source = byDomain[domain];
             const need = allocations[domain] || 0;
             if (!source.length || need <= 0) return;
@@ -178,20 +189,45 @@
         });
 
         sampled.forEach((r, idx) => { r['S.No.'] = String(idx + 1); });
-
-        // Inject starting PM Gati Shakti API rows into the base dataset so they appear on initial map load
-        for (let i = 0; i < 5; i++) {
-            sampled.push({
-                'S.No.': String(sampled.length + 1),
-                'Thematic Domain': 'PM Gati Shakti API',
-                'Classification': 'New',
-                'Group Name': 'National Tracked Infrastructure',
-                'Work Name': `Starting PM Gati Shakti Benchmark Node ${i + 1}`,
-                'State': 'Haryana'
-            });
-        }
-
         return sampled;
+    }
+
+    function appendOverlayRows(targetRows, options = {}) {
+        const existingPts = options.existingPts || [];
+        const markAsDummy = Boolean(options.markAsDummy);
+        const stateName = options.stateName || '';
+
+        let overlapSourceIndex = 0;
+        OVERLAY_BUCKETS.forEach((bucket) => {
+            const cfg = OVERLAY_CONFIG[bucket];
+            for (let i = 0; i < cfg.total; i++) {
+                const shouldOverlap = i < cfg.overlap && existingPts.length > 0;
+                const row = {
+                    'S.No.': String(targetRows.length + 1),
+                    'Thematic Domain': cfg.thematicDomain,
+                    'Group Name': cfg.groupName,
+                    'Work Name': `${cfg.name} Layer ${i + 1}`,
+                    'Classification': 'New',
+                    '_overlay': true,
+                    '_overlayBucket': bucket,
+                    '_overlayOverlap': shouldOverlap,
+                    '_state': stateName || ''
+                };
+                if (markAsDummy) {
+                    row._is_dummy = true;
+                }
+                if (shouldOverlap) {
+                    const sourcePt = existingPts[overlapSourceIndex % existingPts.length];
+                    overlapSourceIndex += 1;
+                    row._pt = [sourcePt[0] + 0.00015, sourcePt[1] - 0.00015];
+                } else if (existingPts.length > 0) {
+                    const sourcePt = existingPts[overlapSourceIndex % existingPts.length];
+                    overlapSourceIndex += 1;
+                    row._pt = [sourcePt[0] + 0.0012, sourcePt[1] - 0.0012];
+                }
+                targetRows.push(row);
+            }
+        });
     }
 
     /* --- GEOMETRY HELPERS FOR RANDOM POINT GENERATION --- */
@@ -296,26 +332,19 @@
                 let pt = row['_pt'];
                 let foundFeatureName = row['_state'];
 
-                if (bucket === 'PM Gati Shakti API') {
-                    // Force exact overlap tracking from previously processed normal rows
-                    if (!pt) {
-                        let validOthers = allCsvRows.slice(0, i).filter(r => r['_pt'] && r['Thematic Domain'] !== 'PM Gati Shakti API');
+                if (!pt) {
+                    if (row._overlayOverlap) {
+                        const validOthers = allCsvRows
+                            .slice(0, i)
+                            .filter(r => r._pt && !r._overlay);
                         if (validOthers.length > 0) {
-                            let cloneTarget = validOthers[Math.floor(Math.random() * validOthers.length)];
-                            // Slight sub-pixel offset (~15 meters) to let the base color peek out
-                            pt = [cloneTarget['_pt'][0] + 0.00015, cloneTarget['_pt'][1] - 0.00015];
-                            foundFeatureName = cloneTarget['_state'];
-
+                            const base = validOthers[Math.floor(Math.random() * validOthers.length)];
+                            pt = [base._pt[0] + 0.00015, base._pt[1] - 0.00015];
                             row['_pt'] = pt;
-                            row['_state'] = foundFeatureName;
-                        } else {
-                            // Fallback if no others parsed yet (shouldn't happen since they append at end)
-                            pt = [bounds.getSouth() + Math.random() * (bounds.getNorth() - bounds.getSouth()), bounds.getWest() + Math.random() * (bounds.getEast() - bounds.getWest())];
-                            row['_pt'] = pt;
-                            row['_state'] = 'Offline Buffer';
+                            row['_state'] = base['_state'];
                         }
                     }
-                } else if (!pt) {
+
                     let attempts = 0;
                     let foundFeature = null;
 
@@ -356,7 +385,7 @@
                 if (pt) {
                     // Assign the state boundary name permanently to the memory model
                     const markerFlags = { icon: createMarkerIcon(bucket, false) };
-                    if (bucket === 'PM Gati Shakti API') markerFlags.zIndexOffset = 1000;
+                    if (row._overlay) markerFlags.zIndexOffset = 1000;
 
                     const marker = L.marker(pt, markerFlags);
                     const isNew = (row['Classification'] || '').toLowerCase() === 'new';
@@ -411,34 +440,19 @@
             // Clear any existing dummy rows entirely and gracefully reset the array map
             allCsvRows = allCsvRows.filter(r => !r._is_dummy);
 
-            // 1. Calculate ratio in full CSV excluding the static PM Shakti ones
-            const domainCounts = { 'Domain I': 0, 'Domain II': 0, 'Domain III': 0, 'Domain IV': 0 };
-            let totalBaseCount = 0;
+            // 1. Budget target count per requested domain ratio
+            const byDomain = DOMAINS.reduce((acc, d) => { acc[d] = []; return acc; }, {});
             allCsvRows.forEach(r => {
                 const b = getDomainBucket(r['Thematic Domain']);
-                if (domainCounts[b] !== undefined) {
-                    domainCounts[b]++;
-                    totalBaseCount++;
-                }
+                if (byDomain[b]) byDomain[b].push(r);
             });
+            const targets = allocateByRatio(byDomain, targetCount);
 
-            // 2. Budget target count per domain
-            const targets = {};
-            let allocated = 0;
-            ['Domain I', 'Domain II', 'Domain III', 'Domain IV'].forEach(d => {
-                let count = totalBaseCount > 0 ? Math.round((domainCounts[d] / totalBaseCount) * targetCount) : 0;
-                targets[d] = count;
-                allocated += count;
-            });
-
-            // 3. Fix rounding drifts
-            let diff = targetCount - allocated;
-            if (diff !== 0) targets['Domain I'] += diff;
-
-            // 4. Sample original rows
+            // 2. Sample original rows
             let sampledData = [];
-            ['Domain I', 'Domain II', 'Domain III', 'Domain IV'].forEach(d => {
+            DOMAINS.forEach(d => {
                 const rowsInDomain = allCsvRows.filter(r => getDomainBucket(r['Thematic Domain']) === d);
+                if (!rowsInDomain.length) return;
                 for (let i = 0; i < targets[d]; i++) {
                     sampledData.push({ ...rowsInDomain[i % rowsInDomain.length] }); // Push cloned real row
                 }
@@ -452,7 +466,6 @@
             // It's cleaner to just overwrite the dummy states.
 
             let generatedPoints = [];
-
             sampledData.forEach((row, i) => {
                 let pt = null;
                 let attempts = 0;
@@ -485,10 +498,7 @@
 
                     const bucket = getDomainBucket(row['Thematic Domain']);
 
-                    // Z-index bump isn't strictly needed here since these base markers don't overlap,
-                    // but it's good practice for consistency.
                     const markerFlags = { icon: createMarkerIcon(bucket, false) };
-                    if (bucket === 'PM Gati Shakti API') markerFlags.zIndexOffset = 1000;
 
                     const marker = L.marker(pt, markerFlags);
                     const isNew = (row['Classification'] || '').toLowerCase() === 'new';
@@ -518,59 +528,44 @@
                 }
             });
 
-            // Spawn up to 2 PM Gati Shakti API markers exactly overlapping random generated points from this batch
-            // Applies to both Village (targetCount 10) and State (targetCount 20) drilldowns.
-            if (generatedPoints.length > 0) {
-                let shaktiCount = Math.min(2, generatedPoints.length);
-                let shuffledPts = [...generatedPoints].sort(() => 0.5 - Math.random());
+            // Add requested overlay layers for drilldown as dummy rows with overlap quotas.
+            appendOverlayRows(allCsvRows, {
+                existingPts: generatedPoints,
+                markAsDummy: true,
+                stateName: filterStateName
+            });
 
-                for (let i = 0; i < shaktiCount; i++) {
-                    let basePt = shuffledPts[i];
-
-                    let newRow = {
-                        'Thematic Domain': 'PM Gati Shakti API',
-                        'Group Name': 'Infrastructure Overlap',
-                        'Work Name': 'PM Shakti Tracked Node',
-                        'Classification': 'New',
-                        '_state': filterStateName,
-                        '_is_dummy': true,
-                        '_is_synthetic_shakti': true
-                    };
-
-                    allCsvRows.push(newRow);
-
-                    // Offset latitude/longitude by 0.00015 degrees (~15m offset) to let base domain visually peek
-                    let overlapPt = [basePt[0] + 0.00015, basePt[1] - 0.00015];
-
-                    // zIndexOffset 1000 absolutely forces Leaflet to paint this on top of the one underneath
-                    const marker = L.marker(overlapPt, {
-                        icon: createMarkerIcon('PM Gati Shakti API', false),
-                        zIndexOffset: 1000
-                    });
-                    const clsBadge = `<span class="class-badge class-new">New</span>`;
-
-                    const popupHtml = `
-                    <div class="popup-header" style="background: ${DOMAIN_COLORS['PM Gati Shakti API'].bg}; border: 1px solid ${DOMAIN_COLORS['PM Gati Shakti API'].bd}; border-radius: 8px;">
+            // Plot any newly appended overlay dummy rows.
+            allCsvRows.forEach((row) => {
+                if (!row._is_dummy || !row._overlay) return;
+                if (rowMarkerMap.has(allCsvRows.indexOf(row))) return;
+                const pt = row._pt;
+                if (!pt) return;
+                const bucket = getDomainBucket(row['Thematic Domain']);
+                const marker = L.marker(pt, {
+                    icon: createMarkerIcon(bucket, false),
+                    zIndexOffset: 1000
+                });
+                const popupHtml = `
+                    <div class="popup-header" style="background: ${DOMAIN_COLORS[bucket].bg}; border: 1px solid ${DOMAIN_COLORS[bucket].bd}; border-radius: 8px;">
                         <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
-                        <h3 class="popup-title">${newRow['Work Name']}</h3>
-                        ${clsBadge}
+                        <h3 class="popup-title">${row['Work Name'] || 'Unnamed Work'}</h3>
+                        <span class="class-badge class-new">New</span>
                         </div>
                         <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-                            <p class="popup-subtitle" style="margin:0; font-weight:700;">${DOMAIN_COLORS['PM Gati Shakti API'].name}</p>
-                            <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${newRow['Group Name']}</p>
+                            <p class="popup-subtitle" style="margin:0; font-weight:700;">${DOMAIN_COLORS[bucket].name}</p>
+                            <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${row['Group Name'] || '—'}</p>
                         </div>
                     </div>
                 `;
-                    marker.bindPopup(popupHtml);
-                    marker.on('click', () => {
-                        const idx = allCsvRows.indexOf(newRow);
-                        if (idx !== -1) flyToRow(idx);
-                    });
-
-                    markerGroup.addLayer(marker);
-                    rowMarkerMap.set(allCsvRows.indexOf(newRow), marker);
-                }
-            }
+                marker.bindPopup(popupHtml);
+                marker.on('click', () => {
+                    const idx = allCsvRows.indexOf(row);
+                    if (idx !== -1) flyToRow(idx);
+                });
+                markerGroup.addLayer(marker);
+                rowMarkerMap.set(allCsvRows.indexOf(row), marker);
+            });
 
             document.getElementById('map-status').textContent = 'Map data updated.';
             renderTable(); // Completely reconstruct the Table DOM since we mutated allCsvRows items
@@ -759,7 +754,7 @@
     /* --- UI & INTERACTIVITY --- */
 
     function renderLegend() {
-        const legendCounts = { 'Domain I': 0, 'Domain II': 0, 'Domain III': 0, 'Domain IV': 0, 'PM Gati Shakti API': 0 };
+        const legendCounts = FILTER_BUCKETS.reduce((acc, d) => { acc[d] = 0; return acc; }, {});
         allCsvRows.forEach(r => {
             // Respect State filtering for legend counts
             if (!activeStateFilter || r['_state'] === activeStateFilter) {
@@ -771,7 +766,7 @@
         });
 
         const container = document.getElementById('domain-legend');
-        container.innerHTML = ['Domain I', 'Domain II', 'Domain III', 'Domain IV', 'PM Gati Shakti API'].map(bucket => {
+        container.innerHTML = FILTER_BUCKETS.map(bucket => {
             const cfg = DOMAIN_COLORS[bucket];
             const isActive = activeDomainFilter === bucket;
             const isDimmed = activeDomainFilter !== null && activeDomainFilter !== bucket;
@@ -917,6 +912,7 @@
             const json = await res.json();
             const normalizedRows = normalizeWorksJsonRows(json);
             allCsvRows = sampleRowsByDomainRatio(normalizedRows, IMPORT_ROW_COUNT);
+            appendOverlayRows(allCsvRows);
 
             document.getElementById('table-search').addEventListener('input', (e) => {
                 searchTerm = e.target.value;
