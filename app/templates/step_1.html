@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %} Gap Analysis {% endblock %}
+{% block title %} Step 1 {% endblock %}
 {% block content %}
 <main>
 <div class="phone">
@@ -91,10 +91,11 @@
 
     <!-- 2. Households Data -->
     <div class="card">
-      <div class="card-header" onclick="toggleCard('hh')">
+      <div class="card-header bg-auto" onclick="toggleCard('hh')">
         <div class="card-title">
           <!-- <div class="card-icon">🏠</div> -->
           <span class="card-title-text">1.2 Households</span>
+          <span class="card-subtitle-text">source: nregasoft</span>
         </div>
         <div class="card-chevron" id="chevron-hh">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -129,10 +130,11 @@
 
     <!-- 3. Employment Data -->
     <div class="card">
-      <div class="card-header" onclick="toggleCard('emp')">
+      <div class="card-header bg-auto" onclick="toggleCard('emp')">
         <div class="card-title">
           <!-- <div class="card-icon">💼</div> -->
           <span class="card-title-text">1.3 Job Card Holders</span>
+          <span class="card-subtitle-text">source: nregasoft</span>
         </div>
         <div class="card-chevron" id="chevron-emp">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -404,10 +406,11 @@
 
     <!-- 1. LULC Data -->
     <div class="card">
-      <div class="card-header" onclick="toggleCard('lulc')">
+      <div class="card-header bg-auto" onclick="toggleCard('lulc')">
         <div class="card-title">
           <!-- <div class="card-icon">👥</div> -->
           <span class="card-title-text">3.1 Land Use Land Cover</span>
+          <span class="card-subtitle-text">source: LULC census</span>
         </div>
         <div class="card-chevron" id="chevron-lulc">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -461,10 +464,11 @@
 
     <!-- 2. Water Resources -->
     <div class="card">
-      <div class="card-header" onclick="toggleCard('wr')">
+      <div class="card-header bg-auto" onclick="toggleCard('wr')">
         <div class="card-title">
           <!-- <div class="card-icon">🏠</div> -->
           <span class="card-title-text">3.2 Water Resources</span>
+          <span class="card-subtitle-text">source: waterbody census</span>
         </div>
         <div class="card-chevron" id="chevron-wr">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -575,10 +579,11 @@
 
     <!-- 4. JJM Data -->
     <div class="card">
-      <div class="card-header" onclick="toggleCard('dw')">
+      <div class="card-header bg-auto" onclick="toggleCard('dw')">
         <div class="card-title">
           <!-- <div class="card-icon">💼</div> -->
           <span class="card-title-text">3.3 Drinking Water</span>
+          <span class="card-subtitle-text">source: JJM Dashboard</span>
         </div>
         <div class="card-chevron" id="chevron-dw">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -600,10 +605,11 @@
 
     <!-- 5. Livestock Data -->
     <div class="card">
-      <div class="card-header" onclick="toggleCard('ls')">
+      <div class="card-header bg-auto" onclick="toggleCard('ls')">
         <div class="card-title">
           <!-- <div class="card-icon">💼</div> -->
           <span class="card-title-text">3.5 Livestock</span>
+          <span class="card-subtitle-text">source: Livestock census</span>
         </div>
         <div class="card-chevron" id="chevron-ls">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -660,10 +666,11 @@
 
     <!-- 1. Temperature Data -->
     <div class="card">
-      <div class="card-header" onclick="toggleCard('temp')">
+      <div class="card-header bg-auto" onclick="toggleCard('temp')">
         <div class="card-title">
           <!-- <div class="card-icon">👥</div> -->
           <span class="card-title-text">4.1 Temperature</span>
+          <span class="card-subtitle-text">source: IMD</span>
         </div>
         <div class="card-chevron" id="chevron-temp">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -733,10 +740,11 @@
 
     <!-- 2. Rainfall Data -->
     <div class="card">
-      <div class="card-header" onclick="toggleCard('rain')">
+      <div class="card-header bg-auto" onclick="toggleCard('rain')">
         <div class="card-title">
           <!-- <div class="card-icon">🏠</div> -->
           <span class="card-title-text">4.2 Rainfall</span>
+          <span class="card-subtitle-text">source: IMD </span>
         </div>
         <div class="card-chevron" id="chevron-rain">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
