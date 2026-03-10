@@ -226,13 +226,17 @@ function appendOverlayRows(targetRows, options = {}) {
                 row._is_dummy = true;
             }
             if (shouldOverlap) {
-                const sourcePt = existingPts[overlapSourceIndex % existingPts.length];
+                const source = existingPts[overlapSourceIndex % existingPts.length];
                 overlapSourceIndex += 1;
-                row._pt = [sourcePt[0] + 0.00015, sourcePt[1] - 0.00015];
+                const sourcePt = Array.isArray(source) ? source : source.pt;
+                const sourceRow = source && !Array.isArray(source) ? source.row : null;
+                if (sourceRow) sourceRow._pop = true;
+                if (sourcePt) row._pt = [sourcePt[0] + 0.00015, sourcePt[1] - 0.00015];
             } else if (existingPts.length > 0) {
-                const sourcePt = existingPts[overlapSourceIndex % existingPts.length];
+                const source = existingPts[overlapSourceIndex % existingPts.length];
                 overlapSourceIndex += 1;
-                row._pt = [sourcePt[0] + 0.0012, sourcePt[1] - 0.0012];
+                const sourcePt = Array.isArray(source) ? source : source.pt;
+                if (sourcePt) row._pt = [sourcePt[0] + 0.0012, sourcePt[1] - 0.0012];
             }
             targetRows.push(row);
         }
@@ -326,12 +330,13 @@ function pointInRing(pt, ring) {
     return isInside;
 }
 
-function createMarkerIcon(bucket, focused) {
+function createMarkerIcon(bucket, focused, shouldPop) {
     const color = DOMAIN_COLORS[bucket].c;
     const size = focused ? 36 : 24;
     const shadow = focused ? '0 4px 12px rgba(0,0,0,0.5)' : '0 2px 6px rgba(0,0,0,0.3)';
+    const popClass = shouldPop ? ' pop-pin' : '';
     return L.divIcon({
-        html: `<i class="fa-solid fa-location-pin" style="color: ${color}; font-size: ${size}px; text-shadow: ${shadow}; transition: all 0.2s; display: block; transform: translateY(-${size / 2}px)"></i>`,
+        html: `<i class="fa-solid fa-location-pin${popClass}" style="color: ${color}; font-size: ${size}px; text-shadow: ${shadow}; transition: all 0.2s; display: block; --pin-translate: -${size / 2}px; transform: translateY(var(--pin-translate));"></i>`,
         className: 'custom-pin',
         iconSize: [size, size],
         iconAnchor: [size / 2, size],
@@ -365,7 +370,7 @@ window.flyToRow = function (idx) {
     if (focusedIdx !== null && rowMarkerMap.has(focusedIdx)) {
         const m = rowMarkerMap.get(focusedIdx);
         const d = allCsvRows[focusedIdx];
-        m.setIcon(createMarkerIcon(getDomainBucket(d['theme']), false));
+        m.setIcon(createMarkerIcon(getDomainBucket(d['theme']), false, Boolean(d._pop)));
         m.setZIndexOffset(0);
     }
 
@@ -373,7 +378,7 @@ window.flyToRow = function (idx) {
     const marker = rowMarkerMap.get(idx);
     if (marker) {
         const d = allCsvRows[idx];
-        marker.setIcon(createMarkerIcon(getDomainBucket(d['theme']), true));
+        marker.setIcon(createMarkerIcon(getDomainBucket(d['theme']), true, Boolean(d._pop)));
         marker.setZIndexOffset(1000);
 
         map.flyTo(marker.getLatLng(), map.getZoom() > 8 ? map.getZoom() : 8, { duration: 0.6 });
@@ -469,7 +474,7 @@ function generateRatioBoundedMarkers(targetCount, geoJsonLayer, filterStateName)
             }
 
             if (pt) {
-                generatedPoints.push(pt);
+                generatedPoints.push({ pt, row });
                 // Append isolated state identity
                 row['_state'] = filterStateName;
                 row['_is_dummy'] = true;
@@ -478,7 +483,7 @@ function generateRatioBoundedMarkers(targetCount, geoJsonLayer, filterStateName)
 
                 const bucket = getDomainBucket(row['theme']);
 
-                const markerFlags = { icon: createMarkerIcon(bucket, false) };
+                const markerFlags = { icon: createMarkerIcon(bucket, false, Boolean(row._pop)) };
 
                 const marker = L.marker(pt, markerFlags);
                 const isNew = (row['type'] || '').toLowerCase() === 'new';
@@ -515,6 +520,15 @@ function generateRatioBoundedMarkers(targetCount, geoJsonLayer, filterStateName)
             stateName: filterStateName
         });
 
+        // Ensure any base markers that are overlapped get the pop animation.
+        filteredRows.forEach((row) => {
+            if (!row._pop || row._overlay) return;
+            const idx = filteredRows.indexOf(row);
+            if (!rowMarkerMap.has(idx)) return;
+            const marker = rowMarkerMap.get(idx);
+            marker.setIcon(createMarkerIcon(getDomainBucket(row['theme']), false, true));
+        });
+
         // Plot any newly appended overlay dummy rows.
         filteredRows.forEach((row) => {
             if (!row._is_dummy || !row._overlay) return;
@@ -523,7 +537,7 @@ function generateRatioBoundedMarkers(targetCount, geoJsonLayer, filterStateName)
             if (!pt) return;
             const bucket = getDomainBucket(row['theme']);
             const marker = L.marker(pt, {
-                icon: createMarkerIcon(bucket, false),
+                icon: createMarkerIcon(bucket, false, false),
                 zIndexOffset: 1000
             });
             const popupHtml = `
@@ -586,6 +600,12 @@ function assignMarkersToStates(stateGeoJsonLayer) {
                         .filter(r => r._pt && !r._overlay);
                     if (validOthers.length > 0) {
                         const base = validOthers[Math.floor(Math.random() * validOthers.length)];
+                        base._pop = true;
+                        const baseIdx = allCsvRows.indexOf(base);
+                        if (baseIdx !== -1 && rowMarkerMap.has(baseIdx)) {
+                            const baseMarker = rowMarkerMap.get(baseIdx);
+                            baseMarker.setIcon(createMarkerIcon(getDomainBucket(base['dk']), false, true));
+                        }
                         pt = [base._pt[0] + 0.00015, base._pt[1] - 0.00015];
                         row['_pt'] = pt;
                         row['_state'] = base['_state'];
@@ -631,7 +651,7 @@ function assignMarkersToStates(stateGeoJsonLayer) {
 
             if (pt) {
                 // Assign the state boundary name permanently to the memory model
-                const markerFlags = { icon: createMarkerIcon(bucket, false) };
+                const markerFlags = { icon: createMarkerIcon(bucket, false, Boolean(row._pop)) };
                 if (row._overlay) markerFlags.zIndexOffset = 1000;
 
                 const marker = L.marker(pt, markerFlags);
