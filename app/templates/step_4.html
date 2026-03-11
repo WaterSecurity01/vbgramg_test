@@ -543,12 +543,12 @@ function generateRatioBoundedMarkers(targetCount, geoJsonLayer, filterStateName)
             const popupHtml = `
                 <div class="popup-header" style="background: ${DOMAIN_COLORS[bucket].bg}; border: 1px solid ${DOMAIN_COLORS[bucket].bd}; border-radius: 8px;">
                     <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
-                    <h3 class="popup-title">${row['Work Name'] || 'Unnamed Work'}</h3>
+                    <h3 class="popup-title">${row['work'] || 'Unnamed Work'}</h3>
                     <span class="class-badge class-new">New</span>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
                         <p class="popup-subtitle" style="margin:0; font-weight:700;">${DOMAIN_COLORS[bucket].name}</p>
-                        <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${row['Group Name'] || '—'}</p>
+                        <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${row['group'] || '—'}</p>
                     </div>
                 </div>
             `;
@@ -655,18 +655,18 @@ function assignMarkersToStates(stateGeoJsonLayer) {
                 if (row._overlay) markerFlags.zIndexOffset = 1000;
 
                 const marker = L.marker(pt, markerFlags);
-                const isNew = (row['Classification'] || '').toLowerCase() === 'new';
-                const clsBadge = `<span class="class-badge ${isNew ? 'class-new' : 'class-repair'}">${row['Classification'] || '—'}</span>`;
+                const isNew = (row['type'] || '').toLowerCase() === 'new';
+                const clsBadge = `<span class="class-badge ${isNew ? 'class-new' : 'class-repair'}">${row['type'] || '—'}</span>`;
 
                 const popupHtml = `
                 <div class="popup-header" style="background: ${DOMAIN_COLORS[bucket].bg}; border: 1px solid ${DOMAIN_COLORS[bucket].bd}; border-radius: 8px;">
                     <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
-                    <h3 class="popup-title">${row['Work Name'] || 'Unnamed Work'}</h3>
+                    <h3 class="popup-title">${row['work'] || 'Unnamed Work'}</h3>
                     ${clsBadge}
                     </div>
                     <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
                         <p class="popup-subtitle" style="margin:0; font-weight:700;">${DOMAIN_COLORS[bucket].name}</p>
-                        <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${row['Group Name'] || '—'}</p>
+                        <p class="popup-subtitle" style="margin:0; opacity:0.8;"><i class="fa-solid fa-layer-group" style="margin-right: 4px;"></i>${row['group'] || '—'}</p>
                     </div>
                 </div>
                 `;
