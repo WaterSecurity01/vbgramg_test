@@ -22,7 +22,7 @@
             {% set labels = ['Gap Analysis','VBGRAMG Works','VGP Stack','VGP AAP','Yuktdhara'] %}
             {% for step in range(1, 5) %}
             <div class="step-wrapper">
-                <a href="{{url_for('routes.step_' + step|string)}}" class="step {% if current_step >= step %}active{% endif %}">{{step-1}}</a>
+                <a href="{{url_for('routes.step_' + step|string)}}" class="step {% if current_step >= step %}active{% endif %}">{{step}}</a>
                 <span class="step-label {% if current_step >= step %}active{% endif %}">{{labels[loop.index-1]}}</span>
             </div>
             {% endfor %}
